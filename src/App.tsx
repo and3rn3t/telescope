@@ -5,10 +5,12 @@ import { fetchJWSTImages } from '@/lib/nasa-api'
 import { Timeline } from '@/components/Timeline'
 import { ImageDetailDialog } from '@/components/ImageDetailDialog'
 import { FilterControls } from '@/components/FilterControls'
+import { InfoTooltip } from '@/components/InfoTooltip'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { Sparkle, Heart } from '@phosphor-icons/react'
+import { generalTooltips } from '@/lib/educational-tooltips'
 
 function App() {
   const [images, setImages] = useState<JWSTImage[]>([])
@@ -89,9 +91,16 @@ function App() {
                       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                         JWST Deep Sky Explorer
                       </h1>
-                      <p className="text-sm text-muted-foreground mt-0.5">
-                        Journey through space and time
-                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-sm text-muted-foreground">
+                          Journey through space and time
+                        </p>
+                        <InfoTooltip 
+                          content={generalTooltips.cosmicTimeline}
+                          side="bottom"
+                          iconSize={14}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -152,6 +161,13 @@ function App() {
                     {filteredImages.length} {filteredImages.length === 1 ? 'image' : 'images'}
                     {activeTab === 'all' && ' • Sorted by distance from Earth'}
                   </p>
+                  {activeTab === 'all' && (
+                    <InfoTooltip 
+                      content={generalTooltips.infraredVision}
+                      side="bottom"
+                      iconSize={14}
+                    />
+                  )}
                 </div>
                 
                 <Timeline

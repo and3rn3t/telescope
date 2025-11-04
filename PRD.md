@@ -40,6 +40,13 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Progression**: User favorites image → Visual confirmation → Can toggle to "My Collection" view → Sees all favorited images → Can unfavorite → Returns to main timeline
 - **Success criteria**: Favorites persist across sessions using useKV, collection view shows all favorited images with same detail capabilities
 
+### 5. Educational Tooltips
+- **Functionality**: Interactive information tooltips throughout the app explaining JWST instruments, cosmic distances, and astronomical concepts
+- **Purpose**: Transform the app into an educational experience, helping users understand what they're seeing and how JWST works
+- **Trigger**: User hovers over or taps info icons next to instruments, distances, object types, and key features
+- **Progression**: User encounters info icon → Hovers/taps → Tooltip appears with title, description, and detailed explanation → User learns → Continues exploring with enhanced understanding
+- **Success criteria**: Tooltips appear smoothly, content is scientifically accurate yet accessible, users gain deeper understanding of JWST capabilities and cosmic phenomena
+
 ## Edge Case Handling
 
 - **API Failures**: Display friendly error message with retry option, show cached/default images if available
@@ -128,7 +135,7 @@ Animations should feel like smooth camera movements through space - gentle, purp
   - **X** (phosphor): For closing modals and clearing filters
   - **Planet, Spiral, Sparkle, Star** (phosphor): For category filters
   - **ArrowLeft** (phosphor): For back navigation
-  - **Info** (phosphor): For metadata tooltips
+  - **Info** (phosphor): For educational tooltips explaining instruments, distances, and concepts
 
 - **Spacing**:
   - Container padding: `p-6` (24px) on desktop, `p-4` (16px) on mobile

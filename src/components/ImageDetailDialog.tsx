@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { X, Heart } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
+import { InfoTooltip } from '@/components/InfoTooltip'
+import { instrumentTooltips, distanceTooltips, objectTypeTooltips } from '@/lib/educational-tooltips'
 
 interface ImageDetailDialogProps {
   image: JWSTImage | null
@@ -70,9 +72,16 @@ export function ImageDetailDialog({
             <ScrollArea className="flex-1">
               <div className="p-6 space-y-6">
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    Cosmic Distance
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                      Cosmic Distance
+                    </h3>
+                    <InfoTooltip 
+                      content={distanceTooltips.lookbackTime}
+                      side="right"
+                      iconSize={14}
+                    />
+                  </div>
                   <div className="space-y-1">
                     <p className="text-3xl font-bold text-accent font-mono">
                       {image.lookbackTime}
@@ -80,6 +89,14 @@ export function ImageDetailDialog({
                     <p className="text-sm text-muted-foreground">
                       Light from this object has traveled for {image.lookbackTime?.toLowerCase()} to reach us
                     </p>
+                    <div className="pt-2">
+                      <InfoTooltip 
+                        content={distanceTooltips.cosmicDistance}
+                        side="bottom"
+                        iconSize={14}
+                        className="text-xs"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -99,16 +116,51 @@ export function ImageDetailDialog({
                     <Separator className="bg-border" />
                     
                     <div className="space-y-3">
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                        Observation Details
-                      </h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                          Observation Details
+                        </h3>
+                        <InfoTooltip 
+                          content={{
+                            title: "How JWST Observes",
+                            description: "Each instrument and target type reveals different secrets about the universe.",
+                            details: "JWST's instruments work together to build a complete picture. Instruments detect different wavelengths of infrared light, revealing temperature, composition, and structure hidden from visible light telescopes."
+                          }}
+                          side="right"
+                          iconSize={14}
+                        />
+                      </div>
                       <div className="flex flex-wrap gap-2">
-                        {image.instrument && (
+                        {image.instrument && instrumentTooltips[image.instrument] && (
+                          <div className="flex items-center gap-1.5 group">
+                            <Badge variant="secondary" className="bg-primary/20 text-primary-foreground">
+                              {image.instrument}
+                            </Badge>
+                            <InfoTooltip 
+                              content={instrumentTooltips[image.instrument]}
+                              side="bottom"
+                              iconSize={12}
+                            />
+                          </div>
+                        )}
+                        {!image.instrument && image.instrument && (
                           <Badge variant="secondary" className="bg-primary/20 text-primary-foreground">
                             {image.instrument}
                           </Badge>
                         )}
-                        {image.objectType && (
+                        {image.objectType && objectTypeTooltips[image.objectType] && (
+                          <div className="flex items-center gap-1.5 group">
+                            <Badge variant="outline" className="border-border text-card-foreground capitalize">
+                              {image.objectType}
+                            </Badge>
+                            <InfoTooltip 
+                              content={objectTypeTooltips[image.objectType]}
+                              side="bottom"
+                              iconSize={12}
+                            />
+                          </div>
+                        )}
+                        {!image.objectType && image.objectType && (
                           <Badge variant="outline" className="border-border text-card-foreground capitalize">
                             {image.objectType}
                           </Badge>

@@ -3,6 +3,8 @@ import { Card } from '@/components/ui/card'
 import { Heart } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { InfoTooltip } from '@/components/InfoTooltip'
+import { distanceTooltips } from '@/lib/educational-tooltips'
 
 interface ImageCardProps {
   image: JWSTImage
@@ -58,9 +60,17 @@ export function ImageCard({ image, isFavorited, onImageClick, onFavoriteToggle }
           </h3>
           
           <div className="flex items-center justify-between text-xs">
-            <span className="text-accent font-medium font-mono">
-              {image.lookbackTime}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-accent font-medium font-mono">
+                {image.lookbackTime}
+              </span>
+              <InfoTooltip 
+                content={distanceTooltips.lightYear}
+                side="top"
+                iconSize={12}
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+            </div>
             {image.instrument && (
               <span className="px-2 py-1 rounded-full bg-primary/20 text-primary-foreground text-xs">
                 {image.instrument}

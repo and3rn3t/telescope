@@ -6,10 +6,12 @@ import { Timeline } from '@/components/Timeline'
 import { ImageDetailDialog } from '@/components/ImageDetailDialog'
 import { FilterControls } from '@/components/FilterControls'
 import { InfoTooltip } from '@/components/InfoTooltip'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TelescopeAnatomy } from '@/components/TelescopeAnatomy'
+import { SpaceTrajectory } from '@/components/SpaceTrajectory'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
-import { Sparkle, Heart } from '@phosphor-icons/react'
+import { Sparkle, Heart, Cube, Planet } from '@phosphor-icons/react'
 import { generalTooltips } from '@/lib/educational-tooltips'
 
 function App() {
@@ -17,6 +19,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState<JWSTImage | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all')
+  const [mainView, setMainView] = useState<'explore' | 'anatomy' | 'trajectory'>('explore')
   const [favorites, setFavorites] = useKV<string[]>('jwst-favorites', [])
   const [filters, setFilters] = useState<FilterState>({
     objectType: 'all',
@@ -105,79 +108,105 @@ function App() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'favorites')}>
-                    <TabsList>
-                      <TabsTrigger value="all" className="gap-2">
-                        <Sparkle size={16} />
-                        Explore All
-                      </TabsTrigger>
-                      <TabsTrigger value="favorites" className="gap-2">
-                        <Heart size={16} weight={(favorites?.length || 0) > 0 ? "fill" : "regular"} />
-                        My Collection
-                        {(favorites?.length || 0) > 0 && (
-                          <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
-                            {favorites?.length || 0}
-                          </span>
-                        )}
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
+                <Tabs value={mainView} onValueChange={(v) => setMainView(v as any)}>
+                  <TabsList>
+                    <TabsTrigger value="explore" className="gap-2">
+                      <Sparkle size={16} />
+                      Image Explorer
+                    </TabsTrigger>
+                    <TabsTrigger value="anatomy" className="gap-2">
+                      <Cube size={16} />
+                      Telescope Anatomy
+                    </TabsTrigger>
+                    <TabsTrigger value="trajectory" className="gap-2">
+                      <Planet size={16} />
+                      Mission & Orbit
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
 
-                  <FilterControls filters={filters} onFilterChange={setFilters} />
-                </div>
+                {mainView === 'explore' && (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'favorites')}>
+                      <TabsList>
+                        <TabsTrigger value="all" className="gap-2">
+                          <Sparkle size={16} />
+                          Explore All
+                        </TabsTrigger>
+                        <TabsTrigger value="favorites" className="gap-2">
+                          <Heart size={16} weight={(favorites?.length || 0) > 0 ? "fill" : "regular"} />
+                          My Collection
+                          {(favorites?.length || 0) > 0 && (
+                            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
+                              {favorites?.length || 0}
+                            </span>
+                          )}
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+
+                    <FilterControls filters={filters} onFilterChange={setFilters} />
+                  </div>
+                )}
               </div>
             </div>
           </header>
 
           <main className="container mx-auto px-4 sm:px-6 py-8">
-            {loading ? (
-              <div className="flex gap-4 overflow-hidden pb-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex-shrink-0 w-72">
-                    <Skeleton className="w-full aspect-square rounded-lg" />
-                    <Skeleton className="w-3/4 h-4 mt-4" />
-                    <Skeleton className="w-1/2 h-3 mt-2" />
+            {mainView === 'explore' && (
+              <>
+                {loading ? (
+                  <div className="flex gap-4 overflow-hidden pb-6">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex-shrink-0 w-72">
+                        <Skeleton className="w-full aspect-square rounded-lg" />
+                        <Skeleton className="w-3/4 h-4 mt-4" />
+                        <Skeleton className="w-1/2 h-3 mt-2" />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : activeTab === 'favorites' && (favorites?.length || 0) === 0 ? (
-              <div className="flex flex-col items-center justify-center h-96 text-center">
-                <div className="p-6 rounded-full bg-muted/50 mb-4">
-                  <Heart size={48} className="text-muted-foreground" />
-                </div>
-                <h2 className="text-2xl font-semibold mb-2">No favorites yet</h2>
-                <p className="text-muted-foreground max-w-md">
-                  Start exploring and add images to your collection by clicking the heart icon
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex items-baseline gap-3">
-                  <h2 className="text-xl font-semibold">
-                    {activeTab === 'favorites' ? 'Your Collection' : 'Cosmic Timeline'}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {filteredImages.length} {filteredImages.length === 1 ? 'image' : 'images'}
-                    {activeTab === 'all' && ' • Sorted by distance from Earth'}
-                  </p>
-                  {activeTab === 'all' && (
-                    <InfoTooltip 
-                      content={generalTooltips.infraredVision}
-                      side="bottom"
-                      iconSize={14}
+                ) : activeTab === 'favorites' && (favorites?.length || 0) === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-96 text-center">
+                    <div className="p-6 rounded-full bg-muted/50 mb-4">
+                      <Heart size={48} className="text-muted-foreground" />
+                    </div>
+                    <h2 className="text-2xl font-semibold mb-2">No favorites yet</h2>
+                    <p className="text-muted-foreground max-w-md">
+                      Start exploring and add images to your collection by clicking the heart icon
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex items-baseline gap-3">
+                      <h2 className="text-xl font-semibold">
+                        {activeTab === 'favorites' ? 'Your Collection' : 'Cosmic Timeline'}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {filteredImages.length} {filteredImages.length === 1 ? 'image' : 'images'}
+                        {activeTab === 'all' && ' • Sorted by distance from Earth'}
+                      </p>
+                      {activeTab === 'all' && (
+                        <InfoTooltip 
+                          content={generalTooltips.infraredVision}
+                          side="bottom"
+                          iconSize={14}
+                        />
+                      )}
+                    </div>
+                    
+                    <Timeline
+                      images={filteredImages}
+                      favorites={favorites || []}
+                      onImageClick={setSelectedImage}
+                      onFavoriteToggle={handleFavoriteToggle}
                     />
-                  )}
-                </div>
-                
-                <Timeline
-                  images={filteredImages}
-                  favorites={favorites || []}
-                  onImageClick={setSelectedImage}
-                  onFavoriteToggle={handleFavoriteToggle}
-                />
-              </div>
+                  </div>
+                )}
+              </>
             )}
+
+            {mainView === 'anatomy' && <TelescopeAnatomy />}
+            {mainView === 'trajectory' && <SpaceTrajectory />}
           </main>
         </div>
       </div>

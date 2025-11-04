@@ -47,6 +47,20 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Progression**: User encounters info icon → Hovers/taps → Tooltip appears with title, description, and detailed explanation → User learns → Continues exploring with enhanced understanding
 - **Success criteria**: Tooltips appear smoothly, content is scientifically accurate yet accessible, users gain deeper understanding of JWST capabilities and cosmic phenomena
 
+### 6. Telescope Anatomy Explorer
+- **Functionality**: Interactive exploration of JWST's components with detailed specifications, technical information, and explanations of each part's role
+- **Purpose**: Help users understand the engineering marvel behind the images - what each component does and why it matters
+- **Trigger**: User navigates to "Telescope Anatomy" tab in main navigation
+- **Progression**: User selects anatomy view → Sees categorized grid of components (optics, instruments, structure, power) → Filters by category → Clicks component → Detail modal opens with specifications and importance → User learns about telescope engineering → Returns to grid
+- **Success criteria**: All major components are represented, technical details are accurate yet accessible, users understand how each part contributes to JWST's mission
+
+### 7. Mission Timeline & Orbital Path
+- **Functionality**: Visual timeline showing JWST's journey from launch to its current position at L2, plus future mission phases
+- **Purpose**: Help users understand where JWST is located, how it got there, and what its orbital characteristics mean for observations
+- **Trigger**: User navigates to "Mission & Orbit" tab in main navigation
+- **Progression**: User selects trajectory view → Sees chronological timeline of mission milestones → Reads L2 orbit facts → Clicks any event → Detail modal shows full context → User understands JWST's unique orbital position and mission history
+- **Success criteria**: Timeline shows past, present, and future events clearly, L2 orbital characteristics are explained accessibly, users understand why the telescope is positioned where it is
+
 ## Edge Case Handling
 
 - **API Failures**: Display friendly error message with retry option, show cached/default images if available
@@ -55,6 +69,8 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **No Favorites Yet**: Show empty state with encouragement to explore and favorite images
 - **Filter Returns No Results**: Clear message indicating no matches with option to reset filters
 - **Very Long Distances**: Format astronomical distances appropriately (light-years, parsecs) with scientific notation when needed
+- **Component Specifications**: All technical specifications sourced from official NASA/ESA JWST documentation for accuracy
+- **Mission Timeline**: Dates and events verified against official mission records, future dates marked as estimates
 
 ## Design Direction
 
@@ -107,11 +123,11 @@ Animations should feel like smooth camera movements through space - gentle, purp
 
 - **Components**:
   - **Card**: For each image in the timeline and detail views, with hover effects that suggest interactivity - subtle glow/scale on hover
-  - **Dialog**: For full-screen image detail view with metadata overlay, allowing immersive exploration
+  - **Dialog**: For full-screen image detail view with metadata overlay and component/event detail modals
   - **ScrollArea**: For the horizontal timeline and vertical metadata sections, custom-styled for the space theme
   - **Button**: For filters, favorites, and actions - with Primary (violet) for main actions, Secondary (ghost/outline) for filters
-  - **Tabs**: For switching between "Explore All" and "My Collection" views
-  - **Badge**: For displaying observation instruments (NIRCam, MIRI, etc.) and object types
+  - **Tabs**: For switching between "Explore All" and "My Collection" views, plus main navigation between Image Explorer, Telescope Anatomy, and Mission & Orbit
+  - **Badge**: For displaying observation instruments (NIRCam, MIRI, etc.), object types, and component categories
   - **Separator**: For dividing metadata sections with subtle cosmic-themed styling
   - **Skeleton**: For loading states that suggest the image emerging from darkness
   - **Select**: For filter dropdowns (instrument, category) with custom dark styling
@@ -133,9 +149,12 @@ Animations should feel like smooth camera movements through space - gentle, purp
   - **MagnifyingGlassPlus/Minus** (phosphor): For zoom controls
   - **Funnel** (phosphor): For filter controls
   - **X** (phosphor): For closing modals and clearing filters
-  - **Planet, Spiral, Sparkle, Star** (phosphor): For category filters
+  - **Planet, Spiral, Sparkle, Star** (phosphor): For category filters and navigation
   - **ArrowLeft** (phosphor): For back navigation
   - **Info** (phosphor): For educational tooltips explaining instruments, distances, and concepts
+  - **Cube** (phosphor): For telescope anatomy section
+  - **Cpu, Eye, Lightning** (phosphor): For component categories in anatomy view
+  - **Rocket, Globe, CircleDashed** (phosphor): For mission timeline and orbit visualization
 
 - **Spacing**:
   - Container padding: `p-6` (24px) on desktop, `p-4` (16px) on mobile
@@ -150,6 +169,9 @@ Animations should feel like smooth camera movements through space - gentle, purp
   - Image detail view becomes full-screen on mobile with swipe to dismiss
   - Metadata displayed below image instead of side-by-side on small screens
   - Touch-optimized zoom gestures using pinch-to-zoom
+  - Anatomy grid switches from 3 columns to 1-2 columns on mobile
+  - Mission timeline maintains vertical orientation with adjusted spacing on mobile
+  - Main navigation tabs stack or scroll horizontally on narrow screens
 
 ## NASA API Integration Strategy
 

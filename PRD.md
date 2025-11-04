@@ -55,11 +55,11 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Success criteria**: All major components are represented with accurate 3D models, deployment sequence shows all 9 critical steps with smooth Three.js animations that accurately reflect deployment mechanics, technical details are accurate yet accessible, users can play/pause/step through the sequence, the 3D visualization provides spatial understanding of how JWST transformed from folded to deployed state
 
 ### 7. Mission Timeline & Orbital Path
-- **Functionality**: Visual timeline showing JWST's journey from launch to its current position at L2, plus future mission phases, and a real-time location tracker with interactive orbital visualization
-- **Purpose**: Help users understand where JWST is located, how it got there, what its orbital characteristics mean for observations, and see its current position in orbit around L2
+- **Functionality**: Visual timeline showing JWST's journey from launch to its current position at L2, plus future mission phases, a real-time location tracker with interactive orbital visualization, and the telescope's next scheduled observation target
+- **Purpose**: Help users understand where JWST is located, how it got there, what its orbital characteristics mean for observations, see its current position in orbit around L2, and discover what the telescope will observe next
 - **Trigger**: User navigates to "Mission & Orbit" tab in main navigation
-- **Progression**: User selects trajectory view → Sees real-time location tracker with animated canvas showing JWST's current position → Views live mission statistics (distance, duration, orbit number) → Scrolls to chronological timeline of mission milestones → Reads L2 orbit facts → Clicks any event → Detail modal shows full context → User understands JWST's unique orbital position and mission history
-- **Success criteria**: Real-time canvas animation smoothly updates JWST's position, live statistics display accurate mission data, timeline shows past, present, and future events clearly, L2 orbital characteristics are explained accessibly, users understand why the telescope is positioned where it is
+- **Progression**: User selects trajectory view → Sees real-time location tracker with animated canvas showing JWST's current position → Views the next scheduled observation target with countdown timer showing time until observation begins → Reads target details including scientific objectives, coordinates, instrument, and principal investigator → Can refresh to see updated schedule → Scrolls to chronological timeline of mission milestones → Reads L2 orbit facts → Clicks any event → Detail modal shows full context → User understands JWST's unique orbital position, mission history, and upcoming observations
+- **Success criteria**: Real-time canvas animation smoothly updates JWST's position, live statistics display accurate mission data, next observation displays with realistic target information generated via LLM, countdown timer updates every second, observation details are scientifically plausible and engaging, timeline shows past, present, and future events clearly, L2 orbital characteristics are explained accessibly, users understand why the telescope is positioned where it is and what it will study next
 
 ## Edge Case Handling
 
@@ -73,6 +73,7 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Mission Timeline**: Dates and events verified against official mission records, future dates marked as estimates
 - **Deployment Sequence Animation**: Handle play/pause/skip controls gracefully, show progress indicator, allow direct navigation to any step, Three.js animation smoothly transitions between deployment states with proper easing and realistic movement, cleanup WebGL resources on unmount to prevent memory leaks
 - **Real-Time Location Tracker**: Canvas animation handles window resize gracefully, calculations account for actual mission duration since launch (Dec 25, 2021), orbit animation loops smoothly with proper timing, handles long-running sessions without memory leaks by properly cleaning up animation frames
+- **Next Observation Schedule**: LLM-generated observation targets are scientifically plausible with realistic cosmic objects, instruments, and research objectives, countdown timer handles edge cases (negative time, very long durations), refresh functionality provides varied observation targets, handles API failures gracefully with error messages
 
 ## Design Direction
 
@@ -158,6 +159,7 @@ Animations should feel like smooth camera movements through space - gentle, purp
   - **Cube** (phosphor): For telescope anatomy section
   - **Cpu, Eye, Lightning** (phosphor): For component categories in anatomy view
   - **Rocket, Globe, CircleDashed, MapPin, Timer** (phosphor): For mission timeline, orbit visualization, and real-time location tracker
+  - **Binoculars, Clock, ArrowRight** (phosphor): For next observation schedule display with countdown and refresh
   - **Play, Pause, SkipForward, SkipBack, ArrowCounterClockwise** (phosphor): For deployment sequence animation controls
   - **CheckCircle** (phosphor): For completed deployment steps
 

@@ -4,14 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { MapPin, Globe, Rocket, Timer } from '@phosphor-icons/react'
 import { InfoTooltip } from '@/components/InfoTooltip'
 
-interface OrbitPosition {
-  x: number
-  y: number
-  angle: number
-}
-
 export function LocationTracker() {
-  const [position, setPosition] = useState<OrbitPosition>({ x: 0, y: 0, angle: 0 })
   const [elapsedTime, setElapsedTime] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number | undefined>(undefined)
@@ -24,16 +17,7 @@ export function LocationTracker() {
     const now = new Date()
     const daysSinceLaunch = (now.getTime() - launchDate.getTime()) / (1000 * 60 * 60 * 24)
     setElapsedTime(daysSinceLaunch)
-
-    const orbitProgress = (daysSinceLaunch % orbitPeriod) / orbitPeriod
-    const angle = orbitProgress * Math.PI * 2
-
-    setPosition({
-      x: Math.cos(angle) * 0.4,
-      y: Math.sin(angle) * 0.15,
-      angle: angle
-    })
-  }, [launchDate, orbitPeriod])
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -78,12 +62,6 @@ export function LocationTracker() {
 
       const jwstX = centerX + Math.cos(angle) * scale * 0.4
       const jwstY = centerY + Math.sin(angle) * scale * 0.15
-
-      setPosition({
-        x: Math.cos(angle) * 0.4,
-        y: Math.sin(angle) * 0.15,
-        angle: angle
-      })
 
       const gradient = ctx.createRadialGradient(jwstX, jwstY, 0, jwstX, jwstY, 15)
       gradient.addColorStop(0, 'oklch(0.65 0.20 50)')

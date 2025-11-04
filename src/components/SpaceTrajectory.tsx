@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Planet, Path, ShieldChevron, Drop, Rocket, Globe, CircleDashed } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
+import { LocationTracker } from '@/components/LocationTracker'
 
 const orbitFactIcons = {
   orbit: CircleDashed,
@@ -39,6 +40,8 @@ export function SpaceTrajectory() {
           </p>
         </div>
       </div>
+
+      <LocationTracker />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">

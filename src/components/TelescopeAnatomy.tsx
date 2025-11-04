@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Eye, Cpu, Cube, Lightning } from '@phosphor-icons/react'
+import { Eye, Cpu, Cube, Lightning, SquaresFour } from '@phosphor-icons/react'
+import { Telescope3D } from '@/components/Telescope3D'
 
 const categoryIcons = {
   optics: Eye,
@@ -32,6 +33,7 @@ const categoryLabels = {
 export function TelescopeAnatomy() {
   const [selectedComponent, setSelectedComponent] = useState<TelescopeComponent | null>(null)
   const [activeCategory, setActiveCategory] = useState<'all' | TelescopeComponent['category']>('all')
+  const [viewMode, setViewMode] = useState<'3d' | 'grid'>('3d')
 
   const filteredComponents = activeCategory === 'all'
     ? telescopeComponents
@@ -47,61 +49,86 @@ export function TelescopeAnatomy() {
           </p>
         </div>
 
-        <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as any)}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="all">All Parts</TabsTrigger>
-            <TabsTrigger value="optics" className="gap-2">
-              <Eye size={16} />
-              Optics
-            </TabsTrigger>
-            <TabsTrigger value="instruments" className="gap-2">
-              <Cpu size={16} />
-              Instruments
-            </TabsTrigger>
-            <TabsTrigger value="structure" className="gap-2">
-              <Cube size={16} />
-              Structure
-            </TabsTrigger>
-            <TabsTrigger value="power" className="gap-2">
-              <Lightning size={16} />
-              Power
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex flex-col sm:flex-row gap-4 justify-between">
+          <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as any)}>
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="all">All Parts</TabsTrigger>
+              <TabsTrigger value="optics" className="gap-2">
+                <Eye size={16} />
+                Optics
+              </TabsTrigger>
+              <TabsTrigger value="instruments" className="gap-2">
+                <Cpu size={16} />
+                Instruments
+              </TabsTrigger>
+              <TabsTrigger value="structure" className="gap-2">
+                <Cube size={16} />
+                Structure
+              </TabsTrigger>
+              <TabsTrigger value="power" className="gap-2">
+                <Lightning size={16} />
+                Power
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
+            <TabsList>
+              <TabsTrigger value="3d" className="gap-2">
+                <Cube size={16} />
+                3D View
+              </TabsTrigger>
+              <TabsTrigger value="grid" className="gap-2">
+                <SquaresFour size={16} />
+                Grid View
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredComponents.map((component) => {
-          const Icon = categoryIcons[component.category]
-          return (
-            <Card
-              key={component.id}
-              className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"
-              onClick={() => setSelectedComponent(component)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{component.name}</CardTitle>
+      {viewMode === '3d' ? (
+        <div className="w-full h-[600px] rounded-lg border border-border overflow-hidden bg-background">
+          <Telescope3D
+            components={filteredComponents}
+            selectedComponent={selectedComponent}
+            onComponentClick={setSelectedComponent}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredComponents.map((component) => {
+            const Icon = categoryIcons[component.category]
+            return (
+              <Card
+                key={component.id}
+                className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"
+                onClick={() => setSelectedComponent(component)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{component.name}</CardTitle>
+                    </div>
+                    <Badge className={categoryColors[component.category]}>
+                      <Icon size={14} className="mr-1" />
+                      {categoryLabels[component.category]}
+                    </Badge>
                   </div>
-                  <Badge className={categoryColors[component.category]}>
-                    <Icon size={14} className="mr-1" />
-                    {categoryLabels[component.category]}
-                  </Badge>
-                </div>
-                <CardDescription className="line-clamp-2">
-                  {component.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="secondary" className="w-full" size="sm">
-                  View Details
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                  <CardDescription className="line-clamp-2">
+                    {component.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="secondary" className="w-full" size="sm">
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+      )}
 
       <Dialog open={!!selectedComponent} onOpenChange={() => setSelectedComponent(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh]">

@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Eye, Cpu, Cube, Lightning, SquaresFour } from '@phosphor-icons/react'
+import { Eye, Cpu, Cube, Lightning, SquaresFour, Rocket } from '@phosphor-icons/react'
 import { Telescope3D } from '@/components/Telescope3D'
+import { DeploymentSequence } from '@/components/DeploymentSequence'
 
 const categoryIcons = {
   optics: Eye,
@@ -33,7 +34,7 @@ const categoryLabels = {
 export function TelescopeAnatomy() {
   const [selectedComponent, setSelectedComponent] = useState<TelescopeComponent | null>(null)
   const [activeCategory, setActiveCategory] = useState<'all' | TelescopeComponent['category']>('all')
-  const [viewMode, setViewMode] = useState<'3d' | 'grid'>('3d')
+  const [viewMode, setViewMode] = useState<'3d' | 'grid' | 'deployment'>('3d')
 
   const filteredComponents = activeCategory === 'all'
     ? telescopeComponents
@@ -82,6 +83,10 @@ export function TelescopeAnatomy() {
                 <SquaresFour size={16} />
                 Grid View
               </TabsTrigger>
+              <TabsTrigger value="deployment" className="gap-2">
+                <Rocket size={16} />
+                Deployment
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -95,6 +100,8 @@ export function TelescopeAnatomy() {
             onComponentClick={setSelectedComponent}
           />
         </div>
+      ) : viewMode === 'deployment' ? (
+        <DeploymentSequence />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredComponents.map((component) => {

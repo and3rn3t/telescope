@@ -48,11 +48,11 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Success criteria**: Tooltips appear smoothly, content is scientifically accurate yet accessible, users gain deeper understanding of JWST capabilities and cosmic phenomena
 
 ### 6. Telescope Anatomy Explorer
-- **Functionality**: Interactive exploration of JWST's components with detailed specifications, technical information, and explanations of each part's role
-- **Purpose**: Help users understand the engineering marvel behind the images - what each component does and why it matters
+- **Functionality**: Interactive exploration of JWST's components with detailed specifications, technical information, explanations of each part's role, plus animated deployment sequence
+- **Purpose**: Help users understand the engineering marvel behind the images - what each component does and why it matters, and how this complex spacecraft unfolded in space
 - **Trigger**: User navigates to "Telescope Anatomy" tab in main navigation
-- **Progression**: User selects anatomy view → Sees categorized grid of components (optics, instruments, structure, power) → Filters by category → Clicks component → Detail modal opens with specifications and importance → User learns about telescope engineering → Returns to grid
-- **Success criteria**: All major components are represented, technical details are accurate yet accessible, users understand how each part contributes to JWST's mission
+- **Progression**: User selects anatomy view → Can switch between 3D visualization, grid view, or deployment sequence → In deployment mode: Watches/controls animated sequence of JWST unfolding over 14 days → Sees step-by-step animations with technical details → Learns about critical deployment moments → In other modes: Sees categorized components → Filters by category → Clicks component → Detail modal opens
+- **Success criteria**: All major components are represented, deployment sequence shows all 9 critical steps with accurate timing and visuals, technical details are accurate yet accessible, users understand both the parts and the incredible deployment process
 
 ### 7. Mission Timeline & Orbital Path
 - **Functionality**: Visual timeline showing JWST's journey from launch to its current position at L2, plus future mission phases
@@ -71,6 +71,7 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Very Long Distances**: Format astronomical distances appropriately (light-years, parsecs) with scientific notation when needed
 - **Component Specifications**: All technical specifications sourced from official NASA/ESA JWST documentation for accuracy
 - **Mission Timeline**: Dates and events verified against official mission records, future dates marked as estimates
+- **Deployment Sequence Animation**: Handle play/pause/skip controls gracefully, show progress indicator, allow direct navigation to any step
 
 ## Design Direction
 
@@ -113,11 +114,12 @@ The typefaces should convey scientific credibility while maintaining elegance an
 
 Animations should feel like smooth camera movements through space - gentle, purposeful, and never rushed. The cosmic theme calls for floating, drifting movements that suggest weightlessness and vast distances, with transitions that feel like traveling between celestial objects.
 
-- **Purposeful Meaning**: Motion reinforces the concept of traveling through space and time - images drift in like distant objects coming into view, the timeline scrolls with momentum suggesting vast distances
+- **Purposeful Meaning**: Motion reinforces the concept of traveling through space and time - images drift in like distant objects coming into view, the timeline scrolls with momentum suggesting vast distances, deployment animations show the intricate choreography of unfolding in space
 - **Hierarchy of Movement**: 
-  - Primary: Timeline scroll and image transitions (fluid, physics-based)
+  - Primary: Timeline scroll, image transitions, and deployment sequence animations (fluid, physics-based)
   - Secondary: Card hover states and zoom interactions (subtle scale and glow)
   - Tertiary: Filter updates and favorites (quick confirmations)
+  - Deployment: Each step animates in with smooth transitions, SVG elements unfold/extend to match real deployment mechanics
 
 ## Component Selection
 
@@ -155,6 +157,8 @@ Animations should feel like smooth camera movements through space - gentle, purp
   - **Cube** (phosphor): For telescope anatomy section
   - **Cpu, Eye, Lightning** (phosphor): For component categories in anatomy view
   - **Rocket, Globe, CircleDashed** (phosphor): For mission timeline and orbit visualization
+  - **Play, Pause, SkipForward, SkipBack, ArrowCounterClockwise** (phosphor): For deployment sequence animation controls
+  - **CheckCircle** (phosphor): For completed deployment steps
 
 - **Spacing**:
   - Container padding: `p-6` (24px) on desktop, `p-4` (16px) on mobile

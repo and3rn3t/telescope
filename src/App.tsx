@@ -8,10 +8,11 @@ import { FilterControls } from '@/components/FilterControls'
 import { InfoTooltip } from '@/components/InfoTooltip'
 import { TelescopeAnatomy } from '@/components/TelescopeAnatomy'
 import { SpaceTrajectory } from '@/components/SpaceTrajectory'
+import { ObservationMetrics } from '@/components/ObservationMetrics'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
-import { Sparkle, Heart, Cube, Planet } from '@phosphor-icons/react'
+import { Sparkle, Heart, Cube, Planet, ChartBar } from '@phosphor-icons/react'
 import { generalTooltips } from '@/lib/educational-tooltips'
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState<JWSTImage | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all')
-  const [mainView, setMainView] = useState<'explore' | 'anatomy' | 'trajectory'>('explore')
+  const [mainView, setMainView] = useState<'explore' | 'anatomy' | 'trajectory' | 'metrics'>('explore')
   const [favorites, setFavorites] = useKV<string[]>('jwst-favorites', [])
   const [filters, setFilters] = useState<FilterState>({
     objectType: 'all',
@@ -122,6 +123,10 @@ function App() {
                       <Planet size={16} />
                       Mission & Orbit
                     </TabsTrigger>
+                    <TabsTrigger value="metrics" className="gap-2">
+                      <ChartBar size={16} />
+                      Mission Metrics
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
 
@@ -207,6 +212,7 @@ function App() {
 
             {mainView === 'anatomy' && <TelescopeAnatomy />}
             {mainView === 'trajectory' && <SpaceTrajectory />}
+            {mainView === 'metrics' && <ObservationMetrics />}
           </main>
         </div>
       </div>

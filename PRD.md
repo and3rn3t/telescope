@@ -48,11 +48,11 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Success criteria**: Tooltips appear smoothly, content is scientifically accurate yet accessible, users gain deeper understanding of JWST capabilities and cosmic phenomena
 
 ### 6. Telescope Anatomy Explorer
-- **Functionality**: Interactive exploration of JWST's components with detailed specifications, technical information, explanations of each part's role, plus animated deployment sequence
+- **Functionality**: Interactive exploration of JWST's components with detailed specifications, technical information, explanations of each part's role, plus interactive 3D deployment sequence using Three.js
 - **Purpose**: Help users understand the engineering marvel behind the images - what each component does and why it matters, and how this complex spacecraft unfolded in space
 - **Trigger**: User navigates to "Telescope Anatomy" tab in main navigation
-- **Progression**: User selects anatomy view → Can switch between 3D visualization, grid view, or deployment sequence → In deployment mode: Watches/controls animated sequence of JWST unfolding over 14 days → Sees step-by-step animations with technical details → Learns about critical deployment moments → In other modes: Sees categorized components → Filters by category → Clicks component → Detail modal opens
-- **Success criteria**: All major components are represented, deployment sequence shows all 9 critical steps with accurate timing and visuals, technical details are accurate yet accessible, users understand both the parts and the incredible deployment process
+- **Progression**: User selects anatomy view → Can switch between 3D visualization, grid view, or deployment sequence → In deployment mode: Watches/controls animated 3D sequence of JWST unfolding over 14 days → Real-time Three.js animation shows mirror wings, sunshield layers, secondary mirror, solar arrays, and antenna deploying → Sees step-by-step animations with technical details → Learns about critical deployment moments → In other modes: Sees categorized components → Filters by category → Clicks component → Detail modal opens
+- **Success criteria**: All major components are represented with accurate 3D models, deployment sequence shows all 9 critical steps with smooth Three.js animations that accurately reflect deployment mechanics, technical details are accurate yet accessible, users can play/pause/step through the sequence, the 3D visualization provides spatial understanding of how JWST transformed from folded to deployed state
 
 ### 7. Mission Timeline & Orbital Path
 - **Functionality**: Visual timeline showing JWST's journey from launch to its current position at L2, plus future mission phases
@@ -71,7 +71,7 @@ A browser-based exploration tool that transforms James Webb Space Telescope imag
 - **Very Long Distances**: Format astronomical distances appropriately (light-years, parsecs) with scientific notation when needed
 - **Component Specifications**: All technical specifications sourced from official NASA/ESA JWST documentation for accuracy
 - **Mission Timeline**: Dates and events verified against official mission records, future dates marked as estimates
-- **Deployment Sequence Animation**: Handle play/pause/skip controls gracefully, show progress indicator, allow direct navigation to any step
+- **Deployment Sequence Animation**: Handle play/pause/skip controls gracefully, show progress indicator, allow direct navigation to any step, Three.js animation smoothly transitions between deployment states with proper easing and realistic movement, cleanup WebGL resources on unmount to prevent memory leaks
 
 ## Design Direction
 
@@ -114,12 +114,12 @@ The typefaces should convey scientific credibility while maintaining elegance an
 
 Animations should feel like smooth camera movements through space - gentle, purposeful, and never rushed. The cosmic theme calls for floating, drifting movements that suggest weightlessness and vast distances, with transitions that feel like traveling between celestial objects.
 
-- **Purposeful Meaning**: Motion reinforces the concept of traveling through space and time - images drift in like distant objects coming into view, the timeline scrolls with momentum suggesting vast distances, deployment animations show the intricate choreography of unfolding in space
+- **Purposeful Meaning**: Motion reinforces the concept of traveling through space and time - images drift in like distant objects coming into view, the timeline scrolls with momentum suggesting vast distances, deployment animations use Three.js to show the intricate choreography of unfolding in space with physically-based movement and realistic timing
 - **Hierarchy of Movement**: 
-  - Primary: Timeline scroll, image transitions, and deployment sequence animations (fluid, physics-based)
-  - Secondary: Card hover states and zoom interactions (subtle scale and glow)
+  - Primary: Timeline scroll, image transitions, and 3D deployment sequence animations (fluid, physics-based with realistic easing)
+  - Secondary: Card hover states, zoom interactions, and 3D model rotation (subtle scale and glow)
   - Tertiary: Filter updates and favorites (quick confirmations)
-  - Deployment: Each step animates in with smooth transitions, SVG elements unfold/extend to match real deployment mechanics
+  - Deployment: Each step animates in Three.js with smooth property interpolation - mirror wings rotate open, sunshield layers scale and separate, secondary mirror extends on struts, solar panels unfold accordion-style, all with momentum-based easing that suggests movement in zero gravity
 
 ## Component Selection
 

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Play, Pause, ArrowCounterClockwise, SkipForward, SkipBack, CheckCircle } from '@phosphor-icons/react'
+import * as THREE from 'three'
 
 interface DeploymentStep {
   id: string
@@ -243,18 +244,7 @@ export function DeploymentSequence() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="relative aspect-square bg-gradient-to-br from-background via-primary/5 to-background rounded-lg border-2 border-border overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.1 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex items-center justify-center p-8"
-            >
-              <DeploymentVisualization step={step.id} />
-            </motion.div>
-          </AnimatePresence>
+          <DeploymentVisualization step={step.id} />
 
           <div className="absolute top-4 right-4">
             <Badge variant="secondary" className="text-sm font-mono">
@@ -405,291 +395,362 @@ export function DeploymentSequence() {
 }
 
 function DeploymentVisualization({ step }: { step: string }) {
-  const variants = {
-    launch: (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="70"
-          y="40"
-          width="60"
-          height="120"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.path
-          d="M 80 80 L 90 80 L 90 100 L 80 100 Z"
-          fill="currentColor"
-          className="text-primary"
-          initial={{ opacity: 0.3 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse' }}
-        />
-        <motion.path
-          d="M 110 80 L 120 80 L 120 100 L 110 100 Z"
-          fill="currentColor"
-          className="text-primary"
-          initial={{ opacity: 0.3 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse', delay: 0.2 }}
-        />
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Stowed Configuration
-        </text>
-      </svg>
-    ),
-    'solar-array': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="70"
-          y="70"
-          width="60"
-          height="60"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.g
-          initial={{ scaleX: 0, originX: '0px' }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-        >
-          <rect x="130" y="75" width="8" height="50" fill="currentColor" className="text-secondary" />
-          <rect x="138" y="75" width="8" height="50" fill="currentColor" className="text-secondary/80" />
-          <rect x="146" y="75" width="8" height="50" fill="currentColor" className="text-secondary/60" />
-        </motion.g>
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Solar Array Deployed
-        </text>
-      </svg>
-    ),
-    'antenna-deploy': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="70"
-          y="80"
-          width="60"
-          height="50"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.g
-          initial={{ rotate: -90, originX: '100px', originY: '80px' }}
-          animate={{ rotate: 0 }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-        >
-          <circle cx="100" cy="65" r="15" fill="currentColor" className="text-accent" />
-          <path
-            d="M 95 60 L 100 50 L 105 60"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-            className="text-accent-foreground"
-          />
-        </motion.g>
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Antenna Deployed
-        </text>
-      </svg>
-    ),
-    'sunshield-pallet': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="60"
-          y="60"
-          width="80"
-          height="40"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.rect
-          x="50"
-          y="100"
-          width="100"
-          height="8"
-          fill="currentColor"
-          className="text-muted"
-          initial={{ y: 60 }}
-          animate={{ y: 100 }}
-          transition={{ duration: 1.5 }}
-        />
-        <motion.rect
-          x="50"
-          y="130"
-          width="100"
-          height="8"
-          fill="currentColor"
-          className="text-muted"
-          initial={{ y: 100 }}
-          animate={{ y: 130 }}
-          transition={{ duration: 1.5, delay: 0.3 }}
-        />
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Pallet Structures
-        </text>
-      </svg>
-    ),
-    'sunshield-unfold': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="60"
-          y="50"
-          width="80"
-          height="30"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.g
-          initial={{ scaleX: 0.3, originX: '100px' }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 2, ease: 'easeInOut' }}
-        >
-          <rect x="40" y="90" width="120" height="3" fill="currentColor" className="text-accent" opacity="0.2" />
-          <rect x="40" y="95" width="120" height="3" fill="currentColor" className="text-accent" opacity="0.4" />
-          <rect x="40" y="100" width="120" height="3" fill="currentColor" className="text-accent" opacity="0.6" />
-          <rect x="40" y="105" width="120" height="3" fill="currentColor" className="text-accent" opacity="0.8" />
-          <rect x="40" y="110" width="120" height="3" fill="currentColor" className="text-accent" />
-        </motion.g>
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Sunshield Unfolding
-        </text>
-      </svg>
-    ),
-    'sunshield-tension': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="60"
-          y="40"
-          width="80"
-          height="25"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.g>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <motion.rect
-              key={i}
-              x="35"
-              y={75 + i * 10}
-              width="130"
-              height="2"
-              fill="currentColor"
-              className="text-accent"
-              opacity={1 - i * 0.15}
-              initial={{ scaleX: 0.7 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1, delay: i * 0.2 }}
-            />
-          ))}
-        </motion.g>
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Layer Tensioning
-        </text>
-      </svg>
-    ),
-    'secondary-mirror': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.rect
-          x="60"
-          y="100"
-          width="80"
-          height="40"
-          fill="currentColor"
-          className="text-primary/20"
-          rx="4"
-        />
-        <motion.g
-          initial={{ y: 30 }}
-          animate={{ y: 0 }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-        >
-          <line x1="85" y1="100" x2="100" y2="60" stroke="currentColor" strokeWidth="2" className="text-muted-foreground" />
-          <line x1="115" y1="100" x2="100" y2="60" stroke="currentColor" strokeWidth="2" className="text-muted-foreground" />
-          <ellipse cx="100" cy="60" rx="20" ry="6" fill="currentColor" className="text-secondary" />
-        </motion.g>
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Secondary Mirror Up
-        </text>
-      </svg>
-    ),
-    'primary-wings': (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.g
-          initial={{ rotate: -30, originX: '100px', originY: '100px' }}
-          animate={{ rotate: 0 }}
-          transition={{ duration: 1.5 }}
-        >
-          <path
-            d="M 50 80 L 70 70 L 70 130 L 50 120 Z"
-            fill="currentColor"
-            className="text-secondary"
-          />
-        </motion.g>
-        <path
-          d="M 70 70 L 90 80 L 90 120 L 70 130 Z"
-          fill="currentColor"
-          className="text-secondary"
-        />
-        <path
-          d="M 90 80 L 110 80 L 110 120 L 90 120 Z"
-          fill="currentColor"
-          className="text-secondary"
-        />
-        <motion.g
-          initial={{ rotate: 30, originX: '100px', originY: '100px' }}
-          animate={{ rotate: 0 }}
-          transition={{ duration: 1.5 }}
-        >
-          <path
-            d="M 110 80 L 130 70 L 130 130 L 110 120 Z"
-            fill="currentColor"
-            className="text-secondary"
-          />
-          <path
-            d="M 130 70 L 150 80 L 150 120 L 130 130 Z"
-            fill="currentColor"
-            className="text-secondary"
-          />
-        </motion.g>
-        <ellipse cx="100" cy="50" rx="15" ry="5" fill="currentColor" className="text-accent" />
-        <text x="100" y="180" textAnchor="middle" className="text-xs fill-muted-foreground">
-          Mirror Wings Open
-        </text>
-      </svg>
-    ),
-    complete: (
-      <svg viewBox="0 0 200 200" className="w-full h-full">
-        <motion.g
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <path
-            d="M 40 80 L 60 70 L 80 80 L 100 80 L 120 80 L 140 70 L 160 80 L 140 130 L 120 120 L 100 120 L 80 120 L 60 130 Z"
-            fill="currentColor"
-            className="text-secondary"
-          />
-          <ellipse cx="100" cy="50" rx="15" ry="5" fill="currentColor" className="text-accent" />
-          <rect x="30" y="140" width="140" height="2" fill="currentColor" className="text-accent" opacity="0.8" />
-          <rect x="30" y="145" width="140" height="2" fill="currentColor" className="text-accent" opacity="0.6" />
-          <rect x="30" y="150" width="140" height="2" fill="currentColor" className="text-accent" opacity="0.4" />
-        </motion.g>
-        <motion.g
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <circle cx="100" cy="100" r="50" stroke="currentColor" strokeWidth="1" fill="none" className="text-primary/20" />
-        </motion.g>
-        <text x="100" y="185" textAnchor="middle" className="text-xs fill-muted-foreground font-semibold">
-          Fully Deployed
-        </text>
-      </svg>
-    )
-  }
+  const containerRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<THREE.Scene | null>(null)
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const animationFrameRef = useRef<number | undefined>(undefined)
+  const meshesRef = useRef<{
+    primaryMirror: THREE.Group
+    secondaryMirror: THREE.Mesh
+    sunshield: THREE.Mesh[]
+    solarArray: THREE.Mesh[]
+    antenna: THREE.Group
+    instruments: THREE.Mesh[]
+    struts: THREE.Mesh[]
+    leftWing: THREE.Group
+    rightWing: THREE.Group
+  } | null>(null)
 
-  return variants[step as keyof typeof variants] || variants.launch
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const container = containerRef.current
+    const width = container.clientWidth
+    const height = container.clientHeight
+
+    const scene = new THREE.Scene()
+    scene.background = new THREE.Color(0x050510)
+    sceneRef.current = scene
+
+    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000)
+    camera.position.set(0, 3, 12)
+    camera.lookAt(0, 0, 0)
+    cameraRef.current = camera
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    renderer.setSize(width, height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    container.appendChild(renderer.domElement)
+    rendererRef.current = renderer
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
+    scene.add(ambientLight)
+
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8)
+    directionalLight1.position.set(5, 10, 5)
+    scene.add(directionalLight1)
+
+    const directionalLight2 = new THREE.DirectionalLight(0x6666ff, 0.3)
+    directionalLight2.position.set(-5, 3, -5)
+    scene.add(directionalLight2)
+
+    const pointLight = new THREE.PointLight(0xffd700, 0.5, 20)
+    pointLight.position.set(0, 0, 0)
+    scene.add(pointLight)
+
+    const primaryMirrorGroup = new THREE.Group()
+    const hexagonShape = new THREE.Shape()
+    const size = 0.35
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI) / 3
+      const x = size * Math.cos(angle)
+      const y = size * Math.sin(angle)
+      if (i === 0) {
+        hexagonShape.moveTo(x, y)
+      } else {
+        hexagonShape.lineTo(x, y)
+      }
+    }
+    hexagonShape.lineTo(size * Math.cos(0), size * Math.sin(0))
+
+    const extrudeSettings = { steps: 1, depth: 0.08, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01, bevelSegments: 3 }
+    const hexGeometry = new THREE.ExtrudeGeometry(hexagonShape, extrudeSettings)
+    const mirrorMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffd700,
+      metalness: 0.95,
+      roughness: 0.05,
+      emissive: 0xaa6600,
+      emissiveIntensity: 0.3
+    })
+
+    const centerPositions = [[0, 0]]
+    centerPositions.forEach(([x, y]) => {
+      const hex = new THREE.Mesh(hexGeometry, mirrorMaterial)
+      hex.position.set(x, y, 0)
+      primaryMirrorGroup.add(hex)
+    })
+
+    const leftWing = new THREE.Group()
+    const leftPositions = [[-0.77, 0], [-1.155, 0.66], [-1.155, -0.66], [-1.54, 0]]
+    leftPositions.forEach(([x, y]) => {
+      const hex = new THREE.Mesh(hexGeometry, mirrorMaterial)
+      hex.position.set(x, y, 0)
+      leftWing.add(hex)
+    })
+    primaryMirrorGroup.add(leftWing)
+
+    const rightWing = new THREE.Group()
+    const rightPositions = [[0.77, 0], [1.155, 0.66], [1.155, -0.66], [1.54, 0]]
+    rightPositions.forEach(([x, y]) => {
+      const hex = new THREE.Mesh(hexGeometry, mirrorMaterial)
+      hex.position.set(x, y, 0)
+      rightWing.add(hex)
+    })
+    primaryMirrorGroup.add(rightWing)
+
+    scene.add(primaryMirrorGroup)
+
+    const secondaryMirrorGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.12, 32)
+    const secondaryMirror = new THREE.Mesh(secondaryMirrorGeometry, mirrorMaterial)
+    secondaryMirror.position.set(0, 0, 3.5)
+    secondaryMirror.rotation.x = Math.PI / 2
+    scene.add(secondaryMirror)
+
+    const strutMaterial = new THREE.MeshStandardMaterial({
+      color: 0x222222,
+      metalness: 0.8,
+      roughness: 0.2
+    })
+    const struts: THREE.Mesh[] = []
+    for (let i = 0; i < 3; i++) {
+      const angle = (i * 2 * Math.PI) / 3
+      const x = Math.cos(angle) * 0.35
+      const y = Math.sin(angle) * 0.35
+      const strutGeometry = new THREE.CylinderGeometry(0.025, 0.025, 3.5, 8)
+      const strut = new THREE.Mesh(strutGeometry, strutMaterial)
+      strut.position.set(x, y, 1.75)
+      strut.rotation.x = Math.PI / 2
+      scene.add(strut)
+      struts.push(strut)
+    }
+
+    const sunshieldLayers: THREE.Mesh[] = []
+    for (let i = 0; i < 5; i++) {
+      const sunshieldGeometry = new THREE.PlaneGeometry(4.5, 3, 12, 8)
+      const sunshieldMaterial = new THREE.MeshStandardMaterial({
+        color: i % 2 === 0 ? 0xcccccc : 0xaaaaaa,
+        metalness: 0.3,
+        roughness: 0.7,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.9
+      })
+      const sunshield = new THREE.Mesh(sunshieldGeometry, sunshieldMaterial)
+      sunshield.position.set(0, 0, -2.5 - i * 0.15)
+      sunshield.rotation.x = Math.PI / 2
+      scene.add(sunshield)
+      sunshieldLayers.push(sunshield)
+    }
+
+    const solarArrayPanels: THREE.Mesh[] = []
+    for (let i = 0; i < 5; i++) {
+      const panelGeometry = new THREE.BoxGeometry(0.3, 1.8, 0.02)
+      const panelMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1a1a3e,
+        metalness: 0.7,
+        roughness: 0.3,
+        emissive: 0x0a0a2e,
+        emissiveIntensity: 0.4
+      })
+      const panel = new THREE.Mesh(panelGeometry, panelMaterial)
+      panel.position.set(3 + i * 0.3, 0, -2)
+      solarArrayPanels.push(panel)
+      scene.add(panel)
+    }
+
+    const antennaGroup = new THREE.Group()
+    const dishGeometry = new THREE.SphereGeometry(0.4, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2)
+    const dishMaterial = new THREE.MeshStandardMaterial({
+      color: 0xddaa00,
+      metalness: 0.9,
+      roughness: 0.1,
+      emissive: 0x886600,
+      emissiveIntensity: 0.2
+    })
+    const dish = new THREE.Mesh(dishGeometry, dishMaterial)
+    const armGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 8)
+    const arm = new THREE.Mesh(armGeometry, strutMaterial)
+    arm.position.y = -0.25
+    antennaGroup.add(dish, arm)
+    antennaGroup.position.set(2, 1, -1.5)
+    scene.add(antennaGroup)
+
+    const instrumentGeometry = new THREE.BoxGeometry(0.35, 0.35, 0.25)
+    const instruments: THREE.Mesh[] = []
+    const instrumentPositions = [
+      { pos: [0, -0.8, -0.3], color: 0x8844ff },
+      { pos: [-0.6, -0.8, -0.3], color: 0xff4488 },
+      { pos: [0.6, -0.8, -0.3], color: 0x44ff88 }
+    ]
+    instrumentPositions.forEach(({ pos, color }) => {
+      const material = new THREE.MeshStandardMaterial({
+        color,
+        metalness: 0.7,
+        roughness: 0.3,
+        emissive: color,
+        emissiveIntensity: 0.4
+      })
+      const mesh = new THREE.Mesh(instrumentGeometry, material)
+      mesh.position.set(pos[0], pos[1], pos[2])
+      scene.add(mesh)
+      instruments.push(mesh)
+    })
+
+    const starGeometry = new THREE.BufferGeometry()
+    const starPositions: number[] = []
+    for (let i = 0; i < 2000; i++) {
+      const x = (Math.random() - 0.5) * 200
+      const y = (Math.random() - 0.5) * 200
+      const z = (Math.random() - 0.5) * 200
+      starPositions.push(x, y, z)
+    }
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3))
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.15,
+      transparent: true,
+      opacity: 0.8
+    })
+    const stars = new THREE.Points(starGeometry, starMaterial)
+    scene.add(stars)
+
+    meshesRef.current = {
+      primaryMirror: primaryMirrorGroup,
+      secondaryMirror,
+      sunshield: sunshieldLayers,
+      solarArray: solarArrayPanels,
+      antenna: antennaGroup,
+      instruments,
+      struts,
+      leftWing,
+      rightWing
+    }
+
+    const handleResize = () => {
+      if (!containerRef.current) return
+      const newWidth = containerRef.current.clientWidth
+      const newHeight = containerRef.current.clientHeight
+      camera.aspect = newWidth / newHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(newWidth, newHeight)
+    }
+    window.addEventListener('resize', handleResize)
+
+    const clock = new THREE.Clock()
+    const animate = () => {
+      animationFrameRef.current = requestAnimationFrame(animate)
+      const elapsed = clock.getElapsedTime()
+
+      primaryMirrorGroup.rotation.y = Math.sin(elapsed * 0.3) * 0.1
+      stars.rotation.y += 0.0001
+      stars.rotation.x += 0.00005
+
+      renderer.render(scene, camera)
+    }
+    animate()
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      window.removeEventListener('resize', handleResize)
+      renderer.dispose()
+      container.removeChild(renderer.domElement)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!meshesRef.current) return
+
+    const meshes = meshesRef.current
+
+    switch (step) {
+      case 'launch':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 0.5
+        meshes.struts.forEach(s => { s.scale.z = 0.2 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(0.3, 0.3, 1); s.position.z = -1 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = -Math.PI / 2; p.position.x = 0.5 })
+        meshes.antenna.rotation.x = -Math.PI / 2
+        break
+
+      case 'solar-array':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 0.5
+        meshes.struts.forEach(s => { s.scale.z = 0.2 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(0.3, 0.3, 1); s.position.z = -1 })
+        meshes.solarArray.forEach((p, i) => { 
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
+        meshes.antenna.rotation.x = -Math.PI / 2
+        break
+
+      case 'antenna-deploy':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 0.5
+        meshes.struts.forEach(s => { s.scale.z = 0.2 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(0.3, 0.3, 1); s.position.z = -1 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.antenna.rotation.x = 0
+        break
+
+      case 'sunshield-pallet':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 0.5
+        meshes.struts.forEach(s => { s.scale.z = 0.2 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(0.5, 0.5, 1); s.position.z = -1.5 - i * 0.05 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.antenna.rotation.x = 0
+        break
+
+      case 'sunshield-unfold':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 0.5
+        meshes.struts.forEach(s => { s.scale.z = 0.2 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.2 - i * 0.08 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.antenna.rotation.x = 0
+        break
+
+      case 'sunshield-tension':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 0.5
+        meshes.struts.forEach(s => { s.scale.z = 0.2 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.5 - i * 0.15 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.antenna.rotation.x = 0
+        break
+
+      case 'secondary-mirror':
+        meshes.leftWing.rotation.y = -Math.PI / 3
+        meshes.rightWing.rotation.y = Math.PI / 3
+        meshes.secondaryMirror.position.z = 3.5
+        meshes.struts.forEach(s => { s.scale.z = 1 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.5 - i * 0.15 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.antenna.rotation.x = 0
+        break
+
+      case 'primary-wings':
+      case 'complete':
+        meshes.leftWing.rotation.y = 0
+        meshes.rightWing.rotation.y = 0
+        meshes.secondaryMirror.position.z = 3.5
+        meshes.struts.forEach(s => { s.scale.z = 1 })
+        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.5 - i * 0.15 })
+        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.antenna.rotation.x = 0
+        break
+    }
+  }, [step])
+
+  return <div ref={containerRef} className="w-full h-full" />
 }

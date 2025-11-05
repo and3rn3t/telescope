@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { JWSTImage, FilterState } from '@/lib/types'
 import { fetchJWSTImages } from '@/lib/nasa-api'
 import { Timeline } from '@/components/Timeline'
@@ -11,7 +10,7 @@ import { SpaceTrajectory } from '@/components/SpaceTrajectory'
 import { ObservationMetrics } from '@/components/ObservationMetrics'
 import { LiveStatusDashboard } from '@/components/LiveStatusDashboard'
 import { TelemetryMonitor } from '@/components/TelemetryMonitor'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { Sparkle, Heart, Cube, Planet, ChartBar, Broadcast } from '@phosphor-icons/react'
@@ -23,7 +22,14 @@ function App() {
   const [selectedImage, setSelectedImage] = useState<JWSTImage | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all')
   const [mainView, setMainView] = useState<'explore' | 'anatomy' | 'trajectory' | 'metrics' | 'live'>('explore')
-  const [favorites, setFavorites] = useKV<string[]>('jwst-favorites', [])
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('jwst-favorites')
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  })
   const [filters, setFilters] = useState<FilterState>({
     objectType: 'all',
     instrument: 'all',
@@ -32,6 +38,31 @@ function App() {
 
   useEffect(() => {
     loadImages()
+    
+    // Check if we're using localStorage fallback and notify user
+    const checkSparkServices = async () => {
+      try {
+        // Try to detect if Spark services are available
+        const response = await fetch('/_spark/loaded', { 
+          method: 'POST',
+          signal: AbortSignal.timeout(2000)
+        })
+        
+        if (!response.ok && response.status === 401) {
+          toast.info('Using local storage for favorites (Spark services unavailable)', {
+            duration: 5000
+          })
+        }
+      } catch (error) {
+        // Spark services unavailable - using localStorage fallback
+        toast.info('Running in offline mode - favorites saved locally', {
+          duration: 3000
+        })
+      }
+    }
+    
+    // Delay the check to avoid interfering with initial load
+    setTimeout(checkSparkServices, 2000)
   }, [])
 
   const loadImages = async () => {
@@ -50,13 +81,25 @@ function App() {
     setFavorites((currentFavorites) => {
       const favs = currentFavorites || []
       const isFavorited = favs.includes(imageId)
+      const newFavorites = isFavorited
+        ? favs.filter(id => id !== imageId)
+        : [...favs, imageId]
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('jwst-favorites', JSON.stringify(newFavorites))
+      } catch (error) {
+        console.warn('Failed to save favorites:', error)
+      }
+      
+      // Show toast notification
       if (isFavorited) {
         toast.success('Removed from collection')
-        return favs.filter(id => id !== imageId)
       } else {
         toast.success('Added to collection')
-        return [...favs, imageId]
       }
+      
+      return newFavorites
     })
   }
 

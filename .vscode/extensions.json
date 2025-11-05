@@ -1,0 +1,44 @@
+{
+  "recommendations": [
+    // Core TypeScript/React Development
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+
+    // GitHub Spark Framework Support
+    "github.copilot",
+    "github.copilot-chat",
+    "github.vscode-github-actions",
+
+    // Essential Extensions for This Project
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json",
+
+    // 3D Development (Three.js/WebGL)
+    "slevesque.shader",
+    "raczzalan.webgl-glsl-editor",
+
+    // API Development & Testing
+    "humao.rest-client",
+    "ms-vscode.vscode-json",
+
+    // UI/UX Enhancement
+    "naumovs.color-highlight",
+    "ms-vscode.hexeditor",
+
+    // Performance & Debugging
+    "ms-vscode.js-debug",
+    "firefox-devtools.vscode-firefox-debug",
+
+    // Code Quality
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+
+    // Git Integration
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github"
+  ],
+  "unwantedRecommendations": ["ms-vscode.vscode-typescript", "hookyqr.beautify"]
+}

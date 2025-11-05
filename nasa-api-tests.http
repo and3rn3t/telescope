@@ -1,0 +1,39 @@
+# NASA API Testing - JWST Deep Sky Explorer
+# Use the REST Client extension to test these endpoints
+# Replace {{nasa_api_key}} with your actual API key
+
+@baseUrl = https://images-api.nasa.gov
+@nasa_api_key = your_nasa_api_key_here
+
+### Test Basic Connection (No API Key)
+GET {{baseUrl}}/search?q=webb&media_type=image&page_size=1
+Accept: application/json
+
+### Test with API Key (Enhanced Rate Limits)
+GET {{baseUrl}}/search?q=james webb space telescope&media_type=image&year_start=2022&page_size=5&api_key={{nasa_api_key}}
+Accept: application/json
+
+### Search Specific JWST Targets
+GET {{baseUrl}}/search?q=pillars of creation webb&media_type=image&api_key={{nasa_api_key}}
+Accept: application/json
+
+### Search by Keywords and Date Range  
+GET {{baseUrl}}/search?q=jwst galaxy&media_type=image&year_start=2022&year_end=2024&page_size=10&api_key={{nasa_api_key}}
+Accept: application/json
+
+### Get Asset Details for a Specific NASA ID
+# Replace nasa_id with actual ID from search results
+GET {{baseUrl}}/asset/GSFC_20171208_Archive_e001406
+Accept: application/json
+
+### Search JWST Nebulae
+GET {{baseUrl}}/search?q=jwst nebula&media_type=image&keywords=nebula&api_key={{nasa_api_key}}
+Accept: application/json
+
+### Search JWST Galaxies
+GET {{baseUrl}}/search?q=jwst galaxy&media_type=image&keywords=galaxy&api_key={{nasa_api_key}}
+Accept: application/json
+
+### Search Recent JWST Images (2024)
+GET {{baseUrl}}/search?q=webb&media_type=image&year_start=2024&page_size=20&api_key={{nasa_api_key}}
+Accept: application/json

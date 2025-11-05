@@ -567,21 +567,9 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
   try {
     // Multiple search strategies to get better cosmic imagery
     const searchQueries = [
-      'webb deep field galaxy space',
-      'james webb nebula cosmic',
-      'jwst galaxy cluster infrared',
-      'webb carina nebula stellar',
-      'james webb pillars creation stellar',
-      'jwst stephan quintet galactic',
-      'webb southern ring planetary nebula',
-      'james webb exoplanet atmospheric spectrum',
-      'jwst infrared cosmic observation',
-      'webb telescope deep space astronomy',
-      'james webb stellar nursery',
-      'jwst dark matter cosmic web',
-      'webb supernova remnant',
-      'james webb brown dwarf',
-      'jwst quasar distant universe',
+      'webb',
+      'james webb telescope',
+      'jwst',
     ]
 
     const allImages: JWSTImage[] = []
@@ -621,11 +609,36 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
         // Process images from this search
         const searchImages = data.collection.items
           .filter(item => item.links && item.links.length > 0)
-          .filter(item => isSpaceImageContent(item.data[0])) // Filter out non-space content
-          .filter(item => isValidSpaceImageUrl(item.links?.[0]?.href)) // Validate image URL
+          // Temporarily allow most content for debugging
+          .filter(item => {
+            const metadata = item.data[0]
+            // Only exclude obvious non-space content
+            const excludeTerms = ['portrait', 'crew photo', 'handshake', 'meeting']
+            const allText = `${metadata.title} ${metadata.description || ''}`.toLowerCase()
+            return !excludeTerms.some(term => allText.includes(term))
+          })
           .map(item => {
             const metadata = item.data[0]
-            const imageUrl = item.links?.[0]?.href || ''
+
+            // Extract different image URLs from the links array
+            const links = item.links || []
+            const thumbnailLink =
+              links.find(link => link.rel === 'preview') ||
+              links.find(link => link.href?.includes('~thumb.jpg')) ||
+              links.find(link => link.rel === 'alternate') ||
+              links[0]
+            const originalLink =
+              links.find(link => link.rel === 'canonical') ||
+              links.find(link => link.href?.includes('~orig.jpg')) ||
+              links[0]
+
+            const thumbnailUrl = thumbnailLink?.href || ''
+            const imageUrl = originalLink?.href || thumbnailUrl
+
+            // Validate that we have a valid image URL
+            if (!isValidSpaceImageUrl(thumbnailUrl)) {
+              return null
+            }
 
             const distanceData = extractDistance(metadata.title, metadata.description || '')
             const instrument = extractInstrument(metadata.keywords)
@@ -635,7 +648,7 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
               title: metadata.title,
               description: metadata.description || 'No description available',
               imageUrl: imageUrl,
-              thumbnailUrl: imageUrl,
+              thumbnailUrl: thumbnailUrl,
               dateCreated: metadata.date_created,
               distance: distanceData?.distance,
               lookbackTime: distanceData?.lookbackTime,
@@ -644,9 +657,37 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
               keywords: metadata.keywords || [],
             }
           })
-          .filter(img => img.distance !== undefined) // Only keep images with distance data
+          .filter((item): item is NonNullable<typeof item> => item !== null) // Remove invalid items
+          // Allow all images for debugging - assign default distances
+          .map(img => {
+            if (img.distance === undefined) {
+              // Add a default distance for all images without one
+              img.distance = 1000000 // 1 million light years default
+              img.lookbackTime = '1 million years'
+              img.objectType = 'galaxy'
+            }
+            return img
+          })
 
         allImages.push(...searchImages)
+
+        // Debug: Log successful image fetches in development
+        if (import.meta.env.DEV) {
+          const totalItems = data.collection.items.length
+          const validItems = data.collection.items.filter(item => item.links && item.links.length > 0).length
+          const spaceItems = data.collection.items.filter(item => item.links && item.links.length > 0 && isSpaceImageContent(item.data[0])).length
+          console.warn(`🌌 Query "${query}": ${totalItems} total → ${validItems} with links → ${spaceItems} space-related → ${searchImages.length} final`)
+          
+          if (searchImages.length > 0) {
+            for (const img of searchImages.slice(0, 3)) {
+              console.warn(`  📸 ${img.title}`)
+              console.warn(`     Thumbnail: ${img.thumbnailUrl}`)
+              console.warn(`     Distance: ${img.distance} (${img.lookbackTime})`)
+            }
+          } else {
+            console.warn(`     ❌ No images found for "${query}"`)
+          }
+        }
 
         // Small delay between requests to be respectful to the API
         await new Promise(resolve => setTimeout(resolve, 100))

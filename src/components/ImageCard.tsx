@@ -34,7 +34,7 @@ export function ImageCard({ image, isFavorited, onImageClick, onFavoriteToggle }
         )}
         onClick={() => onImageClick(image)}
       >
-        <div className="aspect-square overflow-hidden">
+        <div className="aspect-square overflow-hidden relative">
           <img
             src={image.thumbnailUrl}
             alt={image.title}
@@ -43,6 +43,34 @@ export function ImageCard({ image, isFavorited, onImageClick, onFavoriteToggle }
               isMobile ? 'group-active:scale-105' : 'group-hover:scale-110'
             )}
             loading="lazy"
+            onError={e => {
+              const target = e.target as HTMLImageElement
+              console.warn(`🖼️ Image loading failed for: ${target.src}`)
+
+              // Try to fall back to the main image URL if thumbnail fails
+              if (target.src === image.thumbnailUrl && image.imageUrl !== image.thumbnailUrl) {
+                console.warn(`🔄 Trying fallback image: ${image.imageUrl}`)
+                target.src = image.imageUrl
+              } else {
+                // If both fail, show a cosmic placeholder
+                console.warn(`❌ Both image URLs failed for: ${image.title}`)
+                target.style.display = 'none'
+                const parent = target.parentElement
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="w-full h-full bg-linear-to-br from-purple-900/20 to-blue-900/20 flex items-center justify-center">
+                      <div class="text-center text-muted-foreground">
+                        <div class="text-2xl mb-2">🌌</div>
+                        <div class="text-xs">Image unavailable</div>
+                      </div>
+                    </div>
+                  `
+                }
+              }
+            }}
+            onLoad={() => {
+              console.warn(`✅ Image loaded successfully: ${image.title}`)
+            }}
           />
         </div>
 

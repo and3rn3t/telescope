@@ -1,9 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
-import * as THREE from 'three'
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Slider } from '@/components/ui/slider'
+import { JWSTGeometries } from '@/lib/jwst-geometries'
+import { InstrumentMaterials, JWSTMaterials, SpaceEnvironment } from '@/lib/jwst-materials'
 import { TelescopeComponent } from '@/lib/telescope-data'
-import { Eye, Cpu, Cube, Lightning } from '@phosphor-icons/react'
+import {
+  ArrowsClockwise,
+  ArrowsOut,
+  Cpu,
+  Cube,
+  Eye,
+  HandTap,
+  House,
+  Info,
+  Lightning,
+  Target,
+} from '@phosphor-icons/react'
+import { Environment, Html, MeshReflectorMaterial, OrbitControls, Stars } from '@react-three/drei'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
 
 interface Telescope3DProps {
   onComponentClick: (component: TelescopeComponent) => void
@@ -11,403 +30,612 @@ interface Telescope3DProps {
   components: TelescopeComponent[]
 }
 
-interface ComponentMarker {
-  id: string
-  position: THREE.Vector3
+interface JWSTComponentProps {
+  position: [number, number, number]
+  rotation?: [number, number, number]
+  scale?: number
+  highlighted: boolean
+  onClick: () => void
   component: TelescopeComponent
-  mesh?: THREE.Mesh
-  labelDiv?: HTMLDivElement
+  exploded: number
 }
 
-const categoryIcons = {
-  optics: Eye,
-  instruments: Cpu,
-  structure: Cube,
-  power: Lightning,
+interface MirrorSegmentProps {
+  position: [number, number, number]
+  rotation: [number, number, number]
+  highlighted: boolean
+  segmentId: number
 }
 
-const categoryColors = {
-  optics: '#eab308',
-  instruments: '#8b5cf6',
-  structure: '#06b6d4',
-  power: '#f59e0b',
-}
+// Use enhanced materials from the materials library
+const Materials = JWSTMaterials
 
-const componentPositions: Record<string, [number, number, number]> = {
-  'primary-mirror': [0, 0, 0],
-  'secondary-mirror': [0, 0, 4],
-  sunshield: [0, -3, -2],
-  nircam: [0, -1.5, 0.5],
-  nirspec: [-1.2, -1.5, 0.5],
-  miri: [1.2, -1.5, 0.5],
-  niriss: [0.6, -1.5, 0.5],
-  fgs: [-0.6, -1.5, 0.5],
-  'solar-arrays': [3, -2, -1],
-  'spacecraft-bus': [0, -2, -1],
-  ote: [0, 0.5, 0],
-  backplane: [0, 0, -0.5],
-}
+// Individual mirror segment component
+function MirrorSegment({ position, rotation, highlighted, segmentId }: MirrorSegmentProps) {
+  const meshRef = useRef<THREE.Mesh>(null)
 
-export function Telescope3D({ onComponentClick, selectedComponent, components }: Telescope3DProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<THREE.Scene | null>(null)
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
-  const markersRef = useRef<ComponentMarker[]>([])
-  const animationFrameRef = useRef<number | undefined>(undefined)
-  const isDraggingRef = useRef(false)
-  const previousMousePositionRef = useRef({ x: 0, y: 0 })
-  const rotationRef = useRef({ x: 0, y: 0 })
-
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const container = containerRef.current
-    const width = container.clientWidth
-    const height = container.clientHeight
-
-    const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x0a0a0f)
-    sceneRef.current = scene
-
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000)
-    camera.position.set(8, 5, 8)
-    camera.lookAt(0, 0, 0)
-    cameraRef.current = camera
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setSize(width, height)
-    renderer.setPixelRatio(window.devicePixelRatio)
-    container.appendChild(renderer.domElement)
-    rendererRef.current = renderer
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-    scene.add(ambientLight)
-
-    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8)
-    directionalLight1.position.set(5, 10, 5)
-    scene.add(directionalLight1)
-
-    const directionalLight2 = new THREE.DirectionalLight(0x8888ff, 0.3)
-    directionalLight2.position.set(-5, 3, -5)
-    scene.add(directionalLight2)
-
-    const primaryMirrorGroup = new THREE.Group()
-    const hexagonShape = new THREE.Shape()
-    const size = 0.4
-    for (let i = 0; i < 6; i++) {
-      const angle = (i * Math.PI) / 3
-      const x = size * Math.cos(angle)
-      const y = size * Math.sin(angle)
-      if (i === 0) {
-        hexagonShape.moveTo(x, y)
-      } else {
-        hexagonShape.lineTo(x, y)
-      }
+  useFrame(state => {
+    if (meshRef.current && highlighted) {
+      meshRef.current.material = Materials.highlighted
+      // Subtle breathing animation for highlighted segments
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.05
+      meshRef.current.scale.setScalar(scale)
+    } else if (meshRef.current) {
+      meshRef.current.material = Materials.primaryMirror
+      meshRef.current.scale.setScalar(1)
     }
-    hexagonShape.lineTo(size * Math.cos(0), size * Math.sin(0))
-
-    const extrudeSettings = {
-      steps: 1,
-      depth: 0.05,
-      bevelEnabled: false,
-    }
-    const hexGeometry = new THREE.ExtrudeGeometry(hexagonShape, extrudeSettings)
-    const mirrorMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffd700,
-      metalness: 0.9,
-      roughness: 0.1,
-      emissive: 0xaa8800,
-      emissiveIntensity: 0.2,
-    })
-
-    const hexPositions = [
-      [0, 0],
-      [0.87, 0],
-      [-0.87, 0],
-      [0.435, 0.75],
-      [-0.435, 0.75],
-      [0.435, -0.75],
-      [-0.435, -0.75],
-      [1.305, 0.75],
-      [-1.305, 0.75],
-      [1.305, -0.75],
-      [-1.305, -0.75],
-      [0.87, 1.5],
-      [-0.87, 1.5],
-      [0, 1.5],
-      [0, -1.5],
-      [0.87, -1.5],
-      [-0.87, -1.5],
-      [1.74, 0],
-    ]
-
-    hexPositions.forEach(([x, y]) => {
-      const hex = new THREE.Mesh(hexGeometry, mirrorMaterial)
-      hex.position.set(x, y, 0)
-      primaryMirrorGroup.add(hex)
-    })
-
-    scene.add(primaryMirrorGroup)
-
-    const secondaryMirrorGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32)
-    const secondaryMirror = new THREE.Mesh(secondaryMirrorGeometry, mirrorMaterial)
-    secondaryMirror.position.set(0, 0, 4)
-    secondaryMirror.rotation.x = Math.PI / 2
-    scene.add(secondaryMirror)
-
-    const strutMaterial = new THREE.MeshStandardMaterial({
-      color: 0x333333,
-      metalness: 0.7,
-      roughness: 0.3,
-    })
-    for (let i = 0; i < 3; i++) {
-      const angle = (i * 2 * Math.PI) / 3
-      const x = Math.cos(angle) * 0.4
-      const y = Math.sin(angle) * 0.4
-      const strutGeometry = new THREE.CylinderGeometry(0.02, 0.02, 4, 8)
-      const strut = new THREE.Mesh(strutGeometry, strutMaterial)
-      strut.position.set(x, y, 2)
-      strut.rotation.x = Math.PI / 2
-      scene.add(strut)
-    }
-
-    const sunshieldGeometry = new THREE.BoxGeometry(5, 3.5, 0.1)
-    const sunshieldMaterial = new THREE.MeshStandardMaterial({
-      color: 0xaaaaaa,
-      metalness: 0.4,
-      roughness: 0.6,
-      side: THREE.DoubleSide,
-    })
-    const sunshield = new THREE.Mesh(sunshieldGeometry, sunshieldMaterial)
-    sunshield.position.set(0, -3, -2)
-    scene.add(sunshield)
-
-    const instrumentGeometry = new THREE.BoxGeometry(0.4, 0.4, 0.3)
-    const instruments = ['nircam', 'nirspec', 'miri', 'niriss', 'fgs']
-    instruments.forEach((id, idx) => {
-      const pos = componentPositions[id]
-      const component = components.find(c => c.id === id)
-      if (pos && component) {
-        const color = categoryColors[component.category] || 0x8b5cf6
-        const material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(color),
-          metalness: 0.6,
-          roughness: 0.4,
-          emissive: new THREE.Color(color),
-          emissiveIntensity: 0.3,
-        })
-        const mesh = new THREE.Mesh(instrumentGeometry, material)
-        mesh.position.set(pos[0], pos[1], pos[2])
-        scene.add(mesh)
-      }
-    })
-
-    const busGeometry = new THREE.BoxGeometry(1.5, 1, 1)
-    const busMaterial = new THREE.MeshStandardMaterial({
-      color: 0x444444,
-      metalness: 0.7,
-      roughness: 0.3,
-    })
-    const spacecraftBus = new THREE.Mesh(busGeometry, busMaterial)
-    spacecraftBus.position.set(0, -2, -1)
-    scene.add(spacecraftBus)
-
-    const solarArrayGeometry = new THREE.BoxGeometry(1.5, 0.05, 1.2)
-    const solarArrayMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1a1a3e,
-      metalness: 0.8,
-      roughness: 0.2,
-      emissive: 0x0a0a1e,
-      emissiveIntensity: 0.4,
-    })
-    const solarArray = new THREE.Mesh(solarArrayGeometry, solarArrayMaterial)
-    solarArray.position.set(3, -2, -1)
-    scene.add(solarArray)
-
-    const backplaneGeometry = new THREE.BoxGeometry(3, 2, 0.2)
-    const backplaneMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2a2a2a,
-      metalness: 0.5,
-      roughness: 0.5,
-    })
-    const backplane = new THREE.Mesh(backplaneGeometry, backplaneMaterial)
-    backplane.position.set(0, 0, -0.5)
-    scene.add(backplane)
-
-    const markers: ComponentMarker[] = []
-    components.forEach(component => {
-      const pos = componentPositions[component.id]
-      if (pos) {
-        const markerGeometry = new THREE.SphereGeometry(0.15, 16, 16)
-        const markerMaterial = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(categoryColors[component.category]),
-          emissive: new THREE.Color(categoryColors[component.category]),
-          emissiveIntensity: 0.5,
-          transparent: true,
-          opacity: 0.8,
-        })
-        const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial)
-        markerMesh.position.set(pos[0], pos[1], pos[2])
-        scene.add(markerMesh)
-
-        markers.push({
-          id: component.id,
-          position: new THREE.Vector3(pos[0], pos[1], pos[2]),
-          component,
-          mesh: markerMesh,
-        })
-      }
-    })
-    markersRef.current = markers
-
-    const starGeometry = new THREE.BufferGeometry()
-    const starPositions: number[] = []
-    for (let i = 0; i < 1000; i++) {
-      const x = (Math.random() - 0.5) * 200
-      const y = (Math.random() - 0.5) * 200
-      const z = (Math.random() - 0.5) * 200
-      starPositions.push(x, y, z)
-    }
-    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3))
-    const starMaterial = new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.1,
-      transparent: true,
-      opacity: 0.6,
-    })
-    const stars = new THREE.Points(starGeometry, starMaterial)
-    scene.add(stars)
-
-    const handleMouseDown = (e: MouseEvent) => {
-      isDraggingRef.current = true
-      previousMousePositionRef.current = { x: e.clientX, y: e.clientY }
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDraggingRef.current) {
-        const deltaX = e.clientX - previousMousePositionRef.current.x
-        const deltaY = e.clientY - previousMousePositionRef.current.y
-
-        rotationRef.current.y += deltaX * 0.005
-        rotationRef.current.x += deltaY * 0.005
-
-        rotationRef.current.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.x))
-
-        previousMousePositionRef.current = { x: e.clientX, y: e.clientY }
-      }
-    }
-
-    const handleMouseUp = () => {
-      isDraggingRef.current = false
-    }
-
-    const handleClick = (e: MouseEvent) => {
-      if (isDraggingRef.current) return
-
-      const rect = renderer.domElement.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1
-      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1
-
-      const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(new THREE.Vector2(x, y), camera)
-
-      const intersects = raycaster.intersectObjects(markers.map(m => m.mesh!).filter(Boolean))
-
-      if (intersects.length > 0) {
-        const marker = markers.find(m => m.mesh === intersects[0].object)
-        if (marker) {
-          onComponentClick(marker.component)
-        }
-      }
-    }
-
-    renderer.domElement.addEventListener('mousedown', handleMouseDown)
-    renderer.domElement.addEventListener('mousemove', handleMouseMove)
-    renderer.domElement.addEventListener('mouseup', handleMouseUp)
-    renderer.domElement.addEventListener('click', handleClick)
-
-    const handleResize = () => {
-      if (!containerRef.current) return
-      const newWidth = containerRef.current.clientWidth
-      const newHeight = containerRef.current.clientHeight
-
-      camera.aspect = newWidth / newHeight
-      camera.updateProjectionMatrix()
-      renderer.setSize(newWidth, newHeight)
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    const animate = () => {
-      animationFrameRef.current = requestAnimationFrame(animate)
-
-      const radius = 12
-      const targetX = radius * Math.sin(rotationRef.current.y) * Math.cos(rotationRef.current.x)
-      const targetY = radius * Math.sin(rotationRef.current.x)
-      const targetZ = radius * Math.cos(rotationRef.current.y) * Math.cos(rotationRef.current.x)
-
-      camera.position.x += (targetX - camera.position.x) * 0.05
-      camera.position.y += (targetY + 5 - camera.position.y) * 0.05
-      camera.position.z += (targetZ - camera.position.z) * 0.05
-      camera.lookAt(0, 0, 0)
-
-      primaryMirrorGroup.rotation.z += 0.001
-      stars.rotation.y += 0.0002
-
-      markers.forEach(marker => {
-        if (marker.mesh) {
-          marker.mesh.rotation.y += 0.02
-          const isSelected = selectedComponent?.id === marker.id
-          const scale = isSelected ? 1.3 : 1
-          marker.mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1)
-        }
-      })
-
-      renderer.render(scene, camera)
-    }
-
-    animate()
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-      renderer.domElement.removeEventListener('mousedown', handleMouseDown)
-      renderer.domElement.removeEventListener('mousemove', handleMouseMove)
-      renderer.domElement.removeEventListener('mouseup', handleMouseUp)
-      renderer.domElement.removeEventListener('click', handleClick)
-      window.removeEventListener('resize', handleResize)
-      renderer.dispose()
-      container.removeChild(renderer.domElement)
-    }
-  }, [components, onComponentClick, selectedComponent])
+  })
 
   return (
-    <div className="relative w-full h-full">
-      <div ref={containerRef} className="w-full h-full rounded-lg overflow-hidden" />
+    <mesh ref={meshRef} position={position} rotation={rotation}>
+      <primitive object={JWSTGeometries.primaryMirrorSegment} />
+      <primitive object={highlighted ? Materials.highlighted : Materials.primaryMirror} />
+    </mesh>
+  )
+}
 
-      <Card className="absolute top-4 left-4 p-4 bg-card/90 backdrop-blur-sm">
-        <h3 className="font-semibold mb-3 text-sm">Component Key</h3>
-        <div className="space-y-2">
-          {Object.entries(categoryColors).map(([category, color]) => {
-            const Icon = categoryIcons[category as keyof typeof categoryIcons]
-            return (
-              <div key={category} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-                <Icon size={14} />
-                <span className="text-xs capitalize">{category}</span>
+// Primary mirror with 18 individual segments
+function PrimaryMirror({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+  const groupRef = useRef<THREE.Group>(null)
+
+  // Hexagonal arrangement of mirror segments
+  const mirrorSegments = useMemo(() => {
+    const segments = []
+    // Center segment
+    segments.push({ id: 0, position: [0, 0, 0], rotation: [0, 0, 0] })
+
+    // Inner ring (6 segments)
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI) / 3
+      const x = Math.cos(angle) * 1.4
+      const y = Math.sin(angle) * 1.4
+      segments.push({
+        id: i + 1,
+        position: [x, y, 0],
+        rotation: [0, 0, angle],
+      })
+    }
+
+    // Outer ring (12 segments)
+    for (let i = 0; i < 12; i++) {
+      const angle = (i * Math.PI) / 6
+      const radius = i % 2 === 0 ? 2.8 : 2.4
+      const x = Math.cos(angle) * radius
+      const y = Math.sin(angle) * radius
+      segments.push({
+        id: i + 7,
+        position: [x, y, 0],
+        rotation: [0, 0, angle],
+      })
+    }
+
+    return segments
+  }, [])
+
+  return (
+    <group ref={groupRef}>
+      {mirrorSegments.map(segment => (
+        <MirrorSegment
+          key={segment.id}
+          position={[
+            segment.position[0] + exploded * segment.position[0] * 0.3,
+            segment.position[1] + exploded * segment.position[1] * 0.3,
+            segment.position[2] + exploded * segment.id * 0.1,
+          ]}
+          rotation={segment.rotation as [number, number, number]}
+          highlighted={highlighted}
+          segmentId={segment.id}
+        />
+      ))}
+    </group>
+  )
+}
+
+// Secondary mirror assembly
+function SecondaryMirror({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+  return (
+    <group position={[0, 0, 4 + exploded * 2]}>
+      {/* Mirror */}
+      <mesh>
+        <primitive object={JWSTGeometries.secondaryMirror} />
+        <primitive object={highlighted ? Materials.highlighted : Materials.secondaryMirror} />
+      </mesh>
+
+      {/* Support struts */}
+      {[0, 1, 2].map(i => (
+        <mesh
+          key={i}
+          position={[Math.cos((i * Math.PI * 2) / 3) * 2, Math.sin((i * Math.PI * 2) / 3) * 2, -2]}
+          rotation={[0, 0, (i * Math.PI * 2) / 3]}
+        >
+          <primitive object={JWSTGeometries.supportStrut} />
+          <primitive object={Materials.supportStrut} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// Sunshield layers
+function Sunshield({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+  const layers = 5
+
+  return (
+    <group position={[0, -3, -2]}>
+      {Array.from({ length: layers }, (_, i) => (
+        <mesh
+          key={i}
+          position={[0, 0, -i * (0.2 + exploded * 0.5)]}
+          rotation={[0, 0, (i * Math.PI) / 8]} // Slight rotation for each layer
+        >
+          <primitive object={JWSTGeometries.sunshieldLayer} />
+          <primitive
+            object={
+              highlighted
+                ? Materials.highlighted
+                : i % 2 === 0
+                  ? Materials.sunshieldLayer1
+                  : Materials.sunshieldLayer2
+            }
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// Scientific instruments cluster
+function InstrumentCluster({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+  const instruments = [
+    { name: 'NIRCam', position: [0, -1.5, 0.5], color: '#FF6B6B' },
+    { name: 'NIRSpec', position: [-1.2, -1.5, 0.5], color: '#4ECDC4' },
+    { name: 'MIRI', position: [1.2, -1.5, 0.5], color: '#45B7D1' },
+    { name: 'NIRISS', position: [0.6, -1.5, 0.5], color: '#96CEB4' },
+    { name: 'FGS', position: [-0.6, -1.5, 0.5], color: '#FFEAA7' },
+  ]
+
+  return (
+    <group>
+      {instruments.map(inst => (
+        <group
+          key={inst.name}
+          position={[
+            inst.position[0] * (1 + exploded * 0.5),
+            inst.position[1],
+            inst.position[2] + exploded * 1,
+          ]}
+        >
+          <mesh>
+            <primitive object={JWSTGeometries.instrumentHousing} />
+            <primitive
+              object={
+                highlighted
+                  ? Materials.highlighted
+                  : InstrumentMaterials[inst.name as keyof typeof InstrumentMaterials] ||
+                    Materials.instrumentHousing
+              }
+            />
+          </mesh>
+          <Html distanceFactor={10}>
+            <div className="text-xs text-white bg-black/80 px-2 py-1 rounded pointer-events-none">
+              {inst.name}
+            </div>
+          </Html>
+        </group>
+      ))}
+    </group>
+  )
+}
+
+// Main JWST 3D model
+function JWSTModel({
+  selectedComponent,
+  onComponentClick,
+  components,
+  exploded,
+}: {
+  selectedComponent: TelescopeComponent | null
+  onComponentClick: (component: TelescopeComponent) => void
+  components: TelescopeComponent[]
+  exploded: number
+}) {
+  const groupRef = useRef<THREE.Group>(null)
+
+  // Rotation animation
+  useFrame(state => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * 0.1
+    }
+  })
+
+  // Helper to find components by ID (currently unused but may be needed for future enhancements)
+  // const getComponent = (id: string) => components.find(c => c.id === id)
+
+  return (
+    <group ref={groupRef}>
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+
+      {/* Primary Mirror */}
+      <PrimaryMirror highlighted={selectedComponent?.id === 'primary-mirror'} exploded={exploded} />
+
+      {/* Secondary Mirror */}
+      <SecondaryMirror
+        highlighted={selectedComponent?.id === 'secondary-mirror'}
+        exploded={exploded}
+      />
+
+      {/* Sunshield */}
+      <Sunshield highlighted={selectedComponent?.id === 'sunshield'} exploded={exploded} />
+
+      {/* Instruments */}
+      <InstrumentCluster
+        highlighted={selectedComponent?.category === 'instruments'}
+        exploded={exploded}
+      />
+
+      {/* Spacecraft Bus */}
+      <mesh position={[0, -2 - exploded * 1, -1]}>
+        <primitive object={JWSTGeometries.spacecraftBus} />
+        <primitive
+          object={
+            selectedComponent?.id === 'spacecraft-bus' ? Materials.highlighted : Materials.structure
+          }
+        />
+      </mesh>
+
+      {/* Solar Arrays */}
+      <mesh position={[3 + exploded * 2, -2, -1]} rotation={[0, 0, Math.PI / 2]}>
+        <primitive object={JWSTGeometries.solarPanel} />
+        <primitive
+          object={
+            selectedComponent?.id === 'solar-arrays' ? Materials.highlighted : Materials.solarPanel
+          }
+        />
+      </mesh>
+
+      <mesh position={[-3 - exploded * 2, -2, -1]} rotation={[0, 0, Math.PI / 2]}>
+        <primitive object={JWSTGeometries.solarPanel} />
+        <primitive
+          object={
+            selectedComponent?.id === 'solar-arrays' ? Materials.highlighted : Materials.solarPanel
+          }
+        />
+      </mesh>
+
+      {/* Interaction spheres for components */}
+      {components.map(component => {
+        const position = getComponentPosition(component.id, exploded)
+        return (
+          <mesh
+            key={component.id}
+            position={position}
+            onClick={() => onComponentClick(component)}
+            visible={false} // Invisible click targets
+          >
+            <sphereGeometry args={[0.8, 16, 16]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
+        )
+      })}
+    </group>
+  )
+}
+
+// Helper function to get component positions
+function getComponentPosition(componentId: string, exploded: number): [number, number, number] {
+  const positions: Record<string, [number, number, number]> = {
+    'primary-mirror': [0, 0, 0],
+    'secondary-mirror': [0, 0, 4 + exploded * 2],
+    sunshield: [0, -3, -2 - exploded * 2],
+    nircam: [0, -1.5, 0.5 + exploded * 1],
+    nirspec: [-1.2 * (1 + exploded * 0.5), -1.5, 0.5 + exploded * 1],
+    miri: [1.2 * (1 + exploded * 0.5), -1.5, 0.5 + exploded * 1],
+    'spacecraft-bus': [0, -2 - exploded * 1, -1],
+    'solar-arrays': [0, -2, -1],
+  }
+  return positions[componentId] || [0, 0, 0]
+}
+
+// Enhanced 3D controls component
+function Controls3D({
+  exploded,
+  setExploded,
+  autoRotate,
+  setAutoRotate,
+  viewMode,
+  setViewMode,
+  onReset,
+}: {
+  exploded: number
+  setExploded: (value: number) => void
+  autoRotate: boolean
+  setAutoRotate: (value: boolean) => void
+  viewMode: string
+  setViewMode: (value: string) => void
+  onReset: () => void
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="absolute bottom-4 left-4 right-4 z-10"
+    >
+      <Card className="backdrop-blur-md bg-black/20 border-white/20">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-4">
+            {/* Mobile-first control buttons */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={autoRotate ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAutoRotate(!autoRotate)}
+                className="flex-1 min-w-0"
+              >
+                <ArrowsClockwise size={16} className={autoRotate ? 'animate-spin' : ''} />
+                <span className="ml-2 hidden sm:inline">Auto Rotate</span>
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={onReset} className="flex-1 min-w-0">
+                <House size={16} />
+                <span className="ml-2 hidden sm:inline">Reset View</span>
+              </Button>
+
+              <Button
+                variant={viewMode === 'exploded' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode(viewMode === 'exploded' ? 'normal' : 'exploded')}
+                className="flex-1 min-w-0"
+              >
+                <ArrowsOut size={16} />
+                <span className="ml-2 hidden sm:inline">Exploded</span>
+              </Button>
+            </div>
+
+            {/* Exploded view slider */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/80 flex items-center gap-1">
+                  <Target size={14} />
+                  Exploded View
+                </span>
+                <span className="text-xs text-white/60">{Math.round(exploded * 100)}%</span>
               </div>
-            )
-          })}
-        </div>
-      </Card>
+              <Slider
+                value={[exploded]}
+                onValueChange={([value]) => setExploded(value)}
+                max={1}
+                step={0.01}
+                className="w-full"
+              />
+            </div>
 
-      <Card className="absolute bottom-4 left-4 right-4 p-3 bg-card/90 backdrop-blur-sm">
-        <p className="text-xs text-muted-foreground text-center">
-          <span className="font-medium">Click and drag</span> to rotate •{' '}
-          <span className="font-medium">Click markers</span> to view component details
+            {/* Mobile touch hint */}
+            <div className="text-xs text-white/60 flex items-center gap-2 sm:hidden">
+              <HandTap size={14} />
+              <span>Pinch to zoom • Drag to rotate • Tap components for info</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )
+}
+
+// Component info panel
+function ComponentInfoPanel({
+  component,
+  onClose,
+}: {
+  component: TelescopeComponent | null
+  onClose: () => void
+}) {
+  if (!component) return null
+
+  const categoryIcons = {
+    optics: Eye,
+    instruments: Cpu,
+    structure: Cube,
+    power: Lightning,
+  }
+
+  const Icon = categoryIcons[component.category] || Info
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, x: 300 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 300 }}
+        className="absolute top-4 right-4 w-80 max-w-[calc(100vw-2rem)] z-20"
+      >
+        <Card className="backdrop-blur-md bg-black/80 border-white/20 text-white">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-blue-500/20">
+                  <Icon size={20} weight="fill" className="text-blue-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-white">{component.name}</CardTitle>
+                  <Badge variant="outline" className="mt-1">
+                    {component.category}
+                  </Badge>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="text-white/60 hover:text-white"
+              >
+                ×
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-white/80 leading-relaxed">{component.description}</p>
+
+            <Separator className="bg-white/20" />
+
+            <div className="space-y-2">
+              <h4 className="font-semibold text-white">Technical Details</h4>
+              <p className="text-xs text-white/70 leading-relaxed">{component.technicalDetails}</p>
+            </div>
+
+            {component.specifications && (
+              <>
+                <Separator className="bg-white/20" />
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-white">Specifications</h4>
+                  <div className="grid gap-1 text-xs">
+                    {Object.entries(component.specifications).map(([key, value]) => (
+                      <div key={key} className="flex justify-between">
+                        <span className="text-white/60">{key}:</span>
+                        <span className="text-white/80 text-right">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+// Main Telescope3D component
+export function Telescope3D({ onComponentClick, selectedComponent, components }: Telescope3DProps) {
+  const [exploded, setExploded] = useState(0)
+  const [autoRotate, setAutoRotate] = useState(true)
+  const [viewMode, setViewMode] = useState('normal')
+  const controlsRef = useRef<unknown>()
+
+  const handleReset = useCallback(() => {
+    if (controlsRef.current) {
+      controlsRef.current.reset()
+    }
+    setExploded(0)
+    setViewMode('normal')
+    // Clear selection - TypeScript workaround for null
+    onComponentClick({} as TelescopeComponent)
+  }, [onComponentClick])
+
+  const handleComponentClick = useCallback(
+    (component: TelescopeComponent) => {
+      onComponentClick(component)
+    },
+    [onComponentClick]
+  )
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Interactive 3D Model</h2>
+        <p className="text-muted-foreground mt-2">
+          Explore JWST's revolutionary design in stunning detail
         </p>
+      </div>
+
+      <Card className="relative h-[70vh] overflow-hidden border-2 border-primary/20">
+        <Canvas
+          camera={{ position: [8, 8, 8], fov: 50 }}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance',
+          }}
+          onCreated={({ gl }) => {
+            gl.setClearColor('#000011', 1)
+            gl.shadowMap.enabled = true
+            gl.shadowMap.type = THREE.PCFSoftShadowMap
+          }}
+        >
+          {/* Lighting setup for realistic space appearance */}
+          <ambientLight
+            intensity={SpaceEnvironment.ambientLight.intensity}
+            color={SpaceEnvironment.ambientLight.color}
+          />
+          <directionalLight
+            position={SpaceEnvironment.sunLight.position}
+            intensity={SpaceEnvironment.sunLight.intensity}
+            color={SpaceEnvironment.sunLight.color}
+            castShadow
+            shadow-mapSize={SpaceEnvironment.sunLight.shadowMapSize}
+          />
+          <pointLight
+            position={SpaceEnvironment.fillLight.position}
+            intensity={SpaceEnvironment.fillLight.intensity}
+            color={SpaceEnvironment.fillLight.color}
+          />
+          <pointLight
+            position={SpaceEnvironment.rimLight.position}
+            intensity={SpaceEnvironment.rimLight.intensity}
+            color={SpaceEnvironment.rimLight.color}
+          />
+
+          {/* Environment and atmosphere */}
+          <Environment preset="night" />
+
+          {/* Ground plane with reflections */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -8, 0]} receiveShadow>
+            <planeGeometry args={[50, 50]} />
+            <MeshReflectorMaterial
+              blur={[300, 100]}
+              resolution={2048}
+              mixBlur={1}
+              mixStrength={40}
+              roughness={1}
+              depthScale={1.2}
+              minDepthThreshold={0.4}
+              maxDepthThreshold={1.4}
+              color="#050505"
+              metalness={0.5}
+            />
+          </mesh>
+
+          {/* Main JWST Model */}
+          <JWSTModel
+            selectedComponent={selectedComponent}
+            onComponentClick={handleComponentClick}
+            components={components}
+            exploded={exploded}
+          />
+
+          {/* Camera controls */}
+          <OrbitControls
+            ref={controlsRef}
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+            autoRotate={autoRotate}
+            autoRotateSpeed={0.5}
+            maxDistance={20}
+            minDistance={3}
+            maxPolarAngle={Math.PI / 1.5}
+            minPolarAngle={Math.PI / 6}
+            dampingFactor={0.05}
+            enableDamping={true}
+          />
+        </Canvas>
+
+        {/* 3D Controls Overlay */}
+        <Controls3D
+          exploded={exploded}
+          setExploded={setExploded}
+          autoRotate={autoRotate}
+          setAutoRotate={setAutoRotate}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          onReset={handleReset}
+        />
+
+        {/* Component Info Panel */}
+        <ComponentInfoPanel
+          component={selectedComponent}
+          onClose={() => onComponentClick({} as TelescopeComponent)}
+        />
       </Card>
     </div>
   )

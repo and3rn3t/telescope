@@ -1,2 +1,1 @@
-# Temporarily disabled for initial setup commit
-# npx lint-staged
+npx lint-staged

@@ -13,13 +13,13 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TelescopeComponent, telescopeComponents } from '@/lib/telescope-data'
-import { AirplaneTilt, Eye, Gear, GridNine, Lightning, Package } from '@phosphor-icons/react'
+import { Airplane, Lightning, Cube, Engine, EyeSlash, GridFour } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 const categoryIcons = {
-  optics: Eye,
-  instruments: Gear,
-  structure: Package,
+  optics: EyeSlash,
+  instruments: Engine,
+  structure: Cube,
   power: Lightning,
 }
 
@@ -68,15 +68,15 @@ export function TelescopeAnatomy() {
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="all">All Parts</TabsTrigger>
               <TabsTrigger value="optics" className="gap-2">
-                <Eye size={16} />
+                <EyeSlash size={16} />
                 Optics
               </TabsTrigger>
               <TabsTrigger value="instruments" className="gap-2">
-                <Gear size={16} />
+                <Engine size={16} />
                 Instruments
               </TabsTrigger>
               <TabsTrigger value="structure" className="gap-2">
-                <Package size={16} />
+                <Cube size={16} />
                 Structure
               </TabsTrigger>
               <TabsTrigger value="power" className="gap-2">
@@ -92,15 +92,15 @@ export function TelescopeAnatomy() {
           >
             <TabsList>
               <TabsTrigger value="3d" className="gap-2">
-                <Package size={16} />
+                <Cube size={16} />
                 3D View
               </TabsTrigger>
               <TabsTrigger value="grid" className="gap-2">
-                <GridNine size={16} />
+                <GridFour size={16} />
                 Grid View
               </TabsTrigger>
               <TabsTrigger value="deployment" className="gap-2">
-                <AirplaneTilt size={16} />
+                <Airplane size={16} />
                 Deployment
               </TabsTrigger>
             </TabsList>

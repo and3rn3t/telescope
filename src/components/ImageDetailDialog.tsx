@@ -12,7 +12,7 @@ import {
 } from '@/lib/educational-tooltips'
 import { JWSTImage } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, ShareNetwork, HeartStraight } from '@phosphor-icons/react'
+import { ArrowLeft, ShareNetwork, Heart } from '@phosphor-icons/react'
 
 interface ImageDetailDialogProps {
   image: JWSTImage | null
@@ -139,10 +139,7 @@ export function ImageDetailDialog({
                     )}
                     title={isFavorited ? 'Remove from collection' : 'Add to collection'}
                   >
-                    <HeartStraight
-                      size={isMobile ? 22 : 24}
-                      weight={isFavorited ? 'fill' : 'regular'}
-                    />
+                    <Heart size={isMobile ? 22 : 24} weight={isFavorited ? 'fill' : 'regular'} />
                   </Button>
                 </div>
               </div>

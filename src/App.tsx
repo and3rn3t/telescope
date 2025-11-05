@@ -15,15 +15,7 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
 import { generalTooltips } from '@/lib/educational-tooltips'
 import { fetchJWSTImages } from '@/lib/nasa-api'
 import { FilterState, JWSTImage } from '@/lib/types'
-import {
-  Radio,
-  ChartBarHorizontal,
-  Package,
-  HeartStraight,
-  Globe,
-  Star,
-  WifiHigh,
-} from '@phosphor-icons/react'
+import { Broadcast, ChartBar, Cube, Heart, Planet, Sparkle, WifiHigh } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -176,7 +168,7 @@ function App() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <div className="p-1.5 sm:p-2 rounded-lg cosmic-logo cosmic-glow shrink-0">
-                      <Star size={24} weight="fill" className="text-white sm:w-7 sm:h-7" />
+                      <Sparkle size={24} weight="fill" className="text-white sm:w-7 sm:h-7" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h1 className="cosmic-heading-xl truncate">JWST Deep Sky Explorer</h1>
@@ -211,7 +203,7 @@ function App() {
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <Radio size={14} className="sm:w-4 sm:h-4" />
+                        <Broadcast size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Live Status</span>
                         <span className="xs:hidden">Live</span>
                       </TabsTrigger>
@@ -220,7 +212,7 @@ function App() {
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <Star size={14} className="sm:w-4 sm:h-4" />
+                        <Sparkle size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Image Explorer</span>
                         <span className="xs:hidden">Explore</span>
                       </TabsTrigger>
@@ -229,7 +221,7 @@ function App() {
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <Package size={14} className="sm:w-4 sm:h-4" />
+                        <Cube size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Telescope Anatomy</span>
                         <span className="xs:hidden">Anatomy</span>
                       </TabsTrigger>
@@ -238,7 +230,7 @@ function App() {
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <Globe size={14} className="sm:w-4 sm:h-4" />
+                        <Planet size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Mission & Orbit</span>
                         <span className="xs:hidden">Mission</span>
                       </TabsTrigger>
@@ -247,7 +239,7 @@ function App() {
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <ChartBarHorizontal size={14} className="sm:w-4 sm:h-4" />
+                        <ChartBar size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Mission Metrics</span>
                         <span className="xs:hidden">Metrics</span>
                       </TabsTrigger>
@@ -277,7 +269,7 @@ function App() {
                             className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm"
                             data-slot="trigger"
                           >
-                            <Star size={14} className="sm:w-4 sm:h-4" />
+                            <Sparkle size={14} className="sm:w-4 sm:h-4" />
                             <span className="hidden xs:inline">Explore All</span>
                             <span className="xs:hidden">All</span>
                           </TabsTrigger>
@@ -286,7 +278,7 @@ function App() {
                             className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm"
                             data-slot="trigger"
                           >
-                            <HeartStraight
+                            <Heart
                               size={14}
                               weight={(favorites?.length || 0) > 0 ? 'fill' : 'regular'}
                               className="sm:w-4 sm:h-4"
@@ -346,7 +338,7 @@ function App() {
                 ) : activeTab === 'favorites' && (favorites?.length || 0) === 0 ? (
                   <div className="flex flex-col items-center justify-center h-96 text-center cosmic-float">
                     <div className="p-6 rounded-full cosmic-logo cosmic-glow mb-4">
-                      <HeartStraight size={48} className="text-white" />
+                      <Heart size={48} className="text-white" />
                     </div>
                     <h2 className="cosmic-heading-lg mb-2">No favorites yet</h2>
                     <p className="cosmic-body max-w-md">

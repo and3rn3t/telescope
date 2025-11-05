@@ -10,6 +10,7 @@ import { TelescopeAnatomy } from '@/components/TelescopeAnatomy'
 import { SpaceTrajectory } from '@/components/SpaceTrajectory'
 import { ObservationMetrics } from '@/components/ObservationMetrics'
 import { LiveStatusDashboard } from '@/components/LiveStatusDashboard'
+import { TelemetryMonitor } from '@/components/TelemetryMonitor'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
@@ -163,7 +164,12 @@ function App() {
           </header>
 
           <main className="container mx-auto px-4 sm:px-6 py-8">
-            {mainView === 'live' && <LiveStatusDashboard />}
+            {mainView === 'live' && (
+              <div className="space-y-8">
+                <LiveStatusDashboard />
+                <TelemetryMonitor />
+              </div>
+            )}
             
             {mainView === 'explore' && (
               <>

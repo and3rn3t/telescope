@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { motion } from 'framer-motion'
 import {
   Broadcast,
   CheckCircle,
   Clock,
   Database,
-  Thermometer,
-  Lightning,
-  Target,
-  Gauge,
-  WifiHigh,
-  HardDrive,
   Eye,
+  Gauge,
+  HardDrive,
+  Lightning,
   Pulse,
+  Target,
+  Thermometer,
+  WifiHigh,
 } from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 interface TelescopeStatus {
@@ -84,6 +84,7 @@ Make it scientifically plausible. Return ONLY the JSON object:
     const parsed = JSON.parse(result)
     return parsed.status
   } catch (error) {
+    console.warn('Failed to fetch telescope status:', error)
     throw new Error('Failed to fetch telescope status')
   }
 }
@@ -119,7 +120,7 @@ const statusColors = {
   critical: 'bg-destructive',
 }
 
-const statusTextColors = {
+const _statusTextColors = {
   nominal: 'text-green-500',
   warning: 'text-yellow-500',
   critical: 'text-destructive',
@@ -167,6 +168,7 @@ export function LiveStatusDashboard() {
       setStatus(statusData)
       setHealth(healthData)
     } catch (error) {
+      console.warn('Failed to load telescope status:', error)
       toast.error('Failed to load telescope status')
     } finally {
       setLoading(false)

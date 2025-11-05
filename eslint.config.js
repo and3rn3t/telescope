@@ -36,8 +36,8 @@ export default tseslint.config(
       // Code quality improvements
       'prefer-const': 'error',
       'no-var': 'error',
-      'no-console': 'warn',
-      eqeqeq: ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'eqeqeq': ['error', 'always'],
 
       // React/JSX specific
       'react-hooks/exhaustive-deps': 'warn',

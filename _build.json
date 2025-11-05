@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "build": {
+    "command": "npm ci && npm run build",
+    "cwd": "/",
+    "env": {
+      "NODE_VERSION": "20.19.0",
+      "NPM_VERSION": "10.9.0"
+    }
+  },
+  "preview": {
+    "command": "npm run preview"
+  }
+}

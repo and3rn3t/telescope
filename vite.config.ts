@@ -22,4 +22,29 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src'),
     },
   },
+  build: {
+    // Optimize for production deployment
+    target: 'esnext',
+    minify: 'esbuild',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks for better caching
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
+          icons: ['@phosphor-icons/react'],
+          three: ['three'],
+          charts: ['recharts'],
+        },
+      },
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+  },
+  // Preview server configuration
+  preview: {
+    port: 4173,
+    host: true,
+  },
 })

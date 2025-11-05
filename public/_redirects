@@ -1,0 +1,4 @@
+# SPA Routing for JWST Deep Sky Explorer
+# Redirects all requests to index.html for client-side routing
+
+/*    /index.html   200

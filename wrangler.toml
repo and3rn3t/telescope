@@ -1,0 +1,62 @@
+# Cloudflare Pages Deployment Configuration
+
+# Build Configuration
+[build]
+  # Build command for the project
+  command = "npm run build"
+  
+  # Directory that contains the built files
+  publish = "dist"
+
+# Environment Variables for Production
+[build.environment]
+  # Node.js version
+  NODE_VERSION = "20.19.0"
+  
+  # NPM version
+  NPM_VERSION = "10.9.0"
+  
+  # Enable GitHub Spark optimizations
+  NODE_ENV = "production"
+  
+  # Vite build optimizations
+  VITE_BUILD_TARGET = "esnext"
+
+# Preview environment (for PR deployments)
+[context.deploy-preview]
+  command = "npm run build"
+  
+[context.branch-deploy]
+  command = "npm run build"
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Performance headers  
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Special headers for HTML files (shorter cache)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Headers for assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirects for SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Country = ["*"]}

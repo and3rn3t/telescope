@@ -7,6 +7,7 @@
     "dev": "vite",
     "kill": "fuser -k 5000/tcp",
     "build": "tsc -b --noCheck && vite build",
+    "build:production": "NODE_ENV=production npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -15,6 +16,8 @@
     "optimize": "vite optimize",
     "preview": "vite preview",
     "check-all": "npm run type-check && npm run lint && npm run format:check",
+    "deploy": "npm run build:production && wrangler pages deploy dist --project-name=jwst-deep-sky-explorer",
+    "deploy:preview": "npm run build && wrangler pages deploy dist --project-name=jwst-deep-sky-explorer --compatibility-date=2024-11-04",
     "prepare": "husky"
   },
   "dependencies": {
@@ -98,7 +101,8 @@
     "tailwindcss": "^4.1.11",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.38.0",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "wrangler": "^4.45.4"
   },
   "workspaces": {
     "packages": [

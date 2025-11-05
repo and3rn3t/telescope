@@ -70,3 +70,8 @@ Thumbs.db
 
 # GitHub Spark specific
 runtime.config.json
+
+# Cloudflare deployment files
+public/_headers
+public/_redirects
+DEPLOYMENT.md

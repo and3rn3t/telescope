@@ -1,23 +1,45 @@
-import { FilterControls } from '@/components/FilterControls'
-import { ImageDetailDialog } from '@/components/ImageDetailDialog'
-import { InfoTooltip } from '@/components/InfoTooltip'
-import { LiveStatusDashboard } from '@/components/LiveStatusDashboard'
+import { preloadCriticalAssets, usePreloadOnHover } from '@/lib/preload'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
-import { ObservationMetrics } from '@/components/ObservationMetrics'
+// Keep essential components for initial render
+import { InfoTooltip } from '@/components/InfoTooltip'
 import { PullToRefreshIndicator } from '@/components/PullToRefreshIndicator'
-import { SpaceTrajectory } from '@/components/SpaceTrajectory'
-import { TelemetryMonitor } from '@/components/TelemetryMonitor'
-import { TelescopeAnatomy } from '@/components/TelescopeAnatomy'
-import { Timeline } from '@/components/Timeline'
+
+// Lazy load heavy components to reduce initial bundle size
+const FilterControls = lazy(() =>
+  import('@/components/FilterControls').then(m => ({ default: m.FilterControls }))
+)
+const ImageDetailDialog = lazy(() =>
+  import('@/components/ImageDetailDialog').then(m => ({ default: m.ImageDetailDialog }))
+)
+const LiveStatusDashboard = lazy(() =>
+  import('@/components/LiveStatusDashboard').then(m => ({ default: m.LiveStatusDashboard }))
+)
+const ObservationMetrics = lazy(() =>
+  import('@/components/ObservationMetrics').then(m => ({ default: m.ObservationMetrics }))
+)
+const SpaceTrajectory = lazy(() =>
+  import('@/components/SpaceTrajectory').then(m => ({ default: m.SpaceTrajectory }))
+)
+const TelemetryMonitor = lazy(() =>
+  import('@/components/TelemetryMonitor').then(m => ({ default: m.TelemetryMonitor }))
+)
+const TelescopeAnatomy = lazy(() =>
+  import('@/components/TelescopeAnatomy').then(m => ({ default: m.TelescopeAnatomy }))
+)
+const Timeline = lazy(() => import('@/components/Timeline').then(m => ({ default: m.Timeline })))
+
+// Keep essential UI components for initial render
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
 import { generalTooltips } from '@/lib/educational-tooltips'
 import { fetchJWSTImages } from '@/lib/nasa-api'
 import { FilterState, JWSTImage } from '@/lib/types'
+
+// Keep essential icons for navigation
 import { Broadcast, ChartBar, Cube, Heart, Planet, Sparkle, WifiHigh } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 
 function App() {
   const [images, setImages] = useState<JWSTImage[]>([])
@@ -41,8 +63,18 @@ function App() {
     distanceRange: [0, Infinity],
   })
 
+  const { preloadOnHover } = usePreloadOnHover()
+
   useEffect(() => {
     loadImages()
+    preloadCriticalAssets()
+
+    // Register service worker for performance improvements
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // Silently fail if service worker registration fails
+      })
+    }
 
     // Check if we're using localStorage fallback and notify user only when needed
     const checkSparkServices = async () => {
@@ -220,6 +252,7 @@ function App() {
                         value="anatomy"
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
+                        {...preloadOnHover('anatomy')}
                       >
                         <Cube size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Telescope Anatomy</span>
@@ -229,6 +262,7 @@ function App() {
                         value="trajectory"
                         className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
                         data-slot="trigger"
+                        {...preloadOnHover('trajectory')}
                       >
                         <Planet size={14} className="sm:w-4 sm:h-4" />
                         <span className="hidden xs:inline">Mission & Orbit</span>
@@ -295,7 +329,9 @@ function App() {
                       </Tabs>
 
                       <div className="w-full sm:w-auto">
-                        <FilterControls filters={filters} onFilterChange={setFilters} />
+                        <Suspense fallback={<Skeleton className="w-full h-10 rounded-lg" />}>
+                          <FilterControls filters={filters} onFilterChange={setFilters} />
+                        </Suspense>
                       </div>
                     </div>
                   </div>
@@ -307,8 +343,12 @@ function App() {
           <main className="cosmic-container py-6 sm:py-8">
             {mainView === 'live' && (
               <div className="space-y-8">
-                <LiveStatusDashboard />
-                <TelemetryMonitor />
+                <Suspense fallback={<Skeleton className="w-full h-64 rounded-lg" />}>
+                  <LiveStatusDashboard />
+                </Suspense>
+                <Suspense fallback={<Skeleton className="w-full h-32 rounded-lg" />}>
+                  <TelemetryMonitor />
+                </Suspense>
               </div>
             )}
 
@@ -364,31 +404,55 @@ function App() {
                       )}
                     </div>
 
-                    <Timeline
-                      images={filteredImages}
-                      favorites={favorites || []}
-                      onImageClick={setSelectedImage}
-                      onFavoriteToggle={handleFavoriteToggle}
-                    />
+                    <Suspense
+                      fallback={
+                        <div className="space-y-4">
+                          {[1, 2, 3].map(i => (
+                            <Skeleton key={i} className="w-full h-64 rounded-lg" />
+                          ))}
+                        </div>
+                      }
+                    >
+                      <Timeline
+                        images={filteredImages}
+                        favorites={favorites || []}
+                        onImageClick={setSelectedImage}
+                        onFavoriteToggle={handleFavoriteToggle}
+                      />
+                    </Suspense>
                   </div>
                 )}
               </>
             )}
 
-            {mainView === 'anatomy' && <TelescopeAnatomy />}
-            {mainView === 'trajectory' && <SpaceTrajectory />}
-            {mainView === 'metrics' && <ObservationMetrics />}
+            {mainView === 'anatomy' && (
+              <Suspense fallback={<Skeleton className="w-full h-96 rounded-lg" />}>
+                <TelescopeAnatomy />
+              </Suspense>
+            )}
+            {mainView === 'trajectory' && (
+              <Suspense fallback={<Skeleton className="w-full h-96 rounded-lg" />}>
+                <SpaceTrajectory />
+              </Suspense>
+            )}
+            {mainView === 'metrics' && (
+              <Suspense fallback={<Skeleton className="w-full h-96 rounded-lg" />}>
+                <ObservationMetrics />
+              </Suspense>
+            )}
           </main>
         </div>
       </div>
 
-      <ImageDetailDialog
-        image={selectedImage}
-        isOpen={!!selectedImage}
-        isFavorited={selectedImage ? (favorites || []).includes(selectedImage.id) : false}
-        onClose={() => setSelectedImage(null)}
-        onFavoriteToggle={handleFavoriteToggle}
-      />
+      <Suspense fallback={null}>
+        <ImageDetailDialog
+          image={selectedImage}
+          isOpen={!!selectedImage}
+          isFavorited={selectedImage ? (favorites || []).includes(selectedImage.id) : false}
+          onClose={() => setSelectedImage(null)}
+          onFavoriteToggle={handleFavoriteToggle}
+        />
+      </Suspense>
     </div>
   )
 }

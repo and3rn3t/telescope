@@ -203,9 +203,16 @@ function App() {
                       <Sparkle size={24} weight="fill" className="text-white sm:w-7 sm:h-7" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h1 className="cosmic-heading-xl truncate">JWST Deep Sky Explorer</h1>
+                      {/* Improved mobile title handling */}
+                      <h1 className="cosmic-heading-xl font-bold text-white leading-tight">
+                        <span className="hidden sm:inline">JWST Deep Sky Explorer</span>
+                        <span className="sm:hidden">JWST Explorer</span>
+                      </h1>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="cosmic-body truncate">Journey through space and time</p>
+                        <p className="cosmic-body-improved text-slate-200 leading-relaxed">
+                          <span className="hidden sm:inline">Journey through space and time</span>
+                          <span className="sm:hidden">Explore the cosmos</span>
+                        </p>
                         <div className="hidden sm:block">
                           <InfoTooltip
                             content={generalTooltips.cosmicTimeline}
@@ -228,63 +235,63 @@ function App() {
                     setMainView(v as typeof mainView)
                   }}
                 >
-                  <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-                    <TabsList className="cosmic-nav-tabs w-max sm:w-fit">
+                  <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
+                    <TabsList className="cosmic-nav-tabs w-max sm:w-fit min-w-max">
                       <TabsTrigger
                         value="live"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
                         data-slot="trigger"
                       >
-                        <Broadcast size={14} className="sm:w-4 sm:h-4" />
+                        <Broadcast size={16} className="sm:w-4 sm:h-4 shrink-0" />
                         <span className="hidden xs:inline">Live Status</span>
                         <span className="xs:hidden">Live</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="explore"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
                         data-slot="trigger"
                       >
-                        <Sparkle size={14} className="sm:w-4 sm:h-4" />
-                        <span className="hidden xs:inline">Image Explorer</span>
-                        <span className="xs:hidden">Explore</span>
+                        <Sparkle size={16} className="sm:w-4 sm:h-4 shrink-0" />
+                        <span className="hidden xs:inline">Explorer</span>
+                        <span className="xs:hidden">Images</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="anatomy"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
                         data-slot="trigger"
                         {...preloadOnHover('anatomy')}
                       >
-                        <Cube size={14} className="sm:w-4 sm:h-4" />
-                        <span className="hidden xs:inline">Telescope Anatomy</span>
-                        <span className="xs:hidden">Anatomy</span>
+                        <Cube size={16} className="sm:w-4 sm:h-4 shrink-0" />
+                        <span className="hidden xs:inline">Anatomy</span>
+                        <span className="xs:hidden">Parts</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="trajectory"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
                         data-slot="trigger"
                         {...preloadOnHover('trajectory')}
                       >
-                        <Planet size={14} className="sm:w-4 sm:h-4" />
-                        <span className="hidden xs:inline">Mission & Orbit</span>
-                        <span className="xs:hidden">Mission</span>
+                        <Planet size={16} className="sm:w-4 sm:h-4 shrink-0" />
+                        <span className="hidden xs:inline">Mission</span>
+                        <span className="xs:hidden">Orbit</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="metrics"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
                         data-slot="trigger"
                       >
-                        <ChartBar size={14} className="sm:w-4 sm:h-4" />
-                        <span className="hidden xs:inline">Mission Metrics</span>
-                        <span className="xs:hidden">Metrics</span>
+                        <ChartBar size={16} className="sm:w-4 sm:h-4 shrink-0" />
+                        <span className="hidden xs:inline">Metrics</span>
+                        <span className="xs:hidden">Data</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="api-test"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
                         data-slot="trigger"
                       >
-                        <WifiHigh size={14} className="sm:w-4 sm:h-4" />
+                        <WifiHigh size={16} className="sm:w-4 sm:h-4 shrink-0" />
                         <span className="hidden xs:inline">API Test</span>
-                        <span className="xs:hidden">API</span>
+                        <span className="xs:hidden">Test</span>
                       </TabsTrigger>
                     </TabsList>
                   </div>
@@ -300,27 +307,27 @@ function App() {
                         <TabsList className="cosmic-nav-tabs w-full sm:w-fit">
                           <TabsTrigger
                             value="all"
-                            className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm"
+                            className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm px-4 py-2"
                             data-slot="trigger"
                           >
-                            <Sparkle size={14} className="sm:w-4 sm:h-4" />
+                            <Sparkle size={16} className="sm:w-4 sm:h-4 shrink-0" />
                             <span className="hidden xs:inline">Explore All</span>
                             <span className="xs:hidden">All</span>
                           </TabsTrigger>
                           <TabsTrigger
                             value="favorites"
-                            className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm"
+                            className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm px-4 py-2"
                             data-slot="trigger"
                           >
                             <Heart
-                              size={14}
+                              size={16}
                               weight={(favorites?.length || 0) > 0 ? 'fill' : 'regular'}
-                              className="sm:w-4 sm:h-4"
+                              className="sm:w-4 sm:h-4 shrink-0"
                             />
-                            <span className="hidden xs:inline">My Collection</span>
+                            <span className="hidden xs:inline">Collection</span>
                             <span className="xs:hidden">Saved</span>
                             {(favorites?.length || 0) > 0 && (
-                              <span className="ml-1 px-1.5 py-0.5 rounded-full cosmic-accent text-white text-xs font-medium">
+                              <span className="ml-1 px-2 py-1 rounded-full bg-yellow-400 text-slate-900 text-xs font-semibold">
                                 {favorites?.length || 0}
                               </span>
                             )}

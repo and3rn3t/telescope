@@ -292,6 +292,203 @@ function buildNASAApiUrl(baseUrl: string, params: Record<string, string>): strin
 }
 
 /**
+ * Validate that the image URL is from legitimate space image collections
+ */
+function isValidSpaceImageUrl(url?: string): boolean {
+  if (!url) return false
+
+  // Ensure the URL is from NASA's images API and not a placeholder or non-space image
+  const validDomains = ['images-assets.nasa.gov', 'images-api.nasa.gov']
+  const validImageExtensions = ['.jpg', '.jpeg', '.png', '.tiff', '.tif']
+
+  try {
+    const urlObj = new URL(url)
+
+    // Check domain
+    if (!validDomains.some(domain => urlObj.hostname.includes(domain))) {
+      return false
+    }
+
+    // Check file extension
+    const hasValidExtension = validImageExtensions.some(ext =>
+      urlObj.pathname.toLowerCase().includes(ext)
+    )
+
+    if (!hasValidExtension) {
+      return false
+    }
+
+    // Exclude URLs that might contain non-space content based on path
+    const excludePathTerms = [
+      'portrait',
+      'people',
+      'crew',
+      'staff',
+      'team',
+      'meeting',
+      'ceremony',
+      'ground',
+      'facility',
+      'building',
+      'lab',
+      'office',
+      'launch',
+      'landing',
+      'logo',
+      'patch',
+      'diagram',
+      'chart',
+    ]
+
+    const pathname = urlObj.pathname.toLowerCase()
+    return !excludePathTerms.some(term => pathname.includes(term))
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Check if image content is space-related and doesn't contain people/non-space elements
+ */
+function isSpaceImageContent(metadata: {
+  title: string
+  description?: string
+  keywords?: string[]
+}): boolean {
+  const title = metadata.title.toLowerCase()
+  const description = (metadata.description || '').toLowerCase()
+  const keywords = (metadata.keywords || []).map(k => k.toLowerCase()).join(' ')
+  const allText = `${title} ${description} ${keywords}`
+
+  // Exclude images that likely contain people or non-space content
+  const excludeTerms = [
+    'people',
+    'person',
+    'human',
+    'astronaut',
+    'crew',
+    'team',
+    'staff',
+    'scientist',
+    'engineer',
+    'portrait',
+    'face',
+    'meeting',
+    'conference',
+    'ceremony',
+    'presentation',
+    'speech',
+    'handshake',
+    'interview',
+    'press',
+    'media',
+    'announcement',
+    'award',
+    'celebration',
+    'ground',
+    'earth surface',
+    'building',
+    'facility',
+    'laboratory',
+    'lab',
+    'office',
+    'computer',
+    'screen',
+    'monitor',
+    'desk',
+    'room',
+    'indoor',
+    'interior',
+    'launch pad',
+    'rocket launch',
+    'countdown',
+    'liftoff',
+    'landing',
+    'parade',
+    'crowd',
+    'audience',
+    'spectator',
+    'visitor',
+    'tour',
+    'model',
+    'mockup',
+    'replica',
+    'simulation',
+    'test',
+    'prototype',
+    'diagram',
+    'chart',
+    'graph',
+    'illustration',
+    'artwork',
+    'drawing',
+    'logo',
+    'patch',
+    'emblem',
+    'flag',
+    'banner',
+    'sign',
+  ]
+
+  // Check if any exclude terms are present
+  if (excludeTerms.some(term => allText.includes(term))) {
+    return false
+  }
+
+  // Require space-related terms for inclusion
+  const spaceTerms = [
+    'nebula',
+    'galaxy',
+    'star',
+    'planet',
+    'cosmic',
+    'space',
+    'universe',
+    'astronomy',
+    'infrared',
+    'telescope',
+    'jwst',
+    'webb',
+    'hubble',
+    'observation',
+    'spectrum',
+    'deep field',
+    'cluster',
+    'supernova',
+    'black hole',
+    'quasar',
+    'pulsar',
+    'exoplanet',
+    'solar system',
+    'comet',
+    'asteroid',
+    'meteor',
+    'lunar',
+    'mars',
+    'jupiter',
+    'saturn',
+    'venus',
+    'mercury',
+    'uranus',
+    'neptune',
+    'pluto',
+    'milky way',
+    'andromeda',
+    'constellation',
+    'astrophotography',
+    'celestial',
+    'interstellar',
+    'intergalactic',
+    'void',
+    'dark matter',
+    'dark energy',
+  ]
+
+  // Must contain at least one space-related term
+  return spaceTerms.some(term => allText.includes(term))
+}
+
+/**
  * Get sample JWST images as fallback when API fails
  */
 function getSampleJWSTImages(): JWSTImage[] {
@@ -370,16 +567,21 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
   try {
     // Multiple search strategies to get better cosmic imagery
     const searchQueries = [
-      'webb deep field galaxy',
-      'james webb nebula',
-      'jwst galaxy cluster',
-      'webb carina nebula',
-      'james webb pillars of creation',
-      'jwst stephan quintet',
-      'webb southern ring nebula',
-      'james webb exoplanet',
-      'jwst spectrum',
-      'webb infrared space',
+      'webb deep field galaxy space',
+      'james webb nebula cosmic',
+      'jwst galaxy cluster infrared',
+      'webb carina nebula stellar',
+      'james webb pillars creation stellar',
+      'jwst stephan quintet galactic',
+      'webb southern ring planetary nebula',
+      'james webb exoplanet atmospheric spectrum',
+      'jwst infrared cosmic observation',
+      'webb telescope deep space astronomy',
+      'james webb stellar nursery',
+      'jwst dark matter cosmic web',
+      'webb supernova remnant',
+      'james webb brown dwarf',
+      'jwst quasar distant universe',
     ]
 
     const allImages: JWSTImage[] = []
@@ -391,7 +593,9 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
           q: query,
           media_type: 'image',
           year_start: '2022',
-          page_size: '20',
+          page_size: '15', // Reduced to get higher quality results
+          description_508:
+            'space,astronomy,cosmic,telescope,infrared,stellar,galactic,nebula,galaxy,star,planet,universe', // Focus on space terms
         })
 
         const controller = new AbortController()
@@ -417,6 +621,8 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
         // Process images from this search
         const searchImages = data.collection.items
           .filter(item => item.links && item.links.length > 0)
+          .filter(item => isSpaceImageContent(item.data[0])) // Filter out non-space content
+          .filter(item => isValidSpaceImageUrl(item.links?.[0]?.href)) // Validate image URL
           .map(item => {
             const metadata = item.data[0]
             const imageUrl = item.links?.[0]?.href || ''

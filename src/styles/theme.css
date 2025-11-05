@@ -96,10 +96,10 @@
     --cosmic-elevated: oklch(0.245 0.01 286);
     --cosmic-overlay: oklch(0.12 0.02 290);
 
-    /* Text Colors */
+    /* Text Colors - Improved contrast */
     --cosmic-text-primary: oklch(0.985 0 0);
-    --cosmic-text-secondary: oklch(0.708 0 0);
-    --cosmic-text-muted: oklch(0.458 0 0);
+    --cosmic-text-secondary: oklch(0.778 0 0); /* Improved from 0.708 for better contrast */
+    --cosmic-text-muted: oklch(0.558 0 0); /* Improved from 0.458 for better contrast */
 
     /* Border Colors */
     --cosmic-border: oklch(0.266 0.007 286);
@@ -391,6 +391,13 @@
     color: var(--cosmic-text-secondary);
   }
 
+  .cosmic-body-improved {
+    @apply text-sm leading-relaxed;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    /* Improved contrast for better readability */
+    color: rgb(203, 213, 225); /* slate-300 for better contrast */
+  }
+
   .cosmic-data {
     @apply font-mono font-bold;
     font-family:
@@ -417,21 +424,25 @@
 
   /* Navigation Tabs */
   .cosmic-nav-tabs {
-    @apply bg-slate-900/50 backdrop-blur-sm rounded-lg border border-violet-700/20;
+    @apply bg-slate-900/60 backdrop-blur-sm rounded-lg border border-violet-700/30;
+    /* Enhanced background for better contrast */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .cosmic-nav-tab {
     @apply relative
     transition-all duration-300 ease-out
-    text-yellow-400/70
+    text-slate-200
     border-transparent
-    hover:text-yellow-400
-    hover:bg-violet-700/20
+    hover:text-white
+    hover:bg-violet-700/30
     data-[state=active]:text-white
-    data-[state=active]:bg-violet-700/40
-    data-[state=active]:border-yellow-400/30
+    data-[state=active]:bg-violet-700/50
+    data-[state=active]:border-yellow-400/40
     data-[state=active]:shadow-lg
-    data-[state=active]:shadow-yellow-400/10;
+    data-[state=active]:shadow-yellow-400/20;
+    /* Improved contrast for better readability */
+    font-weight: 500;
   }
 
   .cosmic-nav-tab::after {
@@ -448,6 +459,16 @@
 
   .cosmic-nav-tab[data-state='active']::after {
     width: 80%;
+  }
+
+  /* Hide scrollbars for better mobile UX */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   /* Visual Effects & Animations */

@@ -2,6 +2,7 @@ import { FilterControls } from '@/components/FilterControls'
 import { ImageDetailDialog } from '@/components/ImageDetailDialog'
 import { InfoTooltip } from '@/components/InfoTooltip'
 import { LiveStatusDashboard } from '@/components/LiveStatusDashboard'
+import { NASAApiTester } from '@/components/NASAApiTester'
 import { ObservationMetrics } from '@/components/ObservationMetrics'
 import { PullToRefreshIndicator } from '@/components/PullToRefreshIndicator'
 import { SpaceTrajectory } from '@/components/SpaceTrajectory'
@@ -14,7 +15,7 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
 import { generalTooltips } from '@/lib/educational-tooltips'
 import { fetchJWSTImages } from '@/lib/nasa-api'
 import { FilterState, JWSTImage } from '@/lib/types'
-import { Broadcast, ChartBar, Cube, Heart, Planet, Sparkle } from '@phosphor-icons/react'
+import { Broadcast, ChartBar, Cube, Heart, Planet, Sparkle, WifiHigh } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -24,7 +25,7 @@ function App() {
   const [selectedImage, setSelectedImage] = useState<JWSTImage | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all')
   const [mainView, setMainView] = useState<
-    'explore' | 'anatomy' | 'trajectory' | 'metrics' | 'live'
+    'explore' | 'anatomy' | 'trajectory' | 'metrics' | 'live' | 'api-test'
   >('explore')
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
@@ -241,6 +242,15 @@ function App() {
                         <span className="hidden xs:inline">Mission Metrics</span>
                         <span className="xs:hidden">Metrics</span>
                       </TabsTrigger>
+                      <TabsTrigger
+                        value="api-test"
+                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-2.5 sm:px-3 touch-manipulation"
+                        data-slot="trigger"
+                      >
+                        <WifiHigh size={14} className="sm:w-4 sm:h-4" />
+                        <span className="hidden xs:inline">API Test</span>
+                        <span className="xs:hidden">API</span>
+                      </TabsTrigger>
                     </TabsList>
                   </div>
                 </Tabs>
@@ -367,6 +377,7 @@ function App() {
             {mainView === 'anatomy' && <TelescopeAnatomy />}
             {mainView === 'trajectory' && <SpaceTrajectory />}
             {mainView === 'metrics' && <ObservationMetrics />}
+            {mainView === 'api-test' && <NASAApiTester />}
           </main>
         </div>
       </div>

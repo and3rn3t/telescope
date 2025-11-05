@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState } from 'react'
 
 import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { motion } from 'framer-motion'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  Thermometer,
-  Lightning,
+  ArrowsClockwise,
   Atom,
+  CheckCircle,
+  Compass,
+  Crosshair,
   Engine,
   Gauge,
-  TrendUp,
-  TrendDown,
+  Lightning,
   Minus,
-  ArrowsClockwise,
-  CheckCircle,
+  Thermometer,
+  TrendDown,
+  TrendUp,
   Warning,
-  Crosshair,
-  Compass,
 } from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
 
 interface TelemetryReading {
   value: number

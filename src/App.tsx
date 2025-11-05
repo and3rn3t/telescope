@@ -9,10 +9,11 @@ import { InfoTooltip } from '@/components/InfoTooltip'
 import { TelescopeAnatomy } from '@/components/TelescopeAnatomy'
 import { SpaceTrajectory } from '@/components/SpaceTrajectory'
 import { ObservationMetrics } from '@/components/ObservationMetrics'
+import { LiveStatusDashboard } from '@/components/LiveStatusDashboard'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
-import { Sparkle, Heart, Cube, Planet, ChartBar } from '@phosphor-icons/react'
+import { Sparkle, Heart, Cube, Planet, ChartBar, Broadcast } from '@phosphor-icons/react'
 import { generalTooltips } from '@/lib/educational-tooltips'
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState<JWSTImage | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all')
-  const [mainView, setMainView] = useState<'explore' | 'anatomy' | 'trajectory' | 'metrics'>('explore')
+  const [mainView, setMainView] = useState<'explore' | 'anatomy' | 'trajectory' | 'metrics' | 'live'>('explore')
   const [favorites, setFavorites] = useKV<string[]>('jwst-favorites', [])
   const [filters, setFilters] = useState<FilterState>({
     objectType: 'all',
@@ -111,6 +112,10 @@ function App() {
 
                 <Tabs value={mainView} onValueChange={(v) => setMainView(v as any)}>
                   <TabsList>
+                    <TabsTrigger value="live" className="gap-2">
+                      <Broadcast size={16} />
+                      Live Status
+                    </TabsTrigger>
                     <TabsTrigger value="explore" className="gap-2">
                       <Sparkle size={16} />
                       Image Explorer
@@ -158,6 +163,8 @@ function App() {
           </header>
 
           <main className="container mx-auto px-4 sm:px-6 py-8">
+            {mainView === 'live' && <LiveStatusDashboard />}
+            
             {mainView === 'explore' && (
               <>
                 {loading ? (

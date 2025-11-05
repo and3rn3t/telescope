@@ -16,7 +16,7 @@ import {
   WifiHigh,
   HardDrive,
   Eye,
-  Activity,
+  Pulse,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -246,7 +246,7 @@ export function LiveStatusDashboard() {
                     variant="outline"
                     className="gap-1 bg-green-500/10 border-green-500/30 text-green-500"
                   >
-                    <Activity size={12} weight="bold" />
+                    <Pulse size={12} weight="bold" />
                     LIVE
                   </Badge>
                 </CardTitle>
@@ -332,7 +332,7 @@ export function LiveStatusDashboard() {
 
             <div className="p-4 rounded-lg bg-card/30 backdrop-blur-sm border border-border/30">
               <div className="flex items-center gap-2 mb-2">
-                <Activity size={16} className="text-primary" />
+                <Pulse size={16} className="text-primary" />
                 <span className="text-xs text-muted-foreground">Data Rate</span>
               </div>
               <p className="text-sm font-medium font-mono">{dataRate.toFixed(2)} MB/s</p>

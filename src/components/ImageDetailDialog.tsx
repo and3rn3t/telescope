@@ -12,7 +12,7 @@ import {
 } from '@/lib/educational-tooltips'
 import { JWSTImage } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { CaretLeft, Export, Heart } from '@phosphor-icons/react'
+import { ArrowLeft, ShareNetwork, HeartStraight } from '@phosphor-icons/react'
 
 interface ImageDetailDialogProps {
   image: JWSTImage | null
@@ -83,7 +83,7 @@ export function ImageDetailDialog({
                     className="bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white touch-manipulation"
                     title="Share image"
                   >
-                    <Export size={20} />
+                    <ShareNetwork size={20} />
                   </Button>
                 )}
                 <Button
@@ -96,7 +96,7 @@ export function ImageDetailDialog({
                   onClick={onClose}
                   title="Close"
                 >
-                  <CaretLeft size={isMobile ? 22 : 24} />
+                  <ArrowLeft size={isMobile ? 22 : 24} />
                 </Button>
               </div>
             </div>
@@ -125,7 +125,7 @@ export function ImageDetailDialog({
                       className="shrink-0 touch-manipulation"
                       title="Share image"
                     >
-                      <Export size={20} />
+                      <ShareNetwork size={20} />
                     </Button>
                   )}
                   <Button
@@ -139,7 +139,10 @@ export function ImageDetailDialog({
                     )}
                     title={isFavorited ? 'Remove from collection' : 'Add to collection'}
                   >
-                    <Heart size={isMobile ? 22 : 24} weight={isFavorited ? 'fill' : 'regular'} />
+                    <HeartStraight
+                      size={isMobile ? 22 : 24}
+                      weight={isFavorited ? 'fill' : 'regular'}
+                    />
                   </Button>
                 </div>
               </div>

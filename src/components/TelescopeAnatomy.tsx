@@ -13,13 +13,13 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TelescopeComponent, telescopeComponents } from '@/lib/telescope-data'
-import { Cpu, Cube, Eye, Lightning, Rocket, SquaresFour } from '@phosphor-icons/react'
+import { AirplaneTilt, Eye, Gear, GridNine, Lightning, Package } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 const categoryIcons = {
   optics: Eye,
-  instruments: Cpu,
-  structure: Cube,
+  instruments: Gear,
+  structure: Package,
   power: Lightning,
 }
 
@@ -72,11 +72,11 @@ export function TelescopeAnatomy() {
                 Optics
               </TabsTrigger>
               <TabsTrigger value="instruments" className="gap-2">
-                <Cpu size={16} />
+                <Gear size={16} />
                 Instruments
               </TabsTrigger>
               <TabsTrigger value="structure" className="gap-2">
-                <Cube size={16} />
+                <Package size={16} />
                 Structure
               </TabsTrigger>
               <TabsTrigger value="power" className="gap-2">
@@ -92,15 +92,15 @@ export function TelescopeAnatomy() {
           >
             <TabsList>
               <TabsTrigger value="3d" className="gap-2">
-                <Cube size={16} />
+                <Package size={16} />
                 3D View
               </TabsTrigger>
               <TabsTrigger value="grid" className="gap-2">
-                <SquaresFour size={16} />
+                <GridNine size={16} />
                 Grid View
               </TabsTrigger>
               <TabsTrigger value="deployment" className="gap-2">
-                <Rocket size={16} />
+                <AirplaneTilt size={16} />
                 Deployment
               </TabsTrigger>
             </TabsList>

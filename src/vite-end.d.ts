@@ -18,6 +18,20 @@ interface SparkServices {
   llm?: (prompt: string, model: string, stream?: boolean) => Promise<string>
 }
 
+// Lucide React icon declarations
+declare module 'lucide-react/dist/esm/icons/*' {
+  import { ForwardRefExoticComponent, RefAttributes } from 'react'
+  interface LucideProps {
+    size?: string | number
+    absoluteStrokeWidth?: boolean
+    className?: string
+    color?: string
+    strokeWidth?: string | number
+  }
+  const LucideIcon: ForwardRefExoticComponent<LucideProps & RefAttributes<SVGSVGElement>>
+  export default LucideIcon
+}
+
 declare global {
   interface Window {
     spark?: SparkServices

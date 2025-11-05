@@ -13,7 +13,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TelescopeComponent, telescopeComponents } from '@/lib/telescope-data'
-import { Airplane, Lightning, Cube, Engine, EyeSlash, GridFour } from '@phosphor-icons/react'
+import { Airplane, Cube, Engine, EyeSlash, GridFour, Lightning } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 const categoryIcons = {

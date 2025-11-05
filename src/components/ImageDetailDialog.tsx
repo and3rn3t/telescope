@@ -12,7 +12,7 @@ import {
 } from '@/lib/educational-tooltips'
 import { JWSTImage } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, ShareNetwork, Heart } from '@phosphor-icons/react'
+import { ArrowLeft, Heart, ShareNetwork } from '@phosphor-icons/react'
 
 interface ImageDetailDialogProps {
   image: JWSTImage | null

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { Binoculars, Clock, MapPin, ArrowRight, Eye, Sparkle } from '@phosphor-icons/react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ArrowRight, Binoculars, Clock, Eye, MapPin, Sparkle } from '@phosphor-icons/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export interface ObservationTarget {
@@ -25,7 +25,10 @@ export interface ObservationTarget {
 }
 
 async function fetchNextObservation(): Promise<ObservationTarget> {
-  const promptText = `You are generating realistic data for the James Webb Space Telescope's next scheduled observation target.
+  // Check if Spark LLM service is available
+  try {
+    if (typeof window !== 'undefined' && window.spark?.llm) {
+      const promptText = `You are generating realistic data for the James Webb Space Telescope's next scheduled observation target.
 
 Generate a single JSON object (not an array) with a property called "observation" containing an observation target with these exact fields:
 - id: a unique observation ID (format: "JWST-{number}")
@@ -35,7 +38,7 @@ Generate a single JSON object (not an array) with a property called "observation
 - startTime: a realistic near-future date/time (within next 24-48 hours from now), format as human readable like "Today at 14:30 UTC" or "Tomorrow at 09:15 UTC"
 - duration: observation duration in hours and minutes like "3h 45m" or "1h 20m"
 - description: 2-3 sentences about what this observation aims to discover or study
-- coordinates: object with "ra" (right ascension in format like "05h 35m 17s") and "dec" (declination in format like "-05° 23' 28\"")
+- coordinates: object with "ra" (right ascension in format like "05h 35m 17s") and "dec" (declination in format like "-05° 23' 28"")
 - priority: one of ["high", "medium", "low"]
 - principalInvestigator: a realistic researcher name
 - program: observation program number (format: "Program #{number}")
@@ -45,12 +48,106 @@ Make the data scientifically plausible and interesting. Return ONLY the JSON obj
   "observation": { ...all fields here... }
 }`
 
-  try {
-    const result = await window.spark.llm(promptText, 'gpt-4o-mini', true)
-    const parsed = JSON.parse(result)
-    return parsed.observation
-  } catch (error) {
-    throw new Error('Failed to fetch observation data')
+      const result = await window.spark.llm(promptText, 'gpt-4o-mini', true)
+      const parsed = JSON.parse(result)
+      return parsed.observation
+    }
+  } catch {
+    // Silently fall through to mock data - this is expected outside Spark environment
+  }
+
+  // Fallback: Generate realistic mock observation
+  return generateMockObservation()
+}
+
+function generateMockObservation(): ObservationTarget {
+  const targets = [
+    {
+      name: 'TRAPPIST-1 System',
+      category: 'Exoplanet' as const,
+      description:
+        'Atmospheric characterization of potentially habitable exoplanets in the TRAPPIST-1 system to search for signs of water vapor and other biosignatures.',
+    },
+    {
+      name: 'NGC 1365 (Great Barred Spiral Galaxy)',
+      category: 'Galaxy' as const,
+      description:
+        'Deep infrared observations of the central supermassive black hole and active galactic nucleus to study star formation and galactic evolution processes.',
+    },
+    {
+      name: 'Herbig Haro 211',
+      category: 'Protoplanetary Disk' as const,
+      description:
+        'Investigation of protostellar outflows and accretion processes in one of the youngest known star-forming regions in the galaxy.',
+    },
+    {
+      name: 'IC 443 (Jellyfish Nebula)',
+      category: 'Supernova Remnant' as const,
+      description:
+        'Multi-wavelength infrared study of shock wave interactions with interstellar medium and heavy element distribution patterns.',
+    },
+    {
+      name: 'Westerlund 2',
+      category: 'Star Cluster' as const,
+      description:
+        'Characterization of massive star formation processes and stellar winds in one of the most active star-forming clusters in the Milky Way.',
+    },
+  ]
+
+  const instruments = ['NIRCam', 'MIRI', 'NIRSpec', 'NIRISS', 'FGS'] as const
+  const priorities = ['high', 'medium', 'low'] as const
+  const investigators = [
+    'Dr. Sarah Chen (MIT)',
+    'Prof. Michael Rodriguez (ESO)',
+    'Dr. Aisha Patel (STScI)',
+    'Prof. Johannes Mueller (MPE)',
+    'Dr. Elena Volkov (CNES)',
+    'Prof. Kenji Nakamura (JAXA)',
+  ]
+
+  const target = targets[Math.floor(Math.random() * targets.length)]
+  const instrument = instruments[Math.floor(Math.random() * instruments.length)]
+  const priority = priorities[Math.floor(Math.random() * priorities.length)]
+  const investigator = investigators[Math.floor(Math.random() * investigators.length)]
+  const obsId = Math.floor(Math.random() * 9000) + 1000
+  const programNum = Math.floor(Math.random() * 500) + 1000
+
+  // Generate future time (next 24-48 hours)
+  const now = new Date()
+  const hoursFromNow = Math.floor(Math.random() * 48) + 2
+  const futureTime = new Date(now.getTime() + hoursFromNow * 60 * 60 * 1000)
+  const isToday = futureTime.getDate() === now.getDate()
+  const timeStr = futureTime.toTimeString().slice(0, 5) // HH:MM format
+  const startTime = isToday ? `Today at ${timeStr} UTC` : `Tomorrow at ${timeStr} UTC`
+
+  const durationHours = Math.floor(Math.random() * 6) + 1
+  const durationMinutes = Math.floor(Math.random() * 60)
+  const duration = `${durationHours}h ${String(durationMinutes).padStart(2, '0')}m`
+
+  // Generate realistic coordinates
+  const raHours = Math.floor(Math.random() * 24)
+  const raMinutes = Math.floor(Math.random() * 60)
+  const raSeconds = Math.floor(Math.random() * 60)
+  const decDegrees = Math.floor(Math.random() * 180) - 90
+  const decMinutes = Math.floor(Math.random() * 60)
+  const decSeconds = Math.floor(Math.random() * 60)
+  const decSign = decDegrees >= 0 ? '+' : ''
+
+  return {
+    id: `JWST-${obsId}`,
+    targetName: target.name,
+    category: target.category,
+    instrument: instrument,
+    startTime: startTime,
+    duration: duration,
+    description: target.description,
+    coordinates: {
+      ra: `${String(raHours).padStart(2, '0')}h ${String(raMinutes).padStart(2, '0')}m ${String(raSeconds).padStart(2, '0')}s`,
+      dec: `${decSign}${Math.abs(decDegrees)}° ${String(decMinutes).padStart(2, '0')}' ${String(decSeconds).padStart(2, '0')}"`,
+    },
+    priority: priority,
+    principalInvestigator: investigator,
+    program: `Program #${programNum}`,
   }
 }
 
@@ -95,7 +192,7 @@ export function NextObservation() {
       const data = await fetchNextObservation()
       setObservation(data)
       setCountdown(Math.floor(Math.random() * 3600) + 1800)
-    } catch (error) {
+    } catch {
       toast.error('Failed to load observation schedule')
     } finally {
       setLoading(false)

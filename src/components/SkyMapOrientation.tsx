@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Crosshair, ArrowsClockwise, Compass, Eye } from '@phosphor-icons/react'
 import { InfoTooltip } from '@/components/InfoTooltip'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { ArrowsClockwise, Compass, Crosshair, Eye } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 
 interface OrientationData {
   rightAscension: number
@@ -18,7 +18,6 @@ interface OrientationData {
 
 export function SkyMapOrientation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number | undefined>(undefined)
   const [orientation, setOrientation] = useState<OrientationData>({
     rightAscension: 53.16,
     declination: -27.79,
@@ -34,11 +33,11 @@ export function SkyMapOrientation() {
     const interval = setInterval(() => {
       setOrientation(prev => ({
         ...prev,
-        roll: (prev.roll + 0.05) % 360,
-        pitch: Math.sin(Date.now() / 5000) * 0.3,
-        yaw: Math.cos(Date.now() / 7000) * 0.2,
+        roll: (prev.roll + 0.1) % 360,
+        pitch: Math.sin(Date.now() / 10000) * 0.3,
+        yaw: Math.cos(Date.now() / 15000) * 0.2,
       }))
-    }, 50)
+    }, 200) // Reduced frequency from 50ms to 200ms
 
     return () => clearInterval(interval)
   }, [])
@@ -220,16 +219,10 @@ export function SkyMapOrientation() {
         ctx.fillText(label.text, label.x, label.y)
       })
 
-      animationRef.current = requestAnimationFrame(drawSkyMap)
+      // Single redraw when orientation changes - no continuous animation
     }
 
     drawSkyMap()
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-    }
   }, [orientation])
 
   return (
@@ -271,11 +264,7 @@ export function SkyMapOrientation() {
           </div>
 
           <div className="aspect-square max-w-2xl mx-auto">
-            <canvas
-              ref={canvasRef}
-              className="w-full h-full"
-              style={{ width: '100%', height: '100%' }}
-            />
+            <canvas ref={canvasRef} className="w-full h-full" />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-border">

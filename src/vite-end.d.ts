@@ -12,3 +12,14 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// Spark service types (optional)
+interface SparkServices {
+  llm?: (prompt: string, model: string, stream?: boolean) => Promise<string>
+}
+
+declare global {
+  interface Window {
+    spark?: SparkServices
+  }
+}

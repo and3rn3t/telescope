@@ -60,7 +60,10 @@ interface SystemHealth {
 }
 
 async function fetchLiveStatus(): Promise<TelescopeStatus> {
-  const promptText = `You are generating realistic real-time data for the James Webb Space Telescope's current observation status.
+  // Check if Spark LLM service is available
+  try {
+    if (typeof window !== 'undefined' && window.spark?.llm) {
+      const promptText = `You are generating realistic real-time data for the James Webb Space Telescope's current observation status.
 
 Generate a single JSON object with a property called "status" containing the current observation with these exact fields:
 - operational: always true (boolean)
@@ -72,20 +75,75 @@ Generate a single JSON object with a property called "status" containing the cur
 - progress: a number between 45 and 85 (represents percentage)
 - dataCollected: a number between 5 and 45 (represents GB)
 - estimatedCompletion: time remaining like "1h 35m" or "45m"
-- coordinates: object with "ra" (right ascension like "12h 34m 56s") and "dec" (declination like "+42° 15' 30\"")
+- coordinates: object with "ra" (right ascension like "12h 34m 56s") and "dec" (declination like "+42° 15' 30"")
 
 Make it scientifically plausible. Return ONLY the JSON object:
 {
   "status": { ...all fields here... }
 }`
 
-  try {
-    const result = await window.spark.llm(promptText, 'gpt-4o-mini', true)
-    const parsed = JSON.parse(result)
-    return parsed.status
-  } catch (error) {
-    console.warn('Failed to fetch telescope status:', error)
-    throw new Error('Failed to fetch telescope status')
+      const result = await window.spark.llm(promptText, 'gpt-4o-mini', true)
+      const parsed = JSON.parse(result)
+      return parsed.status
+    }
+  } catch {
+    // Silently fall back to mock data - this is expected outside Spark environment
+  }
+
+  // Fallback: Generate realistic mock data
+  return generateMockTelescopeStatus()
+}
+
+function generateMockTelescopeStatus(): TelescopeStatus {
+  const targets = [
+    { name: 'NGC 628 (Phantom Galaxy)', type: 'Galaxy' as const },
+    { name: "Stephan's Quintet", type: 'Galaxy' as const },
+    { name: 'Carina Nebula', type: 'Nebula' as const },
+    { name: 'WASP-96b', type: 'Exoplanet' as const },
+    { name: 'NGC 6302 (Bug Nebula)', type: 'Nebula' as const },
+    { name: 'Messier 16 (Eagle Nebula)', type: 'Star Cluster' as const },
+    { name: 'Cassiopeia A', type: 'Supernova Remnant' as const },
+  ]
+
+  const instruments = ['NIRCam', 'MIRI', 'NIRSpec', 'NIRISS'] as const
+  const target = targets[Math.floor(Math.random() * targets.length)]
+  const instrument = instruments[Math.floor(Math.random() * instruments.length)]
+  const progress = Math.floor(Math.random() * 40) + 45 // 45-85
+  const dataCollected = Math.floor(Math.random() * 40) + 5 // 5-45
+  const obsId = Math.floor(Math.random() * 90000) + 10000 // 5-digit number
+
+  const hoursAgo = Math.floor(Math.random() * 6) + 1
+  const minutesAgo = Math.floor(Math.random() * 60)
+  const startTime = `${hoursAgo}h ${minutesAgo}m ago`
+
+  const remainingHours = Math.floor(Math.random() * 3)
+  const remainingMinutes = Math.floor(Math.random() * 60)
+  const estimatedCompletion =
+    remainingHours > 0 ? `${remainingHours}h ${remainingMinutes}m` : `${remainingMinutes}m`
+
+  // Generate realistic coordinates
+  const raHours = Math.floor(Math.random() * 24)
+  const raMinutes = Math.floor(Math.random() * 60)
+  const raSeconds = Math.floor(Math.random() * 60)
+  const decDegrees = Math.floor(Math.random() * 180) - 90
+  const decMinutes = Math.floor(Math.random() * 60)
+  const decSeconds = Math.floor(Math.random() * 60)
+  const decSign = decDegrees >= 0 ? '+' : ''
+
+  return {
+    operational: true,
+    currentTarget: target.name,
+    targetType: target.type,
+    observationId: `JWST-OBS-${obsId}`,
+    instrument: instrument,
+    startTime: startTime,
+    progress: progress,
+    dataCollected: dataCollected,
+    estimatedCompletion: estimatedCompletion,
+    coordinates: {
+      ra: `${String(raHours).padStart(2, '0')}h ${String(raMinutes).padStart(2, '0')}m ${String(raSeconds).padStart(2, '0')}s`,
+      dec: `${decSign}${Math.abs(decDegrees)}° ${String(decMinutes).padStart(2, '0')}' ${String(decSeconds).padStart(2, '0')}"`,
+    },
   }
 }
 
@@ -135,7 +193,8 @@ export function LiveStatusDashboard() {
 
   useEffect(() => {
     loadStatus()
-    const interval = setInterval(loadStatus, 30000)
+    // Increase refresh interval to reduce load
+    const interval = setInterval(loadStatus, 60000) // Changed from 30s to 60s
     return () => clearInterval(interval)
   }, [])
 
@@ -143,16 +202,18 @@ export function LiveStatusDashboard() {
     if (status) {
       setLiveProgress(status.progress)
 
+      // Reduce update frequency to improve performance
       const progressInterval = setInterval(() => {
         setLiveProgress(prev => {
-          const newProgress = prev + Math.random() * 0.5
+          const increment = Math.random() * 0.3 + 0.1 // Smaller, more consistent increments
+          const newProgress = prev + increment
           return newProgress > 100 ? 100 : newProgress
         })
-      }, 2000)
+      }, 5000) // Increased from 2000ms to 5000ms
 
       const dataInterval = setInterval(() => {
-        setDataRate(Math.random() * 2.5 + 0.5)
-      }, 1500)
+        setDataRate(Math.random() * 2.0 + 0.8) // Reduced variation for smoother updates
+      }, 3000) // Increased from 1500ms to 3000ms
 
       return () => {
         clearInterval(progressInterval)

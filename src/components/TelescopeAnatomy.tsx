@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import { telescopeComponents, TelescopeComponent } from '@/lib/telescope-data'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DeploymentSequence } from '@/components/DeploymentSequence'
+import { Telescope3D } from '@/components/Telescope3D'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Eye, Cpu, Cube, Lightning, SquaresFour, Rocket } from '@phosphor-icons/react'
-import { Telescope3D } from '@/components/Telescope3D'
-import { DeploymentSequence } from '@/components/DeploymentSequence'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TelescopeComponent, telescopeComponents } from '@/lib/telescope-data'
+import { Cpu, Cube, Eye, Lightning, Rocket, SquaresFour } from '@phosphor-icons/react'
+import { useState } from 'react'
 
 const categoryIcons = {
   optics: Eye,
@@ -61,7 +61,10 @@ export function TelescopeAnatomy() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <Tabs value={activeCategory} onValueChange={v => setActiveCategory(v as any)}>
+          <Tabs
+            value={activeCategory}
+            onValueChange={v => setActiveCategory(v as 'all' | TelescopeComponent['category'])}
+          >
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="all">All Parts</TabsTrigger>
               <TabsTrigger value="optics" className="gap-2">
@@ -83,7 +86,10 @@ export function TelescopeAnatomy() {
             </TabsList>
           </Tabs>
 
-          <Tabs value={viewMode} onValueChange={v => setViewMode(v as any)}>
+          <Tabs
+            value={viewMode}
+            onValueChange={v => setViewMode(v as '3d' | 'grid' | 'deployment')}
+          >
             <TabsList>
               <TabsTrigger value="3d" className="gap-2">
                 <Cube size={16} />
@@ -153,6 +159,9 @@ export function TelescopeAnatomy() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <DialogTitle className="text-2xl">{selectedComponent?.name}</DialogTitle>
+                <DialogDescription className="sr-only">
+                  Detailed information about the {selectedComponent?.name} component
+                </DialogDescription>
                 {selectedComponent && (
                   <Badge className={`${categoryColors[selectedComponent.category]} mt-2`}>
                     {(() => {

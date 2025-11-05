@@ -2,7 +2,7 @@ import { FilterControls } from '@/components/FilterControls'
 import { ImageDetailDialog } from '@/components/ImageDetailDialog'
 import { InfoTooltip } from '@/components/InfoTooltip'
 import { LiveStatusDashboard } from '@/components/LiveStatusDashboard'
-import { NASAApiTester } from '@/components/NASAApiTester'
+
 import { ObservationMetrics } from '@/components/ObservationMetrics'
 import { PullToRefreshIndicator } from '@/components/PullToRefreshIndicator'
 import { SpaceTrajectory } from '@/components/SpaceTrajectory'
@@ -44,31 +44,32 @@ function App() {
   useEffect(() => {
     loadImages()
 
-    // Check if we're using localStorage fallback and notify user
+    // Check if we're using localStorage fallback and notify user only when needed
     const checkSparkServices = async () => {
       try {
-        // Try to detect if Spark services are available
-        const response = await fetch('/_spark/loaded', {
-          method: 'POST',
-          signal: AbortSignal.timeout(2000),
-        })
-
-        if (!response.ok && response.status === 401) {
-          toast.info('Using local storage for favorites (Spark services unavailable)', {
-            duration: 5000,
+        // Only check for Spark services if we're in a GitHub Spark environment
+        if (typeof window !== 'undefined' && window.location.hostname.includes('github')) {
+          const response = await fetch('/_spark/loaded', {
+            method: 'GET',
+            signal: AbortSignal.timeout(1000),
           })
+
+          if (!response.ok) {
+            // Silently fall back to localStorage - this is expected in most deployments
+          }
         }
-      } catch (error) {
-        // Spark services unavailable - using localStorage fallback
-        console.warn('Spark KV service unavailable, using localStorage:', error)
-        toast.info('Running in offline mode - favorites saved locally', {
-          duration: 3000,
-        })
+      } catch {
+        // Silently use localStorage fallback - this is expected in most deployments
       }
     }
 
-    // Delay the check to avoid interfering with initial load
-    setTimeout(checkSparkServices, 2000)
+    // Only check if we might be in a Spark environment
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.hostname.includes('github') || window.location.hostname.includes('spark'))
+    ) {
+      setTimeout(checkSparkServices, 2000)
+    }
   }, [])
 
   const loadImages = async () => {
@@ -377,7 +378,6 @@ function App() {
             {mainView === 'anatomy' && <TelescopeAnatomy />}
             {mainView === 'trajectory' && <SpaceTrajectory />}
             {mainView === 'metrics' && <ObservationMetrics />}
-            {mainView === 'api-test' && <NASAApiTester />}
           </main>
         </div>
       </div>

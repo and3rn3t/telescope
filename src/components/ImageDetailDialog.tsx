@@ -1,7 +1,7 @@
 import { InfoTooltip } from '@/components/InfoTooltip'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -12,7 +12,7 @@ import {
 } from '@/lib/educational-tooltips'
 import { JWSTImage } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { Heart, Export, CaretLeft } from '@phosphor-icons/react'
+import { CaretLeft, Export, Heart } from '@phosphor-icons/react'
 
 interface ImageDetailDialogProps {
   image: JWSTImage | null
@@ -113,6 +113,9 @@ export function ImageDetailDialog({
                 >
                   {image.title}
                 </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Detailed view of JWST image: {image.title}
+                </DialogDescription>
                 <div className="flex items-center gap-2">
                   {!isMobile && (
                     <Button

@@ -1,1 +1,40 @@
-{}
+{
+  "extends": {
+    "colors": {
+      "cosmic": {
+        "violet": "oklch(0.35 0.15 290)",
+        "black": "oklch(0.145 0 0)",
+        "white": "oklch(0.985 0 0)",
+        "orange": "oklch(0.65 0.20 50)",
+        "teal": "oklch(0.55 0.12 200)",
+        "gold": "oklch(0.75 0.15 85)"
+      },
+      "jwst": {
+        "deep-space": "oklch(0.12 0.02 290)",
+        "void": "oklch(0.18 0.03 290)",
+        "infrared": "oklch(0.35 0.15 290)",
+        "nebula": "oklch(0.65 0.20 50)",
+        "starlight": "oklch(0.75 0.15 85)",
+        "distant": "oklch(0.55 0.12 200)"
+      }
+    },
+    "spacing": {
+      "cosmic-xs": "var(--size-1)",
+      "cosmic-sm": "var(--size-2)",
+      "cosmic-md": "var(--size-4)",
+      "cosmic-lg": "var(--size-6)",
+      "cosmic-xl": "var(--size-8)",
+      "cosmic-2xl": "var(--size-12)"
+    },
+    "borderRadius": {
+      "cosmic": "var(--radius-lg)",
+      "element": "var(--radius-md)",
+      "badge": "var(--radius-full)"
+    },
+    "fontFamily": {
+      "cosmic": "var(--font-sans-serif)",
+      "data": "var(--font-monospace)",
+      "display": "var(--font-serif)"
+    }
+  }
+}

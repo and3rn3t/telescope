@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JWST Deep Sky Explorer - Style Guide</title>
+    <link rel="stylesheet" href="./src/main.css" />
+    <style>
+      /* Cosmic Brand Colors Demo */
+      .color-swatch {
+        width: 100px;
+        height: 60px;
+        border-radius: 8px;
+        display: flex;
+        align-items: end;
+        padding: 8px;
+        font-family: monospace;
+        font-size: 10px;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .cosmic-violet {
+        background: oklch(0.35 0.15 290);
+      }
+      .nebula-orange {
+        background: oklch(0.65 0.2 50);
+      }
+      .starlight-gold {
+        background: oklch(0.75 0.15 85);
+        color: black;
+      }
+      .cosmic-teal {
+        background: oklch(0.55 0.12 200);
+      }
+      .deep-space {
+        background: oklch(0.12 0.02 290);
+      }
+      .void-black {
+        background: oklch(0.18 0.03 290);
+      }
+
+      /* Typography Examples */
+      .font-demo {
+        margin: 16px 0;
+      }
+
+      /* Component Examples */
+      .cosmic-card {
+        background: oklch(0.2 0.02 290);
+        border: 1px solid oklch(0.3 0.04 290);
+        border-radius: 12px;
+        padding: 24px;
+        margin: 16px 0;
+      }
+
+      .cosmic-button {
+        background: oklch(0.35 0.15 290);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 300ms ease;
+      }
+
+      .cosmic-button:hover {
+        background: oklch(0.4 0.18 290);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px oklch(0.1 0.02 290 / 0.3);
+      }
+
+      .cosmic-badge {
+        background: oklch(0.75 0.15 85);
+        color: oklch(0.12 0.02 290);
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background text-foreground min-h-screen"
+    style="background: oklch(0.145 0 0); color: oklch(0.985 0 0)"
+  >
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4" style="color: oklch(0.75 0.15 85)">
+          JWST Deep Sky Explorer
+        </h1>
+        <p class="text-xl text-muted-foreground">Branding Guidelines Style Guide</p>
+      </header>
+
+      <!-- Color Palette -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Cosmic Color Palette</h2>
+
+        <h3 class="text-lg font-medium mb-4">Primary Colors</h3>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div>
+            <div class="color-swatch cosmic-violet">oklch(0.35 0.15 290)</div>
+            <p class="text-sm mt-2">
+              <strong>Deep Space Violet</strong><br />Primary actions, brand identity
+            </p>
+          </div>
+          <div>
+            <div class="color-swatch deep-space">oklch(0.145 0 0)</div>
+            <p class="text-sm mt-2"><strong>Cosmic Black</strong><br />Primary background</p>
+          </div>
+          <div>
+            <div class="color-swatch" style="background: oklch(0.985 0 0); color: black">
+              oklch(0.985 0 0)
+            </div>
+            <p class="text-sm mt-2"><strong>Starlight White</strong><br />Primary text</p>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-medium mb-4">Secondary Colors</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <div class="color-swatch nebula-orange">oklch(0.65 0.20 50)</div>
+            <p class="text-sm mt-2"><strong>Nebula Orange</strong><br />Warm accents, highlights</p>
+          </div>
+          <div>
+            <div class="color-swatch cosmic-teal">oklch(0.55 0.12 200)</div>
+            <p class="text-sm mt-2"><strong>Cosmic Teal</strong><br />Cool highlights</p>
+          </div>
+          <div>
+            <div class="color-swatch starlight-gold">oklch(0.75 0.15 85)</div>
+            <p class="text-sm mt-2"><strong>Starlight Gold</strong><br />Favorites, CTAs</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Typography -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Typography</h2>
+
+        <div class="space-y-6">
+          <div class="font-demo">
+            <h1 class="text-4xl font-bold" style="letter-spacing: -0.02em; line-height: 1.1">
+              H1: Page Titles (32px)
+            </h1>
+            <p class="text-sm text-muted-foreground">
+              Inter Bold, -0.02em letter spacing, 1.1 line height
+            </p>
+          </div>
+
+          <div class="font-demo">
+            <h2 class="text-2xl font-semibold" style="letter-spacing: -0.01em; line-height: 1.2">
+              H2: Section Headers (24px)
+            </h2>
+            <p class="text-sm text-muted-foreground">
+              Inter Semibold, -0.01em letter spacing, 1.2 line height
+            </p>
+          </div>
+
+          <div class="font-demo">
+            <h3 class="text-xl font-medium" style="line-height: 1.3">H3: Image Titles (18px)</h3>
+            <p class="text-sm text-muted-foreground">
+              Inter Medium, normal letter spacing, 1.3 line height
+            </p>
+          </div>
+
+          <div class="font-demo">
+            <p class="text-base" style="line-height: 1.6">
+              Body Text (16px) - This is the standard body text used throughout the application for
+              descriptions, metadata, and general content.
+            </p>
+            <p class="text-sm text-muted-foreground">
+              Inter Regular, normal letter spacing, 1.6 line height
+            </p>
+          </div>
+
+          <div class="font-demo">
+            <p class="text-3xl font-bold font-mono" style="color: oklch(0.35 0.15 290)">
+              13.8 billion years
+            </p>
+            <p class="text-sm text-muted-foreground">
+              Data Values - Inter Mono Bold for scientific measurements
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Spacing -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Spacing Scale</h2>
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-4 bg-accent rounded" style="width: 4px"></div>
+            <span class="font-mono text-sm">4px - space-y-1 (Tight)</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-4 bg-accent rounded" style="width: 12px"></div>
+            <span class="font-mono text-sm">12px - space-y-3 (Default)</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-4 bg-accent rounded" style="width: 24px"></div>
+            <span class="font-mono text-sm">24px - space-y-6 (Loose)</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-4 bg-accent rounded" style="width: 48px"></div>
+            <span class="font-mono text-sm">48px - space-y-12 (Extra Loose)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Components -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Component Examples</h2>
+
+        <div class="cosmic-card">
+          <div class="flex items-start justify-between mb-4">
+            <h3 class="text-lg font-medium">JWST Discovery Card</h3>
+            <span class="cosmic-badge">NEW</span>
+          </div>
+          <p class="text-muted-foreground mb-4">
+            This card demonstrates our cosmic design system with proper spacing, typography, and
+            colors.
+          </p>
+          <button class="cosmic-button">Explore Galaxy</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <button class="cosmic-button">Primary Action</button>
+          <button class="cosmic-button" style="background: oklch(0.65 0.2 50)">
+            Secondary Action
+          </button>
+          <button
+            class="cosmic-button"
+            style="background: transparent; border: 1px solid oklch(0.3 0.04 290)"
+          >
+            Ghost Action
+          </button>
+        </div>
+      </section>
+
+      <!-- Border Radius -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Border Radius</h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-accent mx-auto mb-2"
+              style="border-radius: 6px; background: oklch(0.35 0.15 290)"
+            ></div>
+            <p class="text-sm">Buttons (6px)</p>
+          </div>
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-accent mx-auto mb-2"
+              style="border-radius: 8px; background: oklch(0.35 0.15 290)"
+            ></div>
+            <p class="text-sm">Cards (8px)</p>
+          </div>
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-accent mx-auto mb-2"
+              style="border-radius: 12px; background: oklch(0.35 0.15 290)"
+            ></div>
+            <p class="text-sm">Dialogs (12px)</p>
+          </div>
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-accent mx-auto mb-2"
+              style="border-radius: 9999px; background: oklch(0.75 0.15 85)"
+            ></div>
+            <p class="text-sm">Badges (Full)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Usage Guidelines -->
+      <section>
+        <h2 class="text-2xl font-semibold mb-6">Usage Guidelines</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="cosmic-card">
+            <h3 class="text-lg font-medium mb-3" style="color: oklch(0.65 0.15 140)">✓ Do</h3>
+            <ul class="space-y-2 text-sm">
+              <li>• Use cosmic violet for primary actions</li>
+              <li>• Maintain 4.5:1 contrast ratios</li>
+              <li>• Apply consistent spacing scales</li>
+              <li>• Use monospace fonts for data values</li>
+              <li>• Add subtle hover animations</li>
+            </ul>
+          </div>
+
+          <div class="cosmic-card">
+            <h3 class="text-lg font-medium mb-3" style="color: oklch(0.65 0.2 25)">✗ Don't</h3>
+            <ul class="space-y-2 text-sm">
+              <li>• Use bright colors that compete with imagery</li>
+              <li>• Apply inconsistent border radius</li>
+              <li>• Mix different spacing scales</li>
+              <li>• Use color alone to convey information</li>
+              <li>• Create jarring animations</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

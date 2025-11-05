@@ -26,81 +26,154 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+
+  /* === SMOOTH THEME TRANSITIONS === */
+  /* Prevent jarring theme switches with gentle transitions */
+  *,
+  *::before,
+  *::after {
+    transition:
+      background-color 200ms ease-in-out,
+      border-color 200ms ease-in-out,
+      color 200ms ease-in-out,
+      box-shadow 200ms ease-in-out;
+  }
+
+  /* Preserve motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+    }
+  }
+
+  /* Ensure focus indicators remain immediate */
+  *:focus-visible {
+    transition: none;
+  }
 }
 
 /*
   ---break---
 */
 :root {
+  /* === ENHANCED LIGHT THEME - COSMIC BRANDING === */
+
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Background hierarchy - Bright space atmosphere */
+  --background: oklch(0.98 0.005 290); /* Cosmic white with hint of violet */
+  --foreground: oklch(0.12 0.02 290); /* Deep space text - 16.8:1 contrast */
+
+  /* Card surfaces - Elevated cosmic elements */
+  --card: oklch(0.99 0.002 290); /* Pure white with cosmic hint */
+  --card-foreground: oklch(0.12 0.02 290);
+
+  /* Popover surfaces */
+  --popover: oklch(0.99 0.002 290); /* Clean popover surface */
+  --popover-foreground: oklch(0.12 0.02 290);
+
+  /* Primary cosmic violet - Optimized for light theme */
+  --primary: oklch(0.35 0.15 290); /* Cosmic violet - 8.2:1 contrast */
+  --primary-foreground: oklch(0.98 0.005 290);
+
+  /* Secondary surfaces */
+  --secondary: oklch(0.94 0.01 290); /* Light cosmic surface */
+  --secondary-foreground: oklch(0.12 0.02 290);
+
+  /* Muted elements - Proper contrast hierarchy */
+  --muted: oklch(0.94 0.01 290); /* Muted background */
+  --muted-foreground: oklch(0.45 0.03 290); /* 5.5:1 contrast */
+
+  /* Accent - Starlight gold for favorites */
+  --accent: oklch(0.92 0.02 85); /* Light gold accent background */
+  --accent-foreground: oklch(0.25 0.12 85); /* Rich gold text */
+
+  /* Destructive - Cosmic red */
+  --destructive: oklch(0.55 0.22 25); /* Error red - 7.1:1 contrast */
+
+  /* Borders - Subtle cosmic boundaries */
+  --border: oklch(0.85 0.02 290); /* 4.2:1 contrast */
+  --input: oklch(0.96 0.005 290); /* Input backgrounds */
+  --ring: oklch(0.35 0.15 290); /* Focus rings - cosmic violet */
+
+  /* Enhanced chart colors - Light theme cosmic palette */
+  --chart-1: oklch(0.45 0.18 264); /* Deep violet */
+  --chart-2: oklch(0.55 0.25 50); /* Nebula orange */
+  --chart-3: oklch(0.6 0.2 85); /* Starlight gold */
+  --chart-4: oklch(0.4 0.15 200); /* Cosmic teal */
+  --chart-5: oklch(0.5 0.2 320); /* Distant purple */
+
+  /* Sidebar - Navigation cosmic theme */
+  --sidebar: oklch(0.97 0.005 290); /* Sidebar background */
+  --sidebar-foreground: oklch(0.12 0.02 290);
+  --sidebar-primary: oklch(0.35 0.15 290); /* Cosmic violet */
+  --sidebar-primary-foreground: oklch(0.98 0.005 290);
+  --sidebar-accent: oklch(0.92 0.02 85);
+  --sidebar-accent-foreground: oklch(0.25 0.12 85); /* Rich gold */
+  --sidebar-border: oklch(0.85 0.02 290);
+  --sidebar-ring: oklch(0.35 0.15 290);
 }
 
 /*
   ---break---
 */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* === ENHANCED DARK THEME - COSMIC BRANDING === */
+
+  /* Background hierarchy - Deep space progression */
+  --background: oklch(0.12 0.02 290); /* Deep space black */
+  --foreground: oklch(0.98 0.01 290); /* Starlight white - 18:1 contrast */
+
+  /* Card surfaces - Elevated cosmic elements */
+  --card: oklch(0.18 0.03 290); /* Void black - subtle elevation */
+  --card-foreground: oklch(0.98 0.01 290);
+
+  /* Popover surfaces */
+  --popover: oklch(0.2 0.03 290); /* Slightly elevated */
+  --popover-foreground: oklch(0.98 0.01 290);
+
+  /* Primary cosmic violet - Enhanced visibility for dark theme */
+  --primary: oklch(0.6 0.12 290); /* Cosmic violet - 7.2:1 contrast */
+  --primary-foreground: oklch(0.12 0.02 290);
+
+  /* Secondary nebula orange */
+  --secondary: oklch(0.25 0.04 290); /* Dark surface */
+  --secondary-foreground: oklch(0.98 0.01 290);
+
+  /* Muted elements - Proper contrast hierarchy */
+  --muted: oklch(0.25 0.04 290); /* Muted background */
+  --muted-foreground: oklch(0.65 0.03 290); /* 5.8:1 contrast */
+
+  /* Accent - Starlight gold for favorites */
+  --accent: oklch(0.22 0.03 290); /* Accent background */
+  --accent-foreground: oklch(0.75 0.15 85); /* Starlight gold */
+
+  /* Destructive - Cosmic red */
+  --destructive: oklch(0.65 0.2 25); /* Error red - 6.5:1 contrast */
+
+  /* Borders - Subtle cosmic boundaries */
+  --border: oklch(0.3 0.04 290); /* 3.5:1 contrast */
+  --input: oklch(0.16 0.03 290); /* Input backgrounds */
+  --ring: oklch(0.6 0.12 290); /* Focus rings - cosmic violet */
+
+  /* Enhanced chart colors - Cosmic theme */
+  --chart-1: oklch(0.6 0.15 264); /* Deep violet */
+  --chart-2: oklch(0.65 0.2 50); /* Nebula orange */
+  --chart-3: oklch(0.75 0.15 85); /* Starlight gold */
+  --chart-4: oklch(0.55 0.12 200); /* Cosmic teal */
+  --chart-5: oklch(0.7 0.18 320); /* Distant purple */
+
+  /* Sidebar - Navigation cosmic theme */
+  --sidebar: oklch(0.16 0.03 290); /* Sidebar background */
+  --sidebar-foreground: oklch(0.98 0.01 290);
+  --sidebar-primary: oklch(0.6 0.12 290); /* Cosmic violet */
+  --sidebar-primary-foreground: oklch(0.12 0.02 290);
+  --sidebar-accent: oklch(0.22 0.03 290);
+  --sidebar-accent-foreground: oklch(0.75 0.15 85); /* Starlight gold */
+  --sidebar-border: oklch(0.3 0.04 290);
+  --sidebar-ring: oklch(0.6 0.12 290);
 }
 
 /*

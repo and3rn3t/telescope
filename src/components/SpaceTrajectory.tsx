@@ -8,6 +8,7 @@ import { Planet, Path, ShieldChevron, Drop, Rocket, Globe, CircleDashed } from '
 import { motion } from 'framer-motion'
 import { LocationTracker } from '@/components/LocationTracker'
 import { NextObservation } from '@/components/NextObservation'
+import { SkyMapOrientation } from '@/components/SkyMapOrientation'
 
 const orbitFactIcons = {
   orbit: CircleDashed,
@@ -43,6 +44,8 @@ export function SpaceTrajectory() {
       </div>
 
       <LocationTracker />
+
+      <SkyMapOrientation />
 
       <NextObservation />
 

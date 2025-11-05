@@ -1,6 +1,6 @@
 # 🚀 Cloudflare Pages Deployment Guide
 
-## Custom Domain: webb.andernet.dev
+## Custom Domain: jwst.andernet.dev
 
 ## Quick Setup
 
@@ -124,7 +124,7 @@ CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 
 ## 🌟 Configured Domain
 
-**Primary Domain**: `webb.andernet.dev`
+**Primary Domain**: `jwst.andernet.dev`
 
 - ✅ Configured for this deployment
 - ✅ SSL/TLS automatic provisioning
@@ -180,5 +180,5 @@ npm run build
 4. **Optimize**: Enable Cloudflare performance features
 5. **Share**: Your JWST Deep Sky Explorer is live! 🔭✨
 
-**Live URL**: `https://webb.andernet.dev`  
+**Live URL**: `https://jwst.andernet.dev`  
 **Fallback URL**: `https://jwst-deep-sky-explorer.pages.dev`

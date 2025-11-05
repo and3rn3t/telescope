@@ -1,16 +1,16 @@
-# Custom Domain Configuration for webb.andernet.dev
+# Custom Domain Configuration for jwst.andernet.dev
 
 ## 🌐 Domain Setup Steps
 
 ### 1. **DNS Configuration**
 
-Since you're using `webb.andernet.dev` (subdomain of `andernet.dev`), you'll need to configure DNS records:
+Since you're using `jwst.andernet.dev` (subdomain of `andernet.dev`), you'll need to configure DNS records:
 
 **Add these DNS records in your DNS provider:**
 
 ```
 Type: CNAME
-Name: webb
+Name: jwst
 Value: jwst-deep-sky-explorer.pages.dev
 Proxy: Enabled (orange cloud in Cloudflare)
 ```
@@ -20,23 +20,23 @@ Proxy: Enabled (orange cloud in Cloudflare)
 1. Go to **Cloudflare Dashboard** → **Pages** → **jwst-deep-sky-explorer**
 2. Navigate to **Custom domains** tab
 3. Click **"Set up a custom domain"**
-4. Enter: `webb.andernet.dev`
+4. Enter: `jwst.andernet.dev`
 5. Cloudflare will automatically provision SSL certificate
 
 ### 3. **Verification**
 
 After DNS propagation (5-60 minutes), verify:
 
-- ✅ `https://webb.andernet.dev` loads your application
+- ✅ `https://jwst.andernet.dev` loads your application
 - ✅ SSL certificate is active (green lock icon)
 - ✅ Redirects from HTTP to HTTPS work automatically
 
 ## 🔧 **Configuration Details**
 
-### **Primary Domain:** `webb.andernet.dev`
+### **Primary Domain:** `jwst.andernet.dev`
 
 - **SSL/TLS:** Automatic (Let's Encrypt)
-- **CDN:** Cloudflare Global Network  
+- **CDN:** Cloudflare Global Network
 - **HTTP/2 & HTTP/3:** Enabled
 - **Brotli Compression:** Enabled
 
@@ -49,7 +49,7 @@ After DNS propagation (5-60 minutes), verify:
 
 ### **Production**
 
-- **Custom Domain:** <https://webb.andernet.dev>
+- **Custom Domain:** <https://jwst.andernet.dev>
 - **Cloudflare Pages:** <https://jwst-deep-sky-explorer.pages.dev>
 
 ### **Preview Deployments**
@@ -59,7 +59,7 @@ After DNS propagation (5-60 minutes), verify:
 
 ## 🔐 **Security Features**
 
-All configured automatically for `webb.andernet.dev`:
+All configured automatically for `jwst.andernet.dev`:
 
 - **HTTPS Enforcement:** HTTP → HTTPS redirects
 - **HSTS Headers:** Strict Transport Security
@@ -89,12 +89,12 @@ Available in Cloudflare Dashboard:
 
 ## 🎯 **Quick Setup Checklist**
 
-- [ ] Add CNAME record: `webb → jwst-deep-sky-explorer.pages.dev`
+- [ ] Add CNAME record: `jwst → jwst-deep-sky-explorer.pages.dev`
 - [ ] Enable Cloudflare proxy (orange cloud)
 - [ ] Configure custom domain in Cloudflare Pages
 - [ ] Wait for SSL certificate provisioning (5-10 minutes)
-- [ ] Test: `https://webb.andernet.dev`
+- [ ] Test: `https://jwst.andernet.dev`
 - [ ] Verify security headers and performance
 - [ ] Set up monitoring and analytics
 
-**Result:** Your JWST Deep Sky Explorer will be live at `https://webb.andernet.dev` with enterprise-grade performance and security! 🔭✨
+**Result:** Your JWST Deep Sky Explorer will be live at `https://jwst.andernet.dev` with enterprise-grade performance and security! 🔭✨

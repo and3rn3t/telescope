@@ -1,5 +1,5 @@
 # Wrangler configuration for JWST Deep Sky Explorer
-# Custom domain: webb.andernet.dev
+# Custom domain: jwst.andernet.dev
 
-name = "jwst-deep-sky-explorer" 
+name = "jwst-deep-sky-explorer"
 compatibility_date = "2024-11-04"

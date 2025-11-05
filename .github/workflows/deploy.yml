@@ -53,10 +53,12 @@ jobs:
         with:
           script: |
             const { owner, repo, number } = context.issue;
-            const deployment_url = `https://jwst-deep-sky-explorer.pages.dev`;
+            const deployment_url = `https://webb.andernet.dev`;
+            const preview_url = `https://jwst-deep-sky-explorer.pages.dev`;
             const comment = `🚀 **Deployment Preview Ready!**
             
-            **Preview URL:** ${deployment_url}
+            **Production URL:** ${deployment_url}
+            **Preview URL:** ${preview_url}
             **Branch:** \`${context.payload.pull_request.head.ref}\`
             **Commit:** \`${context.sha.substring(0, 7)}\`
             

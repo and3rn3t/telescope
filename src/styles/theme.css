@@ -417,21 +417,21 @@
 
   /* Navigation Tabs */
   .cosmic-nav-tabs {
-    @apply bg-jwst-void/50 backdrop-blur-sm rounded-lg border border-cosmic-deep-space-violet/20;
+    @apply bg-slate-900/50 backdrop-blur-sm rounded-lg border border-violet-700/20;
   }
 
   .cosmic-nav-tab {
     @apply relative
     transition-all duration-300 ease-out
-    text-starlight-gold/70
+    text-yellow-400/70
     border-transparent
-    hover:text-starlight-gold
-    hover:bg-cosmic-deep-space-violet/20
+    hover:text-yellow-400
+    hover:bg-violet-700/20
     data-[state=active]:text-white
-    data-[state=active]:bg-cosmic-deep-space-violet/40
-    data-[state=active]:border-starlight-gold/30
+    data-[state=active]:bg-violet-700/40
+    data-[state=active]:border-yellow-400/30
     data-[state=active]:shadow-lg
-    data-[state=active]:shadow-starlight-gold/10;
+    data-[state=active]:shadow-yellow-400/10;
   }
 
   .cosmic-nav-tab::after {
@@ -441,7 +441,7 @@
     left: 50%;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, var(--color-starlight-gold), transparent);
+    background: linear-gradient(90deg, transparent, rgb(250, 204, 21), transparent);
     transform: translateX(-50%);
     transition: width 0.3s ease-out;
   }

@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
+
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   Thermometer,
   Lightning,
-  Cpu,
-  Drop,
-  Sun,
   Atom,
   Engine,
   Gauge,
@@ -202,8 +199,8 @@ function TrendIndicator({ trend }: { trend: 'up' | 'down' | 'stable' }) {
     stable: Minus,
   }
   const colors = {
-    up: 'text-blue-400',
-    down: 'text-cyan-400',
+    up: 'text-galaxy-blue',
+    down: 'text-instrument-teal',
     stable: 'text-muted-foreground',
   }
   const Icon = icons[trend]

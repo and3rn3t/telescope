@@ -40,7 +40,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
     <div className="flex flex-col gap-4">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="cosmic-body-sm text-yellow-400">Object Type</label>
+          <label className="cosmic-body-sm text-starlight-gold">Object Type</label>
           <InfoTooltip
             content={{
               title: 'Cosmic Objects',
@@ -81,7 +81,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="cosmic-body-sm text-yellow-400">Instrument</label>
+          <label className="cosmic-body-sm text-starlight-gold">Instrument</label>
           <InfoTooltip
             content={{
               title: 'JWST Science Instruments',
@@ -131,7 +131,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
               distanceRange: [0, Infinity],
             })
           }
-          className="w-full text-orange-400 hover:text-yellow-400 cosmic-body-sm"
+          className="w-full text-infrared-orange hover:text-starlight-gold cosmic-body-sm"
           data-slot="button"
         >
           Clear Filters
@@ -148,13 +148,13 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
             <Funnel size={16} />
             Filters
             {(filters.objectType !== 'all' || filters.instrument !== 'all') && (
-              <span className="w-2 h-2 rounded-full cosmic-accent" />
+              <span className="w-2 h-2 rounded-full bg-infrared-orange" />
             )}
           </Button>
         </SheetTrigger>
         <SheetContent side="bottom" className="h-auto cosmic-surface">
           <SheetHeader>
-            <SheetTitle className="cosmic-heading-md text-yellow-400">Filter Images</SheetTitle>
+            <SheetTitle className="cosmic-heading-md text-starlight-gold">Filter Images</SheetTitle>
           </SheetHeader>
           <div className="mt-6">
             <FilterContent />
@@ -180,7 +180,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
         </Button>
       ))}
 
-      <div className="w-px h-6 bg-violet-700/30" />
+      <div className="w-px h-6 bg-cosmic-deep-space-violet/30" />
 
       <Select
         value={filters.instrument}

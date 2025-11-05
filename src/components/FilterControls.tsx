@@ -1,4 +1,4 @@
-import { FilterState, ObjectType, InstrumentType } from '@/lib/types'
+import { InfoTooltip } from '@/components/InfoTooltip'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -7,11 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Funnel, Planet, Spiral, Sparkle, Star } from '@phosphor-icons/react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { InfoTooltip } from '@/components/InfoTooltip'
 import { instrumentTooltips, objectTypeTooltips } from '@/lib/educational-tooltips'
+import { FilterState, InstrumentType, ObjectType } from '@/lib/types'
+import { Funnel, Planet, Sparkle, Spiral, Star } from '@phosphor-icons/react'
 
 interface FilterControlsProps {
   filters: FilterState
@@ -40,7 +40,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
     <div className="flex flex-col gap-4">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-muted-foreground">Object Type</label>
+          <label className="cosmic-body-sm text-yellow-400">Object Type</label>
           <InfoTooltip
             content={{
               title: 'Cosmic Objects',
@@ -59,7 +59,8 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
                 variant={filters.objectType === type.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onFilterChange({ ...filters, objectType: type.value })}
-                className="justify-start gap-2 w-full"
+                className="justify-start gap-2 w-full cosmic-nav-tab"
+                data-slot="button"
               >
                 {type.icon}
                 <span className="text-xs">{type.label}</span>
@@ -80,7 +81,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-muted-foreground">Instrument</label>
+          <label className="cosmic-body-sm text-yellow-400">Instrument</label>
           <InfoTooltip
             content={{
               title: 'JWST Science Instruments',
@@ -130,7 +131,8 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
               distanceRange: [0, Infinity],
             })
           }
-          className="w-full"
+          className="w-full text-orange-400 hover:text-yellow-400 cosmic-body-sm"
+          data-slot="button"
         >
           Clear Filters
         </Button>
@@ -142,17 +144,17 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2 cosmic-nav-tab" data-slot="button">
             <Funnel size={16} />
             Filters
             {(filters.objectType !== 'all' || filters.instrument !== 'all') && (
-              <span className="w-2 h-2 rounded-full bg-accent" />
+              <span className="w-2 h-2 rounded-full cosmic-accent" />
             )}
           </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="h-auto">
+        <SheetContent side="bottom" className="h-auto cosmic-surface">
           <SheetHeader>
-            <SheetTitle>Filter Images</SheetTitle>
+            <SheetTitle className="cosmic-heading-md text-yellow-400">Filter Images</SheetTitle>
           </SheetHeader>
           <div className="mt-6">
             <FilterContent />
@@ -170,14 +172,15 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
           variant={filters.objectType === type.value ? 'default' : 'outline'}
           size="sm"
           onClick={() => onFilterChange({ ...filters, objectType: type.value })}
-          className="gap-2"
+          className="gap-2 cosmic-nav-tab"
+          data-slot="button"
         >
           {type.icon}
           <span className="hidden sm:inline">{type.label}</span>
         </Button>
       ))}
 
-      <div className="w-px h-6 bg-border" />
+      <div className="w-px h-6 bg-violet-700/30" />
 
       <Select
         value={filters.instrument}

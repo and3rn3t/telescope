@@ -1,5 +1,18 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-starlight-gold: oklch(84.21% 0.226 87.66);
+  --color-cosmic-deep-space-violet: oklch(35.42% 0.187 285.75);
+  --color-nebula-pink: oklch(68.5% 0.224 350.5);
+  --color-infrared-orange: oklch(76.32% 0.189 65.5);
+  --color-jwst-void: oklch(14.67% 0.025 285.75);
+  --color-galaxy-blue: oklch(58.23% 0.215 230.8);
+  --color-solar-yellow: oklch(88.67% 0.189 87.66);
+  --color-mirror-silver: oklch(78.45% 0.012 220.5);
+  --color-instrument-teal: oklch(65.78% 0.156 180.3);
+  --color-observation-red: oklch(58.92% 0.225 25.8);
+}
+
 @import './styles/theme.css';
 @import './index.css';
 @import 'tw-animate-css';
@@ -7,8 +20,6 @@
   ---break---
 */
 @custom-variant dark (&:is(.dark *));
-
-@config '../tailwind.config.js';
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,

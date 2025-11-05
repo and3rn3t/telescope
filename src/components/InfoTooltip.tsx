@@ -14,15 +14,15 @@ export function InfoTooltip({ content, side = 'top', className, iconSize = 16 }:
     <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button 
+          <button
             className={`inline-flex items-center justify-center text-muted-foreground hover:text-accent transition-colors ${className || ''}`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <Info size={iconSize} weight="fill" />
           </button>
         </TooltipTrigger>
-        <TooltipContent 
-          side={side} 
+        <TooltipContent
+          side={side}
           className="max-w-xs p-4 bg-card/95 backdrop-blur-xl border-border shadow-xl"
           sideOffset={8}
         >

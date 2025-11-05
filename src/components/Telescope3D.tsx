@@ -23,29 +23,29 @@ const categoryIcons = {
   optics: Eye,
   instruments: Cpu,
   structure: Cube,
-  power: Lightning
+  power: Lightning,
 }
 
 const categoryColors = {
   optics: '#eab308',
   instruments: '#8b5cf6',
   structure: '#06b6d4',
-  power: '#f59e0b'
+  power: '#f59e0b',
 }
 
 const componentPositions: Record<string, [number, number, number]> = {
   'primary-mirror': [0, 0, 0],
   'secondary-mirror': [0, 0, 4],
-  'sunshield': [0, -3, -2],
-  'nircam': [0, -1.5, 0.5],
-  'nirspec': [-1.2, -1.5, 0.5],
-  'miri': [1.2, -1.5, 0.5],
-  'niriss': [0.6, -1.5, 0.5],
-  'fgs': [-0.6, -1.5, 0.5],
+  sunshield: [0, -3, -2],
+  nircam: [0, -1.5, 0.5],
+  nirspec: [-1.2, -1.5, 0.5],
+  miri: [1.2, -1.5, 0.5],
+  niriss: [0.6, -1.5, 0.5],
+  fgs: [-0.6, -1.5, 0.5],
   'solar-arrays': [3, -2, -1],
   'spacecraft-bus': [0, -2, -1],
-  'ote': [0, 0.5, 0],
-  'backplane': [0, 0, -0.5]
+  ote: [0, 0.5, 0],
+  backplane: [0, 0, -0.5],
 }
 
 export function Telescope3D({ onComponentClick, selectedComponent, components }: Telescope3DProps) {
@@ -110,7 +110,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
     const extrudeSettings = {
       steps: 1,
       depth: 0.05,
-      bevelEnabled: false
+      bevelEnabled: false,
     }
     const hexGeometry = new THREE.ExtrudeGeometry(hexagonShape, extrudeSettings)
     const mirrorMaterial = new THREE.MeshStandardMaterial({
@@ -118,20 +118,28 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       metalness: 0.9,
       roughness: 0.1,
       emissive: 0xaa8800,
-      emissiveIntensity: 0.2
+      emissiveIntensity: 0.2,
     })
 
     const hexPositions = [
       [0, 0],
-      [0.87, 0], [-0.87, 0],
-      [0.435, 0.75], [-0.435, 0.75],
-      [0.435, -0.75], [-0.435, -0.75],
-      [1.305, 0.75], [-1.305, 0.75],
-      [1.305, -0.75], [-1.305, -0.75],
-      [0.87, 1.5], [-0.87, 1.5],
-      [0, 1.5], [0, -1.5],
-      [0.87, -1.5], [-0.87, -1.5],
-      [1.74, 0]
+      [0.87, 0],
+      [-0.87, 0],
+      [0.435, 0.75],
+      [-0.435, 0.75],
+      [0.435, -0.75],
+      [-0.435, -0.75],
+      [1.305, 0.75],
+      [-1.305, 0.75],
+      [1.305, -0.75],
+      [-1.305, -0.75],
+      [0.87, 1.5],
+      [-0.87, 1.5],
+      [0, 1.5],
+      [0, -1.5],
+      [0.87, -1.5],
+      [-0.87, -1.5],
+      [1.74, 0],
     ]
 
     hexPositions.forEach(([x, y]) => {
@@ -151,7 +159,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
     const strutMaterial = new THREE.MeshStandardMaterial({
       color: 0x333333,
       metalness: 0.7,
-      roughness: 0.3
+      roughness: 0.3,
     })
     for (let i = 0; i < 3; i++) {
       const angle = (i * 2 * Math.PI) / 3
@@ -169,7 +177,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       color: 0xaaaaaa,
       metalness: 0.4,
       roughness: 0.6,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
     })
     const sunshield = new THREE.Mesh(sunshieldGeometry, sunshieldMaterial)
     sunshield.position.set(0, -3, -2)
@@ -187,7 +195,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
           metalness: 0.6,
           roughness: 0.4,
           emissive: new THREE.Color(color),
-          emissiveIntensity: 0.3
+          emissiveIntensity: 0.3,
         })
         const mesh = new THREE.Mesh(instrumentGeometry, material)
         mesh.position.set(pos[0], pos[1], pos[2])
@@ -199,7 +207,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
     const busMaterial = new THREE.MeshStandardMaterial({
       color: 0x444444,
       metalness: 0.7,
-      roughness: 0.3
+      roughness: 0.3,
     })
     const spacecraftBus = new THREE.Mesh(busGeometry, busMaterial)
     spacecraftBus.position.set(0, -2, -1)
@@ -211,7 +219,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       metalness: 0.8,
       roughness: 0.2,
       emissive: 0x0a0a1e,
-      emissiveIntensity: 0.4
+      emissiveIntensity: 0.4,
     })
     const solarArray = new THREE.Mesh(solarArrayGeometry, solarArrayMaterial)
     solarArray.position.set(3, -2, -1)
@@ -221,7 +229,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
     const backplaneMaterial = new THREE.MeshStandardMaterial({
       color: 0x2a2a2a,
       metalness: 0.5,
-      roughness: 0.5
+      roughness: 0.5,
     })
     const backplane = new THREE.Mesh(backplaneGeometry, backplaneMaterial)
     backplane.position.set(0, 0, -0.5)
@@ -237,7 +245,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
           emissive: new THREE.Color(categoryColors[component.category]),
           emissiveIntensity: 0.5,
           transparent: true,
-          opacity: 0.8
+          opacity: 0.8,
         })
         const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial)
         markerMesh.position.set(pos[0], pos[1], pos[2])
@@ -247,7 +255,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
           id: component.id,
           position: new THREE.Vector3(pos[0], pos[1], pos[2]),
           component,
-          mesh: markerMesh
+          mesh: markerMesh,
         })
       }
     })
@@ -266,7 +274,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       color: 0xffffff,
       size: 0.1,
       transparent: true,
-      opacity: 0.6
+      opacity: 0.6,
     })
     const stars = new THREE.Points(starGeometry, starMaterial)
     scene.add(stars)
@@ -304,9 +312,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       const raycaster = new THREE.Raycaster()
       raycaster.setFromCamera(new THREE.Vector2(x, y), camera)
 
-      const intersects = raycaster.intersectObjects(
-        markers.map(m => m.mesh!).filter(Boolean)
-      )
+      const intersects = raycaster.intersectObjects(markers.map(m => m.mesh!).filter(Boolean))
 
       if (intersects.length > 0) {
         const marker = markers.find(m => m.mesh === intersects[0].object)
@@ -380,7 +386,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full rounded-lg overflow-hidden" />
-      
+
       <Card className="absolute top-4 left-4 p-4 bg-card/90 backdrop-blur-sm">
         <h3 className="font-semibold mb-3 text-sm">Component Key</h3>
         <div className="space-y-2">
@@ -388,10 +394,7 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
             const Icon = categoryIcons[category as keyof typeof categoryIcons]
             return (
               <div key={category} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
                 <Icon size={14} />
                 <span className="text-xs capitalize">{category}</span>
               </div>
@@ -402,7 +405,8 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
 
       <Card className="absolute bottom-4 left-4 right-4 p-3 bg-card/90 backdrop-blur-sm">
         <p className="text-xs text-muted-foreground text-center">
-          <span className="font-medium">Click and drag</span> to rotate • <span className="font-medium">Click markers</span> to view component details
+          <span className="font-medium">Click and drag</span> to rotate •{' '}
+          <span className="font-medium">Click markers</span> to view component details
         </p>
       </Card>
     </div>

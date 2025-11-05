@@ -106,10 +106,10 @@ export function LocationTracker() {
     const daysInOrbit = daysSinceLaunch - 30
     const currentOrbitNumber = Math.floor(daysInOrbit / orbitPeriod) + 1
     const daysUntilNextOrbit = orbitPeriod - (daysInOrbit % orbitPeriod)
-    
+
     return {
       orbitNumber: currentOrbitNumber,
-      daysUntilComplete: Math.floor(daysUntilNextOrbit)
+      daysUntilComplete: Math.floor(daysUntilNextOrbit),
     }
   }
 
@@ -146,9 +146,11 @@ export function LocationTracker() {
             </div>
             <InfoTooltip
               content={{
-                title: "L2 Distance",
-                description: "JWST orbits around the Earth-Sun L2 Lagrange point, located approximately 1.5 million kilometers from Earth.",
-                details: "This stable gravitational point allows JWST to maintain a constant distance from Earth while keeping its sensitive instruments shielded from the Sun's heat and light."
+                title: 'L2 Distance',
+                description:
+                  'JWST orbits around the Earth-Sun L2 Lagrange point, located approximately 1.5 million kilometers from Earth.',
+                details:
+                  "This stable gravitational point allows JWST to maintain a constant distance from Earth while keeping its sensitive instruments shielded from the Sun's heat and light.",
               }}
               side="left"
             />
@@ -157,9 +159,7 @@ export function LocationTracker() {
             <div className="text-3xl font-bold font-mono text-secondary">
               {l2Distance.toLocaleString()}
             </div>
-            <div className="text-sm text-muted-foreground">
-              kilometers from Earth
-            </div>
+            <div className="text-sm text-muted-foreground">kilometers from Earth</div>
           </div>
           <Badge variant="secondary" className="w-fit">
             ~4x Moon's distance
@@ -174,9 +174,11 @@ export function LocationTracker() {
             </div>
             <InfoTooltip
               content={{
-                title: "Time in Space",
-                description: "JWST was launched on December 25, 2021, and reached its operational orbit at L2 in late January 2022.",
-                details: "The telescope has a planned mission lifetime of 5-10 years, with sufficient propellant to potentially extend operations beyond that timeframe."
+                title: 'Time in Space',
+                description:
+                  'JWST was launched on December 25, 2021, and reached its operational orbit at L2 in late January 2022.',
+                details:
+                  'The telescope has a planned mission lifetime of 5-10 years, with sufficient propellant to potentially extend operations beyond that timeframe.',
               }}
               side="left"
             />
@@ -185,9 +187,7 @@ export function LocationTracker() {
             <div className="text-3xl font-bold font-mono text-accent">
               {formatDuration(elapsedTime)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              since launch
-            </div>
+            <div className="text-sm text-muted-foreground">since launch</div>
           </div>
           <Badge variant="outline" className="w-fit border-accent text-accent">
             Launched Dec 25, 2021
@@ -202,20 +202,18 @@ export function LocationTracker() {
             </div>
             <InfoTooltip
               content={{
-                title: "Halo Orbit",
-                description: "JWST doesn't orbit Earth directly. Instead, it follows a 'halo orbit' around the L2 point.",
-                details: "This orbit takes approximately 6 months to complete and requires periodic thruster firings to maintain stability. The halo orbit keeps the telescope from being eclipsed by Earth or Moon."
+                title: 'Halo Orbit',
+                description:
+                  "JWST doesn't orbit Earth directly. Instead, it follows a 'halo orbit' around the L2 point.",
+                details:
+                  'This orbit takes approximately 6 months to complete and requires periodic thruster firings to maintain stability. The halo orbit keeps the telescope from being eclipsed by Earth or Moon.',
               }}
               side="left"
             />
           </div>
           <div className="space-y-1">
-            <div className="text-3xl font-bold font-mono text-primary">
-              ~{orbitPeriod}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              days per orbit
-            </div>
+            <div className="text-3xl font-bold font-mono text-primary">~{orbitPeriod}</div>
+            <div className="text-sm text-muted-foreground">days per orbit</div>
           </div>
           <Badge variant="outline" className="w-fit border-primary text-primary">
             Orbit #{milestone.orbitNumber}
@@ -236,9 +234,7 @@ export function LocationTracker() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Next Orbit Complete</span>
-              <span className="font-mono text-foreground">
-                ~{milestone.daysUntilComplete}d
-              </span>
+              <span className="font-mono text-foreground">~{milestone.daysUntilComplete}d</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Current Phase</span>
@@ -256,9 +252,12 @@ export function LocationTracker() {
           <div className="space-y-1">
             <h4 className="font-semibold text-sm">What is L2?</h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              The Earth-Sun L2 Lagrange point is a gravitationally stable location in space where the gravitational forces of Earth and Sun balance with the orbital motion. 
-              Located 1.5 million km beyond Earth (opposite the Sun), it's the perfect spot for JWST to maintain a constant view of deep space while keeping its sunshield 
-              between the telescope and the Sun-Earth system, ensuring ultra-cold operating temperatures for its infrared instruments.
+              The Earth-Sun L2 Lagrange point is a gravitationally stable location in space where
+              the gravitational forces of Earth and Sun balance with the orbital motion. Located 1.5
+              million km beyond Earth (opposite the Sun), it's the perfect spot for JWST to maintain
+              a constant view of deep space while keeping its sunshield between the telescope and
+              the Sun-Earth system, ensuring ultra-cold operating temperatures for its infrared
+              instruments.
             </p>
           </div>
         </div>

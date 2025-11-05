@@ -16,7 +16,9 @@ export function Timeline({ images, favorites, onImageClick, onFavoriteToggle }: 
   if (images.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground text-lg">No images found. Try adjusting your filters.</p>
+        <p className="text-muted-foreground text-lg">
+          No images found. Try adjusting your filters.
+        </p>
       </div>
     )
   }
@@ -24,7 +26,7 @@ export function Timeline({ images, favorites, onImageClick, onFavoriteToggle }: 
   if (isMobile) {
     return (
       <div className="space-y-4 pb-6">
-        {images.map((image) => (
+        {images.map(image => (
           <ImageCard
             key={image.id}
             image={image}
@@ -40,7 +42,7 @@ export function Timeline({ images, favorites, onImageClick, onFavoriteToggle }: 
   return (
     <ScrollArea className="w-full">
       <div className="flex gap-4 pb-6">
-        {images.map((image) => (
+        {images.map(image => (
           <ImageCard
             key={image.id}
             image={image}

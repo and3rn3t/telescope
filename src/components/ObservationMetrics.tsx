@@ -4,11 +4,11 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { motion } from 'framer-motion'
-import { 
-  ChartBar, 
-  Target, 
-  Database, 
-  Clock, 
+import {
+  ChartBar,
+  Target,
+  Database,
+  Clock,
   CheckCircle,
   Camera,
   FileText,
@@ -16,7 +16,7 @@ import {
   TrendUp,
   Eye,
   Star,
-  Atom
+  Atom,
 } from '@phosphor-icons/react'
 
 interface MetricCardProps {
@@ -29,7 +29,15 @@ interface MetricCardProps {
   color?: string
 }
 
-function MetricCard({ icon, label, value, subtext, trend, progress, color = 'primary' }: MetricCardProps) {
+function MetricCard({
+  icon,
+  label,
+  value,
+  subtext,
+  trend,
+  progress,
+  color = 'primary',
+}: MetricCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -40,9 +48,7 @@ function MetricCard({ icon, label, value, subtext, trend, progress, color = 'pri
         <div className={`absolute top-0 left-0 w-1 h-full bg-${color}`} />
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <div className={`p-2 rounded-lg bg-${color}/10`}>
-              {icon}
-            </div>
+            <div className={`p-2 rounded-lg bg-${color}/10`}>{icon}</div>
             {trend && (
               <Badge variant="secondary" className="gap-1">
                 <TrendUp size={12} />
@@ -55,12 +61,8 @@ function MetricCard({ icon, label, value, subtext, trend, progress, color = 'pri
           <div className="space-y-2">
             <div className="text-3xl font-bold tracking-tight">{value}</div>
             <div className="text-sm text-muted-foreground">{label}</div>
-            {subtext && (
-              <div className="text-xs text-muted-foreground">{subtext}</div>
-            )}
-            {progress !== undefined && (
-              <Progress value={progress} className="h-1.5 mt-3" />
-            )}
+            {subtext && <div className="text-xs text-muted-foreground">{subtext}</div>}
+            {progress !== undefined && <Progress value={progress} className="h-1.5 mt-3" />}
           </div>
         </CardContent>
       </Card>
@@ -77,15 +79,20 @@ interface InstrumentStatsProps {
   icon: React.ReactNode
 }
 
-function InstrumentStats({ name, observations, dataVolume, hoursActive, specialty, icon }: InstrumentStatsProps) {
+function InstrumentStats({
+  name,
+  observations,
+  dataVolume,
+  hoursActive,
+  specialty,
+  icon,
+}: InstrumentStatsProps) {
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              {icon}
-            </div>
+            <div className="p-2 rounded-lg bg-primary/10">{icon}</div>
             <div>
               <CardTitle className="text-base">{name}</CardTitle>
               <CardDescription className="text-xs">{specialty}</CardDescription>
@@ -138,7 +145,7 @@ export function ObservationMetrics() {
       dataVolume: '156 TB',
       hoursActive: 12430,
       specialty: 'Near-Infrared Camera',
-      icon: <Camera size={20} className="text-primary" weight="fill" />
+      icon: <Camera size={20} className="text-primary" weight="fill" />,
     },
     {
       name: 'NIRSpec',
@@ -146,7 +153,7 @@ export function ObservationMetrics() {
       dataVolume: '89 TB',
       hoursActive: 8920,
       specialty: 'Near-Infrared Spectrograph',
-      icon: <Atom size={20} className="text-secondary" weight="fill" />
+      icon: <Atom size={20} className="text-secondary" weight="fill" />,
     },
     {
       name: 'MIRI',
@@ -154,7 +161,7 @@ export function ObservationMetrics() {
       dataVolume: '67 TB',
       hoursActive: 6234,
       specialty: 'Mid-Infrared Instrument',
-      icon: <Eye size={20} className="text-accent" weight="fill" />
+      icon: <Eye size={20} className="text-accent" weight="fill" />,
     },
     {
       name: 'NIRISS',
@@ -162,8 +169,8 @@ export function ObservationMetrics() {
       dataVolume: '52 TB',
       hoursActive: 5681,
       specialty: 'Near-Infrared Imager',
-      icon: <Star size={20} className="text-primary" weight="fill" />
-    }
+      icon: <Star size={20} className="text-primary" weight="fill" />,
+    },
   ]
 
   const scienceCategories: ScienceCategory[] = [
@@ -172,29 +179,29 @@ export function ObservationMetrics() {
       observations: 6847,
       percentage: 35,
       color: 'bg-primary',
-      icon: <Target size={16} weight="fill" />
+      icon: <Target size={16} weight="fill" />,
     },
     {
       category: 'Stars & Stellar Evolution',
       observations: 5234,
       percentage: 27,
       color: 'bg-secondary',
-      icon: <Star size={16} weight="fill" />
+      icon: <Star size={16} weight="fill" />,
     },
     {
       category: 'Exoplanets & Atmospheres',
       observations: 3921,
       percentage: 20,
       color: 'bg-accent',
-      icon: <Eye size={16} weight="fill" />
+      icon: <Eye size={16} weight="fill" />,
     },
     {
       category: 'Nebulae & Star Formation',
       observations: 3463,
       percentage: 18,
       color: 'bg-muted',
-      icon: <Atom size={16} weight="fill" />
-    }
+      icon: <Atom size={16} weight="fill" />,
+    },
   ]
 
   const totalObservations = 19465
@@ -208,7 +215,8 @@ export function ObservationMetrics() {
       <div>
         <h2 className="text-2xl font-bold mb-2">Mission Performance & Scientific Output</h2>
         <p className="text-muted-foreground">
-          Real-time metrics tracking JWST's observations, data collection, and scientific discoveries
+          Real-time metrics tracking JWST's observations, data collection, and scientific
+          discoveries
         </p>
       </div>
 
@@ -290,7 +298,9 @@ export function ObservationMetrics() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-secondary">{activePrograms}</div>
-                <div className="text-sm text-muted-foreground mt-1">Active observation programs</div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Active observation programs
+                </div>
                 <div className="mt-4 space-y-1">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Cycle 1</span>
@@ -329,9 +339,7 @@ export function ObservationMetrics() {
           <Card>
             <CardHeader>
               <CardTitle>Observation Efficiency Timeline</CardTitle>
-              <CardDescription>
-                Daily observation completion rate over the mission
-              </CardDescription>
+              <CardDescription>Daily observation completion rate over the mission</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -371,7 +379,7 @@ export function ObservationMetrics() {
 
         <TabsContent value="instruments" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {instruments.map((instrument) => (
+            {instruments.map(instrument => (
               <InstrumentStats key={instrument.name} {...instrument} />
             ))}
           </div>
@@ -388,7 +396,7 @@ export function ObservationMetrics() {
                 {instruments.map((instrument, index) => {
                   const maxObs = Math.max(...instruments.map(i => i.observations))
                   const percentage = (instrument.observations / maxObs) * 100
-                  
+
                   return (
                     <div key={instrument.name} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
@@ -420,13 +428,11 @@ export function ObservationMetrics() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {scienceCategories.map((category) => (
+                  {scienceCategories.map(category => (
                     <div key={category.category} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
-                          <div className={`p-1 rounded ${category.color}`}>
-                            {category.icon}
-                          </div>
+                          <div className={`p-1 rounded ${category.color}`}>{category.icon}</div>
                           <span className="font-medium">{category.category}</span>
                         </div>
                         <span className="text-muted-foreground">
@@ -443,9 +449,7 @@ export function ObservationMetrics() {
             <Card>
               <CardHeader>
                 <CardTitle>Key Scientific Discoveries</CardTitle>
-                <CardDescription>
-                  Major breakthroughs enabled by JWST observations
-                </CardDescription>
+                <CardDescription>Major breakthroughs enabled by JWST observations</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -458,7 +462,9 @@ export function ObservationMetrics() {
                       <div className="text-xs text-muted-foreground mt-1">
                         Discovered galaxies from just 300 million years after the Big Bang
                       </div>
-                      <Badge variant="secondary" className="mt-2 text-xs">z~13-14 redshift</Badge>
+                      <Badge variant="secondary" className="mt-2 text-xs">
+                        z~13-14 redshift
+                      </Badge>
                     </div>
                   </div>
 
@@ -471,7 +477,9 @@ export function ObservationMetrics() {
                       <div className="text-xs text-muted-foreground mt-1">
                         Detected water, methane, and CO₂ in distant exoplanet atmospheres
                       </div>
-                      <Badge variant="secondary" className="mt-2 text-xs">247 exoplanets analyzed</Badge>
+                      <Badge variant="secondary" className="mt-2 text-xs">
+                        247 exoplanets analyzed
+                      </Badge>
                     </div>
                   </div>
 
@@ -484,7 +492,9 @@ export function ObservationMetrics() {
                       <div className="text-xs text-muted-foreground mt-1">
                         Revealed intricate details of stellar nurseries and protoplanetary disks
                       </div>
-                      <Badge variant="secondary" className="mt-2 text-xs">189 nebulae mapped</Badge>
+                      <Badge variant="secondary" className="mt-2 text-xs">
+                        189 nebulae mapped
+                      </Badge>
                     </div>
                   </div>
 
@@ -495,9 +505,12 @@ export function ObservationMetrics() {
                     <div className="flex-1">
                       <div className="font-medium text-sm">Supermassive Black Holes</div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Found active black holes in the early universe, challenging formation theories
+                        Found active black holes in the early universe, challenging formation
+                        theories
                       </div>
-                      <Badge variant="secondary" className="mt-2 text-xs">82 AGN detected</Badge>
+                      <Badge variant="secondary" className="mt-2 text-xs">
+                        82 AGN detected
+                      </Badge>
                     </div>
                   </div>
                 </div>

@@ -27,7 +27,7 @@ export function SkyMapOrientation() {
     yaw: 0,
     fieldOfView: 2.2,
     targetName: 'NGC 1365',
-    coordinateDisplay: '03h 33m 38s, -27° 47\' 24"'
+    coordinateDisplay: '03h 33m 38s, -27° 47\' 24"',
   })
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function SkyMapOrientation() {
         ...prev,
         roll: (prev.roll + 0.05) % 360,
         pitch: Math.sin(Date.now() / 5000) * 0.3,
-        yaw: Math.cos(Date.now() / 7000) * 0.2
+        yaw: Math.cos(Date.now() / 7000) * 0.2,
       }))
     }, 50)
 
@@ -71,7 +71,7 @@ export function SkyMapOrientation() {
       ctx.strokeStyle = 'oklch(0.25 0.03 290)'
       ctx.lineWidth = 1
       ctx.setLineDash([4, 4])
-      
+
       for (let i = 1; i <= 3; i++) {
         ctx.beginPath()
         ctx.arc(centerX, centerY, (mapRadius / 3) * i, 0, Math.PI * 2)
@@ -106,9 +106,29 @@ export function SkyMapOrientation() {
       }
 
       const constellations = [
-        { points: [[0.3, 0.2], [0.5, 0.3], [0.7, 0.25], [0.6, 0.5]] },
-        { points: [[0.2, 0.6], [0.3, 0.7], [0.25, 0.8]] },
-        { points: [[0.7, 0.6], [0.8, 0.65], [0.75, 0.75], [0.7, 0.8]] }
+        {
+          points: [
+            [0.3, 0.2],
+            [0.5, 0.3],
+            [0.7, 0.25],
+            [0.6, 0.5],
+          ],
+        },
+        {
+          points: [
+            [0.2, 0.6],
+            [0.3, 0.7],
+            [0.25, 0.8],
+          ],
+        },
+        {
+          points: [
+            [0.7, 0.6],
+            [0.8, 0.65],
+            [0.75, 0.75],
+            [0.7, 0.8],
+          ],
+        },
       ]
 
       ctx.strokeStyle = 'oklch(0.4 0.05 290 / 0.3)'
@@ -126,7 +146,7 @@ export function SkyMapOrientation() {
 
       const raOffset = (orientation.rightAscension / 360) * Math.PI * 2
       const decOffset = (orientation.declination / 90) * mapRadius * 0.3
-      
+
       const targetX = centerX + Math.cos(raOffset) * decOffset
       const targetY = centerY + Math.sin(raOffset) * decOffset
 
@@ -187,14 +207,16 @@ export function SkyMapOrientation() {
         { text: '0°', x: centerX + mapRadius + 15, y: centerY },
         { text: '90°', x: centerX, y: centerY - mapRadius - 15 },
         { text: '180°', x: centerX - mapRadius - 20, y: centerY },
-        { text: '270°', x: centerX, y: centerY + mapRadius + 20 }
+        { text: '270°', x: centerX, y: centerY + mapRadius + 20 },
       ]
 
       ctx.fillStyle = 'oklch(0.6 0.01 290)'
       ctx.font = '10px Inter'
       labels.forEach(label => {
-        ctx.textAlign = label.x > centerX + 10 ? 'left' : label.x < centerX - 10 ? 'right' : 'center'
-        ctx.textBaseline = label.y > centerY + 10 ? 'top' : label.y < centerY - 10 ? 'bottom' : 'middle'
+        ctx.textAlign =
+          label.x > centerX + 10 ? 'left' : label.x < centerX - 10 ? 'right' : 'center'
+        ctx.textBaseline =
+          label.y > centerY + 10 ? 'top' : label.y < centerY - 10 ? 'bottom' : 'middle'
         ctx.fillText(label.text, label.x, label.y)
       })
 
@@ -218,7 +240,8 @@ export function SkyMapOrientation() {
           Telescope Orientation & Pointing
         </h2>
         <p className="text-muted-foreground">
-          Real-time view of JWST's orientation and current pointing direction on the celestial sphere
+          Real-time view of JWST's orientation and current pointing direction on the celestial
+          sphere
         </p>
       </div>
 
@@ -236,9 +259,11 @@ export function SkyMapOrientation() {
               </Badge>
               <InfoTooltip
                 content={{
-                  title: "Sky Map Projection",
-                  description: "This celestial map shows JWST's current pointing direction in the sky using equatorial coordinates (Right Ascension and Declination).",
-                  details: "The yellow crosshair indicates the telescope's field of view and orientation. The arrow shows the 'north' direction of the detector. Background stars and constellations provide reference points."
+                  title: 'Sky Map Projection',
+                  description:
+                    "This celestial map shows JWST's current pointing direction in the sky using equatorial coordinates (Right Ascension and Declination).",
+                  details:
+                    "The yellow crosshair indicates the telescope's field of view and orientation. The arrow shows the 'north' direction of the detector. Background stars and constellations provide reference points.",
                 }}
                 side="left"
               />
@@ -263,7 +288,8 @@ export function SkyMapOrientation() {
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">Declination</div>
               <div className="text-lg font-bold font-mono text-accent">
-                {orientation.declination > 0 ? '+' : ''}{orientation.declination.toFixed(2)}°
+                {orientation.declination > 0 ? '+' : ''}
+                {orientation.declination.toFixed(2)}°
               </div>
             </div>
             <div className="text-center">
@@ -291,17 +317,17 @@ export function SkyMapOrientation() {
             </div>
             <InfoTooltip
               content={{
-                title: "Target Coordinates",
-                description: "The astronomical object currently in JWST's field of view, specified in equatorial coordinates.",
-                details: "Right Ascension (RA) measures east-west position like longitude, while Declination (Dec) measures north-south like latitude on the celestial sphere."
+                title: 'Target Coordinates',
+                description:
+                  "The astronomical object currently in JWST's field of view, specified in equatorial coordinates.",
+                details:
+                  'Right Ascension (RA) measures east-west position like longitude, while Declination (Dec) measures north-south like latitude on the celestial sphere.',
               }}
               side="left"
             />
           </div>
           <div className="space-y-1">
-            <div className="text-xl font-bold text-accent">
-              {orientation.targetName}
-            </div>
+            <div className="text-xl font-bold text-accent">{orientation.targetName}</div>
             <div className="text-sm text-muted-foreground font-mono">
               {orientation.coordinateDisplay}
             </div>
@@ -316,15 +342,17 @@ export function SkyMapOrientation() {
             </div>
             <InfoTooltip
               content={{
-                title: "Spacecraft Attitude",
-                description: "JWST's orientation in 3D space, controlled by reaction wheels and thrusters.",
-                details: "Roll controls rotation around the viewing axis, pitch controls up/down tilt, and yaw controls left/right rotation. Precise attitude control is critical for long exposures."
+                title: 'Spacecraft Attitude',
+                description:
+                  "JWST's orientation in 3D space, controlled by reaction wheels and thrusters.",
+                details:
+                  'Roll controls rotation around the viewing axis, pitch controls up/down tilt, and yaw controls left/right rotation. Precise attitude control is critical for long exposures.',
               }}
               side="left"
             />
           </div>
           <div className="space-y-2">
-            <motion.div 
+            <motion.div
               className="flex justify-between items-center text-sm"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -333,7 +361,7 @@ export function SkyMapOrientation() {
               <span className="text-muted-foreground">Roll:</span>
               <span className="font-mono font-semibold">{orientation.roll.toFixed(2)}°</span>
             </motion.div>
-            <motion.div 
+            <motion.div
               className="flex justify-between items-center text-sm"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -342,7 +370,7 @@ export function SkyMapOrientation() {
               <span className="text-muted-foreground">Pitch:</span>
               <span className="font-mono font-semibold">{orientation.pitch.toFixed(2)}°</span>
             </motion.div>
-            <motion.div 
+            <motion.div
               className="flex justify-between items-center text-sm"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -386,10 +414,13 @@ export function SkyMapOrientation() {
           <div className="space-y-1">
             <h4 className="font-semibold text-sm">Ultra-Precise Pointing</h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              JWST's pointing precision is extraordinary - it can hold its position within 0.007 arcseconds (about 1/10,000th of a degree). 
-              This is equivalent to holding a laser pointer steady on a dime from 200 miles away! The Fine Guidance Sensor locks onto guide 
-              stars to maintain this incredible stability during long exposures, while reaction wheels make continuous micro-adjustments to 
-              compensate for any drift. This precision enables JWST to capture razor-sharp images of the most distant galaxies in the universe.
+              JWST's pointing precision is extraordinary - it can hold its position within 0.007
+              arcseconds (about 1/10,000th of a degree). This is equivalent to holding a laser
+              pointer steady on a dime from 200 miles away! The Fine Guidance Sensor locks onto
+              guide stars to maintain this incredible stability during long exposures, while
+              reaction wheels make continuous micro-adjustments to compensate for any drift. This
+              precision enables JWST to capture razor-sharp images of the most distant galaxies in
+              the universe.
             </p>
           </div>
         </div>

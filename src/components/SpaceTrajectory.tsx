@@ -2,9 +2,23 @@ import { useState } from 'react'
 import { trajectoryData, orbitFacts, TrajectoryPoint } from '@/lib/telescope-data'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Planet, Path, ShieldChevron, Drop, Rocket, Globe, CircleDashed } from '@phosphor-icons/react'
+import {
+  Planet,
+  Path,
+  ShieldChevron,
+  Drop,
+  Rocket,
+  Globe,
+  CircleDashed,
+} from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { LocationTracker } from '@/components/LocationTracker'
 import { NextObservation } from '@/components/NextObservation'
@@ -14,19 +28,19 @@ const orbitFactIcons = {
   orbit: CircleDashed,
   path: Path,
   shield: ShieldChevron,
-  fuel: Drop
+  fuel: Drop,
 }
 
 const typeColors = {
   past: 'bg-muted text-muted-foreground',
   present: 'bg-primary text-primary-foreground',
-  future: 'bg-secondary text-secondary-foreground'
+  future: 'bg-secondary text-secondary-foreground',
 }
 
 const typeLabels = {
   past: 'Completed',
   present: 'Current',
-  future: 'Planned'
+  future: 'Planned',
 }
 
 export function SpaceTrajectory() {
@@ -53,10 +67,10 @@ export function SpaceTrajectory() {
         <div className="lg:col-span-2 space-y-4">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Mission Timeline</h3>
-            
+
             <div className="relative">
               <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
-              
+
               <div className="space-y-6">
                 {trajectoryData.map((point, index) => (
                   <motion.div
@@ -71,8 +85,8 @@ export function SpaceTrajectory() {
                         point.type === 'present'
                           ? 'bg-primary text-primary-foreground animate-pulse'
                           : point.type === 'past'
-                          ? 'bg-muted text-muted-foreground'
-                          : 'bg-secondary text-secondary-foreground'
+                            ? 'bg-muted text-muted-foreground'
+                            : 'bg-secondary text-secondary-foreground'
                       }`}
                     >
                       {point.type === 'present' ? (
@@ -83,7 +97,7 @@ export function SpaceTrajectory() {
                         <Globe size={16} />
                       )}
                     </div>
-                    
+
                     <Card
                       className="cursor-pointer hover:border-primary/50 transition-all"
                       onClick={() => setSelectedPoint(point)}
@@ -150,7 +164,9 @@ export function SpaceTrajectory() {
               <div>
                 <h3 className="font-semibold mb-2">Current Status</h3>
                 <p className="text-sm text-muted-foreground">
-                  JWST is currently orbiting L2, conducting groundbreaking observations of the cosmos. The telescope performs station-keeping maneuvers every 21 days to maintain its position.
+                  JWST is currently orbiting L2, conducting groundbreaking observations of the
+                  cosmos. The telescope performs station-keeping maneuvers every 21 days to maintain
+                  its position.
                 </p>
               </div>
             </div>
@@ -175,7 +191,7 @@ export function SpaceTrajectory() {
               )}
             </div>
           </DialogHeader>
-          
+
           <ScrollArea className="max-h-[60vh]">
             <div className="space-y-4 pr-4">
               <div>

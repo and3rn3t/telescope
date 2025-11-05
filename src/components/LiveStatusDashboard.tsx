@@ -4,10 +4,10 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { motion } from 'framer-motion'
-import { 
-  Broadcast, 
-  CheckCircle, 
-  Clock, 
+import {
+  Broadcast,
+  CheckCircle,
+  Clock,
   Database,
   Thermometer,
   Lightning,
@@ -16,7 +16,7 @@ import {
   WifiHigh,
   HardDrive,
   Eye,
-  Activity
+  Activity,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -93,36 +93,36 @@ async function fetchSystemHealth(): Promise<SystemHealth> {
     primaryMirror: {
       temperature: -233.5 + (Math.random() * 2 - 1),
       alignment: 'Optimal',
-      status: 'nominal'
+      status: 'nominal',
     },
     powerSystem: {
       voltage: 28.5 + (Math.random() * 0.5 - 0.25),
       current: 2000 + Math.floor(Math.random() * 100),
-      status: 'nominal'
+      status: 'nominal',
     },
     communications: {
       bandwidth: 28 + Math.floor(Math.random() * 4),
-      latency: 5.2 + (Math.random() * 0.3),
-      status: 'nominal'
+      latency: 5.2 + Math.random() * 0.3,
+      status: 'nominal',
     },
     dataStorage: {
       used: 145 + Math.floor(Math.random() * 10),
       total: 256,
-      status: 'nominal'
-    }
+      status: 'nominal',
+    },
   }
 }
 
 const statusColors = {
   nominal: 'bg-green-500',
   warning: 'bg-yellow-500',
-  critical: 'bg-destructive'
+  critical: 'bg-destructive',
 }
 
 const statusTextColors = {
   nominal: 'text-green-500',
   warning: 'text-yellow-500',
-  critical: 'text-destructive'
+  critical: 'text-destructive',
 }
 
 export function LiveStatusDashboard() {
@@ -141,10 +141,10 @@ export function LiveStatusDashboard() {
   useEffect(() => {
     if (status) {
       setLiveProgress(status.progress)
-      
+
       const progressInterval = setInterval(() => {
         setLiveProgress(prev => {
-          const newProgress = prev + (Math.random() * 0.5)
+          const newProgress = prev + Math.random() * 0.5
           return newProgress > 100 ? 100 : newProgress
         })
       }, 2000)
@@ -163,10 +163,7 @@ export function LiveStatusDashboard() {
   const loadStatus = async () => {
     setLoading(true)
     try {
-      const [statusData, healthData] = await Promise.all([
-        fetchLiveStatus(),
-        fetchSystemHealth()
-      ])
+      const [statusData, healthData] = await Promise.all([fetchLiveStatus(), fetchSystemHealth()])
       setStatus(statusData)
       setHealth(healthData)
     } catch (error) {
@@ -209,7 +206,7 @@ export function LiveStatusDashboard() {
 
       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        
+
         <CardHeader className="relative">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3 flex-1">
@@ -219,13 +216,13 @@ export function LiveStatusDashboard() {
                   boxShadow: [
                     '0 0 0 0 rgba(var(--primary), 0.4)',
                     '0 0 0 10px rgba(var(--primary), 0)',
-                    '0 0 0 0 rgba(var(--primary), 0)'
-                  ]
+                    '0 0 0 0 rgba(var(--primary), 0)',
+                  ],
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: 'easeInOut',
                 }}
               >
                 <Broadcast size={28} weight="fill" className="text-primary" />
@@ -233,19 +230,22 @@ export function LiveStatusDashboard() {
                   className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"
                   animate={{
                     scale: [1, 1.2, 1],
-                    opacity: [1, 0.8, 1]
+                    opacity: [1, 0.8, 1],
                   }}
                   transition={{
                     duration: 1.5,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: 'easeInOut',
                   }}
                 />
               </motion.div>
               <div className="flex-1">
                 <CardTitle className="text-xl flex items-center gap-2 flex-wrap">
                   Currently Observing
-                  <Badge variant="outline" className="gap-1 bg-green-500/10 border-green-500/30 text-green-500">
+                  <Badge
+                    variant="outline"
+                    className="gap-1 bg-green-500/10 border-green-500/30 text-green-500"
+                  >
                     <Activity size={12} weight="bold" />
                     LIVE
                   </Badge>
@@ -293,12 +293,12 @@ export function LiveStatusDashboard() {
                   className="absolute top-0 left-0 h-2 w-2 bg-primary rounded-full blur-sm"
                   style={{ left: `${liveProgress}%` }}
                   animate={{
-                    opacity: [0.5, 1, 0.5]
+                    opacity: [0.5, 1, 0.5],
                   }}
                   transition={{
                     duration: 1,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: 'easeInOut',
                   }}
                 />
               </div>
@@ -347,9 +347,7 @@ export function LiveStatusDashboard() {
             <Gauge size={24} weight="fill" className="text-primary" />
             <CardTitle>System Health</CardTitle>
           </div>
-          <CardDescription>
-            Real-time monitoring of critical telescope subsystems
-          </CardDescription>
+          <CardDescription>Real-time monitoring of critical telescope subsystems</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -361,10 +359,14 @@ export function LiveStatusDashboard() {
                   </div>
                   <div>
                     <div className="text-sm font-medium">Primary Mirror</div>
-                    <div className="text-xs text-muted-foreground">{health.primaryMirror.alignment}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {health.primaryMirror.alignment}
+                    </div>
                   </div>
                 </div>
-                <div className={`w-2 h-2 rounded-full ${statusColors[health.primaryMirror.status]}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${statusColors[health.primaryMirror.status]}`}
+                />
               </div>
               <div className="flex items-baseline gap-2">
                 <Thermometer size={16} className="text-muted-foreground" />
@@ -385,7 +387,9 @@ export function LiveStatusDashboard() {
                     <div className="text-xs text-muted-foreground">Solar Array</div>
                   </div>
                 </div>
-                <div className={`w-2 h-2 rounded-full ${statusColors[health.powerSystem.status]}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${statusColors[health.powerSystem.status]}`}
+                />
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold font-mono">
@@ -408,7 +412,9 @@ export function LiveStatusDashboard() {
                     <div className="text-xs text-muted-foreground">Deep Space Network</div>
                   </div>
                 </div>
-                <div className={`w-2 h-2 rounded-full ${statusColors[health.communications.status]}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${statusColors[health.communications.status]}`}
+                />
               </div>
               <div className="flex items-baseline gap-2">
                 <WifiHigh size={16} className="text-muted-foreground" />
@@ -432,19 +438,19 @@ export function LiveStatusDashboard() {
                     <div className="text-xs text-muted-foreground">Solid State Recorder</div>
                   </div>
                 </div>
-                <div className={`w-2 h-2 rounded-full ${statusColors[health.dataStorage.status]}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${statusColors[health.dataStorage.status]}`}
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold font-mono">
-                    {health.dataStorage.used} GB
-                  </span>
+                  <span className="text-2xl font-bold font-mono">{health.dataStorage.used} GB</span>
                   <span className="text-sm text-muted-foreground">
                     / {health.dataStorage.total} GB
                   </span>
                 </div>
-                <Progress 
-                  value={(health.dataStorage.used / health.dataStorage.total) * 100} 
+                <Progress
+                  value={(health.dataStorage.used / health.dataStorage.total) * 100}
                   className="h-1"
                 />
               </div>

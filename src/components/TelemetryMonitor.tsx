@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
+import {
   Thermometer,
   Lightning,
   Cpu,
@@ -21,7 +21,7 @@ import {
   CheckCircle,
   Warning,
   Crosshair,
-  Compass
+  Compass,
 } from '@phosphor-icons/react'
 
 interface TelemetryReading {
@@ -53,23 +53,30 @@ interface TelemetryData {
   powerDistribution: SubsystemTelemetry
 }
 
-function generateRandomReading(base: number, variance: number, unit: string, min: number, max: number, optimal: number): TelemetryReading {
+function generateRandomReading(
+  base: number,
+  variance: number,
+  unit: string,
+  min: number,
+  max: number,
+  optimal: number
+): TelemetryReading {
   const value = base + (Math.random() * variance * 2 - variance)
   const diff = value - optimal
   const threshold = Math.abs(max - optimal) * 0.1
-  
+
   let status: 'nominal' | 'warning' | 'critical' = 'nominal'
   if (Math.abs(diff) > threshold * 2) status = 'warning'
   if (value < min || value > max) status = 'critical'
-  
-  const trend = Math.abs(diff) < 0.5 ? 'stable' : (diff > 0 ? 'up' : 'down')
-  
+
+  const trend = Math.abs(diff) < 0.5 ? 'stable' : diff > 0 ? 'up' : 'down'
+
   return { value, unit, status, trend, min, max, optimal }
 }
 
 async function fetchTelemetryData(): Promise<TelemetryData> {
   await new Promise(resolve => setTimeout(resolve, 200))
-  
+
   return {
     opticalTelescope: {
       name: 'Optical Telescope Element',
@@ -82,8 +89,8 @@ async function fetchTelemetryData(): Promise<TelemetryData> {
         'Mirror Alignment Error': generateRandomReading(0.015, 0.008, 'nm RMS', 0, 0.05, 0.015),
         'Wavefront Error': generateRandomReading(131, 8, 'nm RMS', 0, 200, 131),
         'Focus Position': generateRandomReading(12.453, 0.002, 'mm', 12.4, 12.5, 12.453),
-        'Optical Path Length': generateRandomReading(6.5, 0.01, 'm', 6.4, 6.6, 6.5)
-      }
+        'Optical Path Length': generateRandomReading(6.5, 0.01, 'm', 6.4, 6.6, 6.5),
+      },
     },
     guidanceSensors: {
       name: 'Fine Guidance Sensors',
@@ -96,8 +103,8 @@ async function fetchTelemetryData(): Promise<TelemetryData> {
         'Pointing Accuracy': generateRandomReading(0.007, 0.002, 'arcsec', 0, 0.02, 0.007),
         'Tracking Error X': generateRandomReading(0.003, 0.001, 'arcsec', -0.01, 0.01, 0),
         'Tracking Error Y': generateRandomReading(-0.002, 0.001, 'arcsec', -0.01, 0.01, 0),
-        'Star Lock Signal': generateRandomReading(94.5, 1.5, '%', 85, 100, 95)
-      }
+        'Star Lock Signal': generateRandomReading(94.5, 1.5, '%', 85, 100, 95),
+      },
     },
     thermalControl: {
       name: 'Thermal Control System',
@@ -110,8 +117,8 @@ async function fetchTelemetryData(): Promise<TelemetryData> {
         'Cold Side Temp': generateRandomReading(-233.4, 0.6, '°C', -240, -230, -233),
         'Hot Side Temp': generateRandomReading(67.8, 4.5, '°C', 40, 85, 70),
         'Radiator Efficiency': generateRandomReading(97.2, 1.2, '%', 90, 100, 97),
-        'Heat Dissipation': generateRandomReading(385, 15, 'W', 300, 450, 380)
-      }
+        'Heat Dissipation': generateRandomReading(385, 15, 'W', 300, 450, 380),
+      },
     },
     reactionWheels: {
       name: 'Attitude Control Wheels',
@@ -124,8 +131,8 @@ async function fetchTelemetryData(): Promise<TelemetryData> {
         'Wheel 3 Speed': generateRandomReading(3210, 140, 'RPM', -5000, 5000, 3200),
         'Wheel 4 Speed': generateRandomReading(890, 65, 'RPM', -5000, 5000, 900),
         'Angular Momentum': generateRandomReading(42.3, 2.1, 'Nms', 0, 80, 45),
-        'Spin Axis Stability': generateRandomReading(99.7, 0.2, '%', 98, 100, 99.8)
-      }
+        'Spin Axis Stability': generateRandomReading(99.7, 0.2, '%', 98, 100, 99.8),
+      },
     },
     instrumentControl: {
       name: 'Science Instrument Module',
@@ -138,8 +145,8 @@ async function fetchTelemetryData(): Promise<TelemetryData> {
         'NIRSpec Detector Temp': generateRandomReading(-195.7, 0.3, '°C', -200, -190, -195.8),
         'NIRISS Detector Temp': generateRandomReading(-196.1, 0.3, '°C', -200, -190, -196.2),
         'Filter Wheel Position': generateRandomReading(143.24, 0.05, '°', 0, 360, 143.24),
-        'Calibration Lamp Power': generateRandomReading(2.45, 0.12, 'W', 0, 5, 2.5)
-      }
+        'Calibration Lamp Power': generateRandomReading(2.45, 0.12, 'W', 0, 5, 2.5),
+      },
     },
     powerDistribution: {
       name: 'Electrical Power System',
@@ -152,9 +159,9 @@ async function fetchTelemetryData(): Promise<TelemetryData> {
         'Total Power Draw': generateRandomReading(2015, 85, 'W', 1500, 2500, 2000),
         'Battery Charge': generateRandomReading(87.4, 2.1, '%', 40, 100, 85),
         'Solar Array Current': generateRandomReading(62.3, 3.2, 'A', 40, 80, 62.5),
-        'Power Efficiency': generateRandomReading(94.2, 1.5, '%', 85, 100, 94)
-      }
-    }
+        'Power Efficiency': generateRandomReading(94.2, 1.5, '%', 85, 100, 94),
+      },
+    },
   }
 }
 
@@ -163,20 +170,20 @@ const statusConfig = {
     color: 'text-green-500',
     bg: 'bg-green-500',
     label: 'NOMINAL',
-    icon: CheckCircle
+    icon: CheckCircle,
   },
   warning: {
     color: 'text-yellow-500',
     bg: 'bg-yellow-500',
     label: 'WARNING',
-    icon: Warning
+    icon: Warning,
   },
   critical: {
     color: 'text-destructive',
     bg: 'bg-destructive',
     label: 'CRITICAL',
-    icon: Warning
-  }
+    icon: Warning,
+  },
 }
 
 const subsystemIcons = {
@@ -185,19 +192,19 @@ const subsystemIcons = {
   'Thermal Control System': Thermometer,
   'Attitude Control Wheels': Engine,
   'Science Instrument Module': Atom,
-  'Electrical Power System': Lightning
+  'Electrical Power System': Lightning,
 }
 
 function TrendIndicator({ trend }: { trend: 'up' | 'down' | 'stable' }) {
   const icons = {
     up: TrendUp,
     down: TrendDown,
-    stable: Minus
+    stable: Minus,
   }
   const colors = {
     up: 'text-blue-400',
     down: 'text-cyan-400',
-    stable: 'text-muted-foreground'
+    stable: 'text-muted-foreground',
   }
   const Icon = icons[trend]
   return <Icon size={12} weight="bold" className={colors[trend]} />
@@ -206,7 +213,7 @@ function TrendIndicator({ trend }: { trend: 'up' | 'down' | 'stable' }) {
 function SubsystemPanel({ subsystem }: { subsystem: SubsystemTelemetry }) {
   const StatusIcon = statusConfig[subsystem.status].icon
   const SubsystemIcon = subsystemIcons[subsystem.name as keyof typeof subsystemIcons]
-  
+
   return (
     <Card className="border-border/50">
       <CardHeader className="pb-3">
@@ -222,8 +229,8 @@ function SubsystemPanel({ subsystem }: { subsystem: SubsystemTelemetry }) {
               </CardDescription>
             </div>
           </div>
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className={`gap-1.5 ${statusConfig[subsystem.status].color} border-current/30 bg-current/5`}
           >
             <StatusIcon size={12} weight="fill" />
@@ -246,14 +253,16 @@ function SubsystemPanel({ subsystem }: { subsystem: SubsystemTelemetry }) {
               </div>
               <div className={`w-1.5 h-1.5 rounded-full ${statusConfig[reading.status].bg}`} />
             </div>
-            
+
             <div className="flex items-baseline gap-2 mb-2">
               <span className={`text-xl font-bold font-mono ${statusConfig[reading.status].color}`}>
-                {reading.value.toFixed(reading.unit === '%' || reading.unit.includes('arcsec') ? 2 : 1)}
+                {reading.value.toFixed(
+                  reading.unit === '%' || reading.unit.includes('arcsec') ? 2 : 1
+                )}
               </span>
               <span className="text-xs text-muted-foreground font-mono">{reading.unit}</span>
             </div>
-            
+
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
                 <span>Min: {reading.min}</span>
@@ -264,15 +273,15 @@ function SubsystemPanel({ subsystem }: { subsystem: SubsystemTelemetry }) {
                 <motion.div
                   className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-green-500 to-yellow-500"
                   initial={{ width: 0 }}
-                  animate={{ 
-                    width: `${Math.min(100, Math.max(0, ((reading.value - reading.min) / (reading.max - reading.min)) * 100))}%` 
+                  animate={{
+                    width: `${Math.min(100, Math.max(0, ((reading.value - reading.min) / (reading.max - reading.min)) * 100))}%`,
                   }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
                 />
                 <div
                   className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3 bg-white/60"
-                  style={{ 
-                    left: `${((reading.optimal - reading.min) / (reading.max - reading.min)) * 100}%` 
+                  style={{
+                    left: `${((reading.optimal - reading.min) / (reading.max - reading.min)) * 100}%`,
                   }}
                 />
               </div>
@@ -308,14 +317,16 @@ export function TelemetryMonitor() {
     }
   }, [autoRefresh])
 
-  const allSubsystems = telemetry ? [
-    telemetry.opticalTelescope,
-    telemetry.guidanceSensors,
-    telemetry.thermalControl,
-    telemetry.reactionWheels,
-    telemetry.instrumentControl,
-    telemetry.powerDistribution
-  ] : []
+  const allSubsystems = telemetry
+    ? [
+        telemetry.opticalTelescope,
+        telemetry.guidanceSensors,
+        telemetry.thermalControl,
+        telemetry.reactionWheels,
+        telemetry.instrumentControl,
+        telemetry.powerDistribution,
+      ]
+    : []
 
   const nominalCount = allSubsystems.filter(s => s.status === 'nominal').length
   const warningCount = allSubsystems.filter(s => s.status === 'warning').length
@@ -327,7 +338,7 @@ export function TelemetryMonitor() {
         <div className="text-center space-y-4">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           >
             <ArrowsClockwise size={48} className="text-primary mx-auto" />
           </motion.div>
@@ -356,19 +367,14 @@ export function TelemetryMonitor() {
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`px-4 py-2 rounded-lg border transition-colors ${
-                autoRefresh 
-                  ? 'bg-primary text-primary-foreground border-primary' 
+                autoRefresh
+                  ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-muted border-border hover:bg-muted/80'
               }`}
             >
               <div className="flex items-center gap-2">
-                <ArrowsClockwise 
-                  size={16} 
-                  className={autoRefresh ? 'animate-spin' : ''} 
-                />
-                <span className="text-sm font-medium">
-                  {autoRefresh ? 'Auto' : 'Manual'}
-                </span>
+                <ArrowsClockwise size={16} className={autoRefresh ? 'animate-spin' : ''} />
+                <span className="text-sm font-medium">{autoRefresh ? 'Auto' : 'Manual'}</span>
               </div>
             </button>
           </div>

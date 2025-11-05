@@ -57,17 +57,17 @@ Make the data scientifically plausible and interesting. Return ONLY the JSON obj
 const priorityColors = {
   high: 'bg-destructive text-destructive-foreground',
   medium: 'bg-secondary text-secondary-foreground',
-  low: 'bg-muted text-muted-foreground'
+  low: 'bg-muted text-muted-foreground',
 }
 
 const categoryIcons = {
-  'Galaxy': Sparkle,
-  'Nebula': Eye,
-  'Exoplanet': MapPin,
+  Galaxy: Sparkle,
+  Nebula: Eye,
+  Exoplanet: MapPin,
   'Star Cluster': Sparkle,
   'Supernova Remnant': Eye,
   'Protoplanetary Disk': MapPin,
-  'default': Binoculars
+  default: Binoculars,
 }
 
 export function NextObservation() {
@@ -106,7 +106,7 @@ export function NextObservation() {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m ${secs}s`
     }
@@ -140,7 +140,8 @@ export function NextObservation() {
 
   if (!observation) return null
 
-  const CategoryIcon = categoryIcons[observation.category as keyof typeof categoryIcons] || categoryIcons['default']
+  const CategoryIcon =
+    categoryIcons[observation.category as keyof typeof categoryIcons] || categoryIcons['default']
 
   return (
     <AnimatePresence mode="wait">
@@ -152,7 +153,7 @@ export function NextObservation() {
       >
         <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
-          
+
           <CardHeader className="relative">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 flex-1">
@@ -164,7 +165,7 @@ export function NextObservation() {
                   transition={{
                     duration: 2,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: 'easeInOut',
                   }}
                 >
                   <Binoculars size={24} weight="fill" className="text-primary" />
@@ -176,9 +177,7 @@ export function NextObservation() {
                       Live Schedule
                     </Badge>
                   </CardTitle>
-                  <CardDescription className="mt-1">
-                    {observation.program}
-                  </CardDescription>
+                  <CardDescription className="mt-1">{observation.program}</CardDescription>
                 </div>
               </div>
               <Badge className={priorityColors[observation.priority]}>
@@ -236,7 +235,9 @@ export function NextObservation() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-0.5">Coordinates</p>
-                  <p className="text-xs font-mono">{observation.coordinates.ra}, {observation.coordinates.dec}</p>
+                  <p className="text-xs font-mono">
+                    {observation.coordinates.ra}, {observation.coordinates.dec}
+                  </p>
                 </div>
               </div>
             </div>
@@ -251,7 +252,9 @@ export function NextObservation() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Time Until Observation</p>
-                    <p className="text-2xl font-bold font-mono tracking-tight">{formatCountdown(countdown)}</p>
+                    <p className="text-2xl font-bold font-mono tracking-tight">
+                      {formatCountdown(countdown)}
+                    </p>
                   </div>
                   <motion.div
                     animate={{
@@ -260,7 +263,7 @@ export function NextObservation() {
                     transition={{
                       duration: 4,
                       repeat: Infinity,
-                      ease: "linear"
+                      ease: 'linear',
                     }}
                   >
                     <Clock size={32} weight="fill" className="text-primary opacity-50" />
@@ -274,12 +277,7 @@ export function NextObservation() {
                 <p className="text-xs text-muted-foreground">Principal Investigator</p>
                 <p className="text-sm font-medium">{observation.principalInvestigator}</p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={loadObservation}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={loadObservation} className="gap-2">
                 <ArrowRight size={16} />
                 Refresh
               </Button>

@@ -1,0 +1,23 @@
+# Prettier Configuration for JWST Deep Sky Explorer
+# GitHub Spark framework compatible settings
+
+{
+  'semi': false,
+  'singleQuote': true,
+  'tabWidth': 2,
+  'trailingComma': 'es5',
+  'printWidth': 100,
+  'useTabs': false,
+  'bracketSpacing': true,
+  'bracketSameLine': false,
+  'arrowParens': 'avoid',
+  'endOfLine': 'lf',
+  'proseWrap': 'preserve',
+
+  'overrides':
+    [
+      { 'files': '*.json', 'options': { 'printWidth': 120 } },
+      { 'files': '*.md', 'options': { 'proseWrap': 'always', 'printWidth': 80 } },
+      { 'files': '*.spark', 'options': { 'parser': 'typescript' } },
+    ],
+}

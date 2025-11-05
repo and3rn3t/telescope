@@ -4,7 +4,14 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Play, Pause, ArrowCounterClockwise, SkipForward, SkipBack, CheckCircle } from '@phosphor-icons/react'
+import {
+  Play,
+  Pause,
+  ArrowCounterClockwise,
+  SkipForward,
+  SkipBack,
+  CheckCircle,
+} from '@phosphor-icons/react'
 import * as THREE from 'three'
 
 interface DeploymentStep {
@@ -24,8 +31,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'JWST is fully folded inside the Ariane 5 rocket fairing',
     duration: '0 hours',
     day: 'Day 0',
-    technical: 'All components secured in folded configuration for launch. Primary mirror wings folded back, sunshield compacted, secondary mirror support tower stowed.',
-    criticality: 'critical'
+    technical:
+      'All components secured in folded configuration for launch. Primary mirror wings folded back, sunshield compacted, secondary mirror support tower stowed.',
+    criticality: 'critical',
   },
   {
     id: 'solar-array',
@@ -33,8 +41,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Solar panels unfold to provide power to the spacecraft',
     duration: '33 minutes after launch',
     day: 'Day 0',
-    technical: 'Single-sided solar array deploys from stowed position. Five sub-panels unfold accordion-style to achieve full ~21 square meter surface area.',
-    criticality: 'critical'
+    technical:
+      'Single-sided solar array deploys from stowed position. Five sub-panels unfold accordion-style to achieve full ~21 square meter surface area.',
+    criticality: 'critical',
   },
   {
     id: 'antenna-deploy',
@@ -42,8 +51,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Communications antenna deploys for Earth contact',
     duration: '2.5 hours after launch',
     day: 'Day 0',
-    technical: 'High-gain antenna deploys to enable high-speed Ka-band communications at 28 Mbps with ground stations.',
-    criticality: 'critical'
+    technical:
+      'High-gain antenna deploys to enable high-speed Ka-band communications at 28 Mbps with ground stations.',
+    criticality: 'critical',
   },
   {
     id: 'sunshield-pallet',
@@ -51,8 +61,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Forward and aft sunshield pallets lower into position',
     duration: 'Day 3-4',
     day: 'Day 3-4',
-    technical: 'Forward pallet structure lowers, then aft pallet deploys. These structures form the support frame for the five sunshield layers.',
-    criticality: 'critical'
+    technical:
+      'Forward pallet structure lowers, then aft pallet deploys. These structures form the support frame for the five sunshield layers.',
+    criticality: 'critical',
   },
   {
     id: 'sunshield-unfold',
@@ -60,8 +71,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Tennis court-sized sunshield unfolds from its compact configuration',
     duration: 'Day 5-8',
     day: 'Day 5-8',
-    technical: 'Sunshield membrane release devices activate. All five Kapton layers unfold simultaneously from their Z-fold configuration to nearly full size.',
-    criticality: 'critical'
+    technical:
+      'Sunshield membrane release devices activate. All five Kapton layers unfold simultaneously from their Z-fold configuration to nearly full size.',
+    criticality: 'critical',
   },
   {
     id: 'sunshield-tension',
@@ -69,8 +81,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Each of the five layers is individually separated and tensioned',
     duration: 'Day 8-10',
     day: 'Day 8-10',
-    technical: 'Motor-driven tensioning systems pull each layer taut, creating precise gaps between layers for heat radiation. Each layer must achieve specific tension levels.',
-    criticality: 'critical'
+    technical:
+      'Motor-driven tensioning systems pull each layer taut, creating precise gaps between layers for heat radiation. Each layer must achieve specific tension levels.',
+    criticality: 'critical',
   },
   {
     id: 'secondary-mirror',
@@ -78,8 +91,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Secondary mirror support tower extends forward',
     duration: 'Day 11-12',
     day: 'Day 11-12',
-    technical: 'Three-strut support tower extends from stowed position, moving secondary mirror 7.6 meters forward from primary mirror to final optical position.',
-    criticality: 'critical'
+    technical:
+      'Three-strut support tower extends from stowed position, moving secondary mirror 7.6 meters forward from primary mirror to final optical position.',
+    criticality: 'critical',
   },
   {
     id: 'primary-wings',
@@ -87,8 +101,9 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'Side segments of primary mirror unfold into final configuration',
     duration: 'Day 13-14',
     day: 'Day 13-14',
-    technical: 'Left and right wing panels rotate outward, locking into position. Each wing contains 3 mirror segments, completing the 18-segment hexagonal array.',
-    criticality: 'critical'
+    technical:
+      'Left and right wing panels rotate outward, locking into position. Each wing contains 3 mirror segments, completing the 18-segment hexagonal array.',
+    criticality: 'critical',
   },
   {
     id: 'complete',
@@ -96,9 +111,10 @@ const deploymentSteps: DeploymentStep[] = [
     description: 'All major deployments finished - telescope in final form',
     duration: 'Day 14',
     day: 'Day 14',
-    technical: 'Telescope achieves full deployed configuration. All 344 single-point failure items successfully deployed. Mirror alignment and commissioning phase begins.',
-    criticality: 'high'
-  }
+    technical:
+      'Telescope achieves full deployed configuration. All 344 single-point failure items successfully deployed. Mirror alignment and commissioning phase begins.',
+    criticality: 'high',
+  },
 ]
 
 export function DeploymentSequence() {
@@ -193,11 +209,7 @@ export function DeploymentSequence() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button
-                onClick={handlePlayPause}
-                size="lg"
-                className="gap-2"
-              >
+              <Button onClick={handlePlayPause} size="lg" className="gap-2">
                 {isPlaying ? (
                   <>
                     <Pause size={20} weight="fill" />
@@ -210,12 +222,7 @@ export function DeploymentSequence() {
                   </>
                 )}
               </Button>
-              <Button
-                onClick={handleReset}
-                variant="secondary"
-                size="lg"
-                className="gap-2"
-              >
+              <Button onClick={handleReset} variant="secondary" size="lg" className="gap-2">
                 <ArrowCounterClockwise size={20} />
                 Reset
               </Button>
@@ -289,9 +296,7 @@ export function DeploymentSequence() {
                   {step.duration}
                 </motion.p>
               </div>
-              <Badge className={getCriticalityColor(step.criticality)}>
-                {step.criticality}
-              </Badge>
+              <Badge className={getCriticalityColor(step.criticality)}>{step.criticality}</Badge>
             </div>
 
             <motion.p
@@ -312,9 +317,7 @@ export function DeploymentSequence() {
               className="p-4 bg-muted/50 rounded-lg"
             >
               <h4 className="font-semibold text-sm mb-2">Technical Details</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {step.technical}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.technical}</p>
             </motion.div>
 
             {step.id === 'complete' && (
@@ -325,9 +328,9 @@ export function DeploymentSequence() {
                 className="p-4 bg-secondary/20 border border-secondary rounded-lg"
               >
                 <p className="text-sm text-foreground">
-                  <strong>Success Rate:</strong> All 344 single-point failure items deployed successfully. 
-                  JWST became the most complex spacecraft ever deployed in space, with zero failures 
-                  during the deployment sequence.
+                  <strong>Success Rate:</strong> All 344 single-point failure items deployed
+                  successfully. JWST became the most complex spacecraft ever deployed in space, with
+                  zero failures during the deployment sequence.
                 </p>
               </motion.div>
             )}
@@ -352,8 +355,8 @@ export function DeploymentSequence() {
                     index === currentStep
                       ? 'bg-primary/10 border border-primary/30'
                       : index < currentStep
-                      ? 'bg-muted/50 hover:bg-muted'
-                      : 'hover:bg-muted/30'
+                        ? 'bg-muted/50 hover:bg-muted'
+                        : 'hover:bg-muted/30'
                   }`}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -363,8 +366,8 @@ export function DeploymentSequence() {
                       index < currentStep
                         ? 'bg-secondary border-secondary'
                         : index === currentStep
-                        ? 'bg-primary border-primary'
-                        : 'bg-background border-border'
+                          ? 'bg-primary border-primary'
+                          : 'bg-background border-border'
                     }`}
                   >
                     {index < currentStep ? (
@@ -380,9 +383,7 @@ export function DeploymentSequence() {
                         {s.day}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {s.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">{s.description}</p>
                   </div>
                 </motion.button>
               ))}
@@ -464,14 +465,21 @@ function DeploymentVisualization({ step }: { step: string }) {
     }
     hexagonShape.lineTo(size * Math.cos(0), size * Math.sin(0))
 
-    const extrudeSettings = { steps: 1, depth: 0.08, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01, bevelSegments: 3 }
+    const extrudeSettings = {
+      steps: 1,
+      depth: 0.08,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.01,
+      bevelSegments: 3,
+    }
     const hexGeometry = new THREE.ExtrudeGeometry(hexagonShape, extrudeSettings)
     const mirrorMaterial = new THREE.MeshStandardMaterial({
       color: 0xffd700,
       metalness: 0.95,
       roughness: 0.05,
       emissive: 0xaa6600,
-      emissiveIntensity: 0.3
+      emissiveIntensity: 0.3,
     })
 
     const centerPositions = [[0, 0]]
@@ -482,7 +490,12 @@ function DeploymentVisualization({ step }: { step: string }) {
     })
 
     const leftWing = new THREE.Group()
-    const leftPositions = [[-0.77, 0], [-1.155, 0.66], [-1.155, -0.66], [-1.54, 0]]
+    const leftPositions = [
+      [-0.77, 0],
+      [-1.155, 0.66],
+      [-1.155, -0.66],
+      [-1.54, 0],
+    ]
     leftPositions.forEach(([x, y]) => {
       const hex = new THREE.Mesh(hexGeometry, mirrorMaterial)
       hex.position.set(x, y, 0)
@@ -491,7 +504,12 @@ function DeploymentVisualization({ step }: { step: string }) {
     primaryMirrorGroup.add(leftWing)
 
     const rightWing = new THREE.Group()
-    const rightPositions = [[0.77, 0], [1.155, 0.66], [1.155, -0.66], [1.54, 0]]
+    const rightPositions = [
+      [0.77, 0],
+      [1.155, 0.66],
+      [1.155, -0.66],
+      [1.54, 0],
+    ]
     rightPositions.forEach(([x, y]) => {
       const hex = new THREE.Mesh(hexGeometry, mirrorMaterial)
       hex.position.set(x, y, 0)
@@ -510,7 +528,7 @@ function DeploymentVisualization({ step }: { step: string }) {
     const strutMaterial = new THREE.MeshStandardMaterial({
       color: 0x222222,
       metalness: 0.8,
-      roughness: 0.2
+      roughness: 0.2,
     })
     const struts: THREE.Mesh[] = []
     for (let i = 0; i < 3; i++) {
@@ -534,7 +552,7 @@ function DeploymentVisualization({ step }: { step: string }) {
         roughness: 0.7,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.9
+        opacity: 0.9,
       })
       const sunshield = new THREE.Mesh(sunshieldGeometry, sunshieldMaterial)
       sunshield.position.set(0, 0, -2.5 - i * 0.15)
@@ -551,7 +569,7 @@ function DeploymentVisualization({ step }: { step: string }) {
         metalness: 0.7,
         roughness: 0.3,
         emissive: 0x0a0a2e,
-        emissiveIntensity: 0.4
+        emissiveIntensity: 0.4,
       })
       const panel = new THREE.Mesh(panelGeometry, panelMaterial)
       panel.position.set(3 + i * 0.3, 0, -2)
@@ -566,7 +584,7 @@ function DeploymentVisualization({ step }: { step: string }) {
       metalness: 0.9,
       roughness: 0.1,
       emissive: 0x886600,
-      emissiveIntensity: 0.2
+      emissiveIntensity: 0.2,
     })
     const dish = new THREE.Mesh(dishGeometry, dishMaterial)
     const armGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 8)
@@ -581,7 +599,7 @@ function DeploymentVisualization({ step }: { step: string }) {
     const instrumentPositions = [
       { pos: [0, -0.8, -0.3], color: 0x8844ff },
       { pos: [-0.6, -0.8, -0.3], color: 0xff4488 },
-      { pos: [0.6, -0.8, -0.3], color: 0x44ff88 }
+      { pos: [0.6, -0.8, -0.3], color: 0x44ff88 },
     ]
     instrumentPositions.forEach(({ pos, color }) => {
       const material = new THREE.MeshStandardMaterial({
@@ -589,7 +607,7 @@ function DeploymentVisualization({ step }: { step: string }) {
         metalness: 0.7,
         roughness: 0.3,
         emissive: color,
-        emissiveIntensity: 0.4
+        emissiveIntensity: 0.4,
       })
       const mesh = new THREE.Mesh(instrumentGeometry, material)
       mesh.position.set(pos[0], pos[1], pos[2])
@@ -610,7 +628,7 @@ function DeploymentVisualization({ step }: { step: string }) {
       color: 0xffffff,
       size: 0.15,
       transparent: true,
-      opacity: 0.8
+      opacity: 0.8,
     })
     const stars = new THREE.Points(starGeometry, starMaterial)
     scene.add(stars)
@@ -624,7 +642,7 @@ function DeploymentVisualization({ step }: { step: string }) {
       instruments,
       struts,
       leftWing,
-      rightWing
+      rightWing,
     }
 
     const handleResize = () => {
@@ -670,9 +688,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 0.5
-        meshes.struts.forEach(s => { s.scale.z = 0.2 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(0.3, 0.3, 1); s.position.z = -1 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = -Math.PI / 2; p.position.x = 0.5 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 0.2
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(0.3, 0.3, 1)
+          s.position.z = -1
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = -Math.PI / 2
+          p.position.x = 0.5
+        })
         meshes.antenna.rotation.x = -Math.PI / 2
         break
 
@@ -680,9 +706,14 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 0.5
-        meshes.struts.forEach(s => { s.scale.z = 0.2 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(0.3, 0.3, 1); s.position.z = -1 })
-        meshes.solarArray.forEach((p, i) => { 
+        meshes.struts.forEach(s => {
+          s.scale.z = 0.2
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(0.3, 0.3, 1)
+          s.position.z = -1
+        })
+        meshes.solarArray.forEach((p, i) => {
           p.rotation.y = 0
           p.position.x = 3 + i * 0.3
         })
@@ -693,9 +724,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 0.5
-        meshes.struts.forEach(s => { s.scale.z = 0.2 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(0.3, 0.3, 1); s.position.z = -1 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 0.2
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(0.3, 0.3, 1)
+          s.position.z = -1
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
         meshes.antenna.rotation.x = 0
         break
 
@@ -703,9 +742,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 0.5
-        meshes.struts.forEach(s => { s.scale.z = 0.2 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(0.5, 0.5, 1); s.position.z = -1.5 - i * 0.05 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 0.2
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(0.5, 0.5, 1)
+          s.position.z = -1.5 - i * 0.05
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
         meshes.antenna.rotation.x = 0
         break
 
@@ -713,9 +760,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 0.5
-        meshes.struts.forEach(s => { s.scale.z = 0.2 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.2 - i * 0.08 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 0.2
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(1, 1, 1)
+          s.position.z = -2.2 - i * 0.08
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
         meshes.antenna.rotation.x = 0
         break
 
@@ -723,9 +778,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 0.5
-        meshes.struts.forEach(s => { s.scale.z = 0.2 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.5 - i * 0.15 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 0.2
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(1, 1, 1)
+          s.position.z = -2.5 - i * 0.15
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
         meshes.antenna.rotation.x = 0
         break
 
@@ -733,9 +796,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = -Math.PI / 3
         meshes.rightWing.rotation.y = Math.PI / 3
         meshes.secondaryMirror.position.z = 3.5
-        meshes.struts.forEach(s => { s.scale.z = 1 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.5 - i * 0.15 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 1
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(1, 1, 1)
+          s.position.z = -2.5 - i * 0.15
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
         meshes.antenna.rotation.x = 0
         break
 
@@ -744,9 +815,17 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.leftWing.rotation.y = 0
         meshes.rightWing.rotation.y = 0
         meshes.secondaryMirror.position.z = 3.5
-        meshes.struts.forEach(s => { s.scale.z = 1 })
-        meshes.sunshield.forEach((s, i) => { s.scale.set(1, 1, 1); s.position.z = -2.5 - i * 0.15 })
-        meshes.solarArray.forEach((p, i) => { p.rotation.y = 0; p.position.x = 3 + i * 0.3 })
+        meshes.struts.forEach(s => {
+          s.scale.z = 1
+        })
+        meshes.sunshield.forEach((s, i) => {
+          s.scale.set(1, 1, 1)
+          s.position.z = -2.5 - i * 0.15
+        })
+        meshes.solarArray.forEach((p, i) => {
+          p.rotation.y = 0
+          p.position.x = 3 + i * 0.3
+        })
         meshes.antenna.rotation.x = 0
         break
     }

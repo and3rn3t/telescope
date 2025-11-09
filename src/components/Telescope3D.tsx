@@ -460,6 +460,10 @@ function JWSTModel({
             key={component.id}
             position={position}
             onClick={() => onComponentClick(component)}
+            onDoubleClick={() => {
+              // Double-click to focus camera on component
+              onComponentClick(component)
+            }}
             visible={false} // Invisible click targets
           >
             <sphereGeometry args={[0.8, 16, 16]} />
@@ -1032,6 +1036,31 @@ export function Telescope3D({
               RIGHT: THREE.MOUSE.PAN,
             }}
           />
+
+          {/* Orientation Helper - Mini Axes */}
+          <Html position={[0, 0, 0]} style={{ pointerEvents: 'none' }}>
+            <div className="fixed bottom-24 right-4 bg-black/50 rounded-lg p-3 backdrop-blur-sm border border-white/10">
+              <div className="text-xs text-white/60 mb-1 text-center">Orientation</div>
+              <div className="relative w-16 h-16">
+                <svg viewBox="-50 -50 100 100" className="w-full h-full">
+                  {/* X-axis - Red */}
+                  <line x1="0" y1="0" x2="40" y2="0" stroke="#ef4444" strokeWidth="2" />
+                  <text x="45" y="5" fill="#ef4444" fontSize="12" fontWeight="bold">X</text>
+                  
+                  {/* Y-axis - Green */}
+                  <line x1="0" y1="0" x2="0" y2="-40" stroke="#22c55e" strokeWidth="2" />
+                  <text x="5" y="-42" fill="#22c55e" fontSize="12" fontWeight="bold">Y</text>
+                  
+                  {/* Z-axis - Blue */}
+                  <line x1="0" y1="0" x2="-28" y2="28" stroke="#3b82f6" strokeWidth="2" />
+                  <text x="-35" y="35" fill="#3b82f6" fontSize="12" fontWeight="bold">Z</text>
+                  
+                  {/* Origin */}
+                  <circle cx="0" cy="0" r="3" fill="white" />
+                </svg>
+              </div>
+            </div>
+          </Html>
         </Canvas>
         </Suspense>
 
@@ -1050,6 +1079,25 @@ export function Telescope3D({
           onCameraPreset={handleCameraPreset}
           onScreenshot={handleScreenshot}
         />
+
+        {/* Mobile Touch Gesture Hints */}
+        <div className="absolute bottom-4 left-4 md:hidden bg-black/70 rounded-lg p-3 backdrop-blur-sm border border-white/20 max-w-[200px]">
+          <div className="text-xs text-white/90 space-y-1.5">
+            <div className="font-semibold mb-2 text-white">Touch Gestures:</div>
+            <div className="flex items-center gap-2">
+              <span className="text-blue-400">👆</span>
+              <span>Drag to rotate</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-blue-400">🤏</span>
+              <span>Pinch to zoom</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-blue-400">👆👆</span>
+              <span>Two fingers to pan</span>
+            </div>
+          </div>
+        </div>
 
         {/* Component Info Panel */}
         <ComponentInfoPanel

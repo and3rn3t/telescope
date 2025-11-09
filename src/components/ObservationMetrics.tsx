@@ -1,29 +1,29 @@
-import { useState, useEffect } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { motion } from 'framer-motion'
-import {
-  ChartBar,
-  Target,
-  Database,
-  Clock,
-  CheckCircle,
-  Camera,
-  FileText,
-  Users,
-  TrendUp,
-  Eye,
-  Star,
-  Atom,
-  Warning,
-  ArrowClockwise,
-} from '@phosphor-icons/react'
-import { fetchJWSTImages, calculateMetricsFromImages, type DerivedMetrics } from '@/lib/nasa-api'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { calculateMetricsFromImages, fetchJWSTImages, type DerivedMetrics } from '@/lib/nasa-api'
 import type { JWSTImage } from '@/lib/types'
+import {
+  ArrowClockwise,
+  Atom,
+  Camera,
+  ChartBar,
+  CheckCircle,
+  Clock,
+  Database,
+  Eye,
+  FileText,
+  Star,
+  Target,
+  TrendUp,
+  Users,
+  Warning,
+} from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 interface MetricCardProps {
@@ -160,14 +160,14 @@ export function ObservationMetrics({ images: providedImages }: ObservationMetric
     try {
       setLoading(true)
       setError(null)
-      
+
       // Fetch images from NASA API
       const images = await fetchJWSTImages()
-      
+
       // Calculate metrics from the fetched images
       const calculatedMetrics = calculateMetricsFromImages(images)
       setMetrics(calculatedMetrics)
-      
+
       toast.success(`Loaded metrics from ${images.length} JWST observations`)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load metrics'
@@ -255,7 +255,15 @@ export function ObservationMetrics({ images: providedImages }: ObservationMetric
     ][idx],
   }))
 
-  const { totalObservations, totalDataVolume, missionDays, successRate, papersPublished, activePrograms, uniqueTargets } = metrics
+  const {
+    totalObservations,
+    totalDataVolume,
+    missionDays,
+    successRate,
+    papersPublished,
+    activePrograms,
+    uniqueTargets,
+  } = metrics
 
   return (
     <div className="space-y-6">
@@ -269,7 +277,9 @@ export function ObservationMetrics({ images: providedImages }: ObservationMetric
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            Metrics calculated from {providedImages?.length || metrics?.totalObservations.toLocaleString() || 'NASA'} real JWST observations via NASA API
+            Metrics calculated from{' '}
+            {providedImages?.length || metrics?.totalObservations.toLocaleString() || 'NASA'} real
+            JWST observations via NASA API
           </p>
         </div>
         {!providedImages && (
@@ -304,8 +314,10 @@ export function ObservationMetrics({ images: providedImages }: ObservationMetric
           <Alert className="bg-primary/5 border-primary/20">
             <Database size={16} className="text-primary" />
             <AlertDescription className="text-sm">
-              These metrics are calculated from live NASA API data and extrapolated based on JWST's actual mission performance. 
-              Observation counts, instrument usage, and science distributions reflect real patterns from {providedImages?.length || 'fetched'} API observations.
+              These metrics are calculated from live NASA API data and extrapolated based on JWST's
+              actual mission performance. Observation counts, instrument usage, and science
+              distributions reflect real patterns from {providedImages?.length || 'fetched'} API
+              observations.
             </AlertDescription>
           </Alert>
 
@@ -394,7 +406,9 @@ export function ObservationMetrics({ images: providedImages }: ObservationMetric
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-accent">{uniqueTargets.toLocaleString()}</div>
+                <div className="text-3xl font-bold text-accent">
+                  {uniqueTargets.toLocaleString()}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Celestial objects observed</div>
                 <div className="mt-4 flex gap-2">
                   <Badge variant="secondary" className="text-xs">
@@ -465,7 +479,7 @@ export function ObservationMetrics({ images: providedImages }: ObservationMetric
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {instruments.map((instrument) => {
+                {instruments.map(instrument => {
                   const maxObs = Math.max(...instruments.map(i => i.observations))
                   const percentage = (instrument.observations / maxObs) * 100
 

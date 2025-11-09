@@ -5,7 +5,6 @@ import { Slider } from '@/components/ui/slider'
 import { JWSTGeometries } from '@/lib/jwst-geometries'
 import { JWSTMaterials, SpaceEnvironment } from '@/lib/jwst-materials'
 import {
-  ArrowUp,
   CalendarBlank,
   Camera,
   Compass,
@@ -256,7 +255,12 @@ const STAGE_TECHNICAL_DATA: Record<
     ],
   },
   primary_mirror_wings: {
-    components: ['Primary Mirror (18 segments)', 'Left Wing (6 segments)', 'Right Wing (6 segments)', 'Hinge Mechanisms'],
+    components: [
+      'Primary Mirror (18 segments)',
+      'Left Wing (6 segments)',
+      'Right Wing (6 segments)',
+      'Hinge Mechanisms',
+    ],
     specifications: [
       { label: 'Total Mirror Diameter', value: '6.5 meters' },
       { label: 'Segment Size', value: '1.32m flat-to-flat hexagon' },
@@ -806,14 +810,16 @@ function DeployingJWST({
       </group>
 
       {/* Visual Enhancements: Trails, Vectors, and Highlights */}
-      {showTrails && deploymentState.stage === 'solar_array' && deploymentState.solarArrayAngle < 90 && (
-        <DeploymentTrail
-          position={[1.3, -1.5, -2]}
-          targetPosition={[1.3, 0, 0]}
-          progress={1 - deploymentState.solarArrayAngle / 90}
-          color="#4a9eff"
-        />
-      )}
+      {showTrails &&
+        deploymentState.stage === 'solar_array' &&
+        deploymentState.solarArrayAngle < 90 && (
+          <DeploymentTrail
+            position={[1.3, -1.5, -2]}
+            targetPosition={[1.3, 0, 0]}
+            progress={1 - deploymentState.solarArrayAngle / 90}
+            color="#4a9eff"
+          />
+        )}
 
       {showTrails && deploymentState.stage === 'sunshield_tensioning' && (
         <>
@@ -829,18 +835,43 @@ function DeployingJWST({
         </>
       )}
 
-      {showVectors && deploymentState.stage === 'solar_array' && deploymentState.solarArrayAngle > 0 && deploymentState.solarArrayAngle < 90 && (
-        <DeploymentVector start={[1.3, -1.5, -2]} direction={[0, 1, 0]} length={1.5} color="#00ff00" />
-      )}
+      {showVectors &&
+        deploymentState.stage === 'solar_array' &&
+        deploymentState.solarArrayAngle > 0 &&
+        deploymentState.solarArrayAngle < 90 && (
+          <DeploymentVector
+            start={[1.3, -1.5, -2]}
+            direction={[0, 1, 0]}
+            length={1.5}
+            color="#00ff00"
+          />
+        )}
 
-      {showVectors && deploymentState.stage === 'secondary_mirror' && deploymentState.secondaryMirrorExtension > 0 && (
-        <DeploymentVector start={[0, 0, 1.5]} direction={[0, 0, 1]} length={1.5} color="#ffff00" />
-      )}
+      {showVectors &&
+        deploymentState.stage === 'secondary_mirror' &&
+        deploymentState.secondaryMirrorExtension > 0 && (
+          <DeploymentVector
+            start={[0, 0, 1.5]}
+            direction={[0, 0, 1]}
+            length={1.5}
+            color="#ffff00"
+          />
+        )}
 
       {showVectors && deploymentState.stage === 'primary_mirror_wings' && (
         <>
-          <DeploymentVector start={[-2.64, 0, 0]} direction={[1, 0, 0]} length={1.2} color="#ff00ff" />
-          <DeploymentVector start={[2.64, 0, 0]} direction={[-1, 0, 0]} length={1.2} color="#ff00ff" />
+          <DeploymentVector
+            start={[-2.64, 0, 0]}
+            direction={[1, 0, 0]}
+            length={1.2}
+            color="#ff00ff"
+          />
+          <DeploymentVector
+            start={[2.64, 0, 0]}
+            direction={[-1, 0, 0]}
+            length={1.2}
+            color="#ff00ff"
+          />
         </>
       )}
 
@@ -861,7 +892,7 @@ function DeployingJWST({
             <ComponentHighlight active color="#ffff00" scale={1} />
           </group>
         )}
-        {(deploymentState.stage === 'primary_mirror_wings') && (
+        {deploymentState.stage === 'primary_mirror_wings' && (
           <group position={[0, 0, 0]}>
             <ComponentHighlight active color="#ff00ff" scale={3.5} />
           </group>
@@ -1164,7 +1195,11 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
 
           <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
-          <DeployingJWST deploymentState={deploymentState} showTrails={showTrails} showVectors={showVectors} />
+          <DeployingJWST
+            deploymentState={deploymentState}
+            showTrails={showTrails}
+            showVectors={showVectors}
+          />
 
           <OrbitControls
             ref={orbitControlsRef}
@@ -1568,12 +1603,14 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
                           Specifications
                         </div>
                         <div className="space-y-1 ml-3">
-                          {STAGE_TECHNICAL_DATA[deploymentState.stage].specifications.map((spec, i) => (
-                            <div key={i} className="flex justify-between text-[11px]">
-                              <span className="text-gray-400">{spec.label}:</span>
-                              <span className="text-gray-300 font-medium">{spec.value}</span>
-                            </div>
-                          ))}
+                          {STAGE_TECHNICAL_DATA[deploymentState.stage].specifications.map(
+                            (spec, i) => (
+                              <div key={i} className="flex justify-between text-[11px]">
+                                <span className="text-gray-400">{spec.label}:</span>
+                                <span className="text-gray-300 font-medium">{spec.value}</span>
+                              </div>
+                            )
+                          )}
                         </div>
                       </div>
 
@@ -1584,12 +1621,14 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
                           Parameters
                         </div>
                         <div className="space-y-1 ml-3">
-                          {STAGE_TECHNICAL_DATA[deploymentState.stage].parameters.map((param, i) => (
-                            <div key={i} className="flex justify-between text-[11px]">
-                              <span className="text-gray-400">{param.label}:</span>
-                              <span className="text-gray-300 font-medium">{param.value}</span>
-                            </div>
-                          ))}
+                          {STAGE_TECHNICAL_DATA[deploymentState.stage].parameters.map(
+                            (param, i) => (
+                              <div key={i} className="flex justify-between text-[11px]">
+                                <span className="text-gray-400">{param.label}:</span>
+                                <span className="text-gray-300 font-medium">{param.value}</span>
+                              </div>
+                            )
+                          )}
                         </div>
                       </div>
 
@@ -1600,12 +1639,14 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
                           Success Criteria
                         </div>
                         <div className="space-y-1 ml-3">
-                          {STAGE_TECHNICAL_DATA[deploymentState.stage].successCriteria.map((criteria, i) => (
-                            <div key={i} className="text-gray-300 text-[11px] flex gap-2">
-                              <span className="text-green-400 shrink-0">✓</span>
-                              <span>{criteria}</span>
-                            </div>
-                          ))}
+                          {STAGE_TECHNICAL_DATA[deploymentState.stage].successCriteria.map(
+                            (criteria, i) => (
+                              <div key={i} className="text-gray-300 text-[11px] flex gap-2">
+                                <span className="text-green-400 shrink-0">✓</span>
+                                <span>{criteria}</span>
+                              </div>
+                            )
+                          )}
                         </div>
                       </div>
 
@@ -1641,80 +1682,80 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
       {/* Mini-Map Orientation Helper */}
       <AnimatePresence>
         <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute top-4 right-4 w-32 h-32 bg-gray-900/90 rounded-lg border border-gray-700 backdrop-blur-sm overflow-hidden"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="absolute top-4 right-4 w-32 h-32 bg-gray-900/90 rounded-lg border border-gray-700 backdrop-blur-sm overflow-hidden"
+        >
+          <div className="absolute top-1 left-1 right-1 flex items-center justify-center gap-1 z-10">
+            <Compass size={12} weight="fill" className="text-blue-400" />
+            <span className="text-[10px] text-gray-300 font-medium">View</span>
+          </div>
+          <Canvas
+            camera={{ position: [0, 0, 8], fov: 50 }}
+            gl={{ alpha: true }}
+            style={{ background: 'transparent' }}
           >
-            <div className="absolute top-1 left-1 right-1 flex items-center justify-center gap-1 z-10">
-              <Compass size={12} weight="fill" className="text-blue-400" />
-              <span className="text-[10px] text-gray-300 font-medium">View</span>
-            </div>
-            <Canvas
-              camera={{ position: [0, 0, 8], fov: 50 }}
-              gl={{ alpha: true }}
-              style={{ background: 'transparent' }}
-            >
-              <ambientLight intensity={0.5} />
-              <pointLight position={[5, 5, 5]} intensity={0.8} />
+            <ambientLight intensity={0.5} />
+            <pointLight position={[5, 5, 5]} intensity={0.8} />
 
-              {/* Simplified telescope representation */}
-              <group rotation={[0, deploymentState.overallProgress * Math.PI * 2, 0]}>
-                {/* Main mirror (golden hexagon) */}
-                <mesh position={[0, 0, 0]}>
-                  <cylinderGeometry args={[0.8, 0.8, 0.1, 6]} />
-                  <meshStandardMaterial color="#FFD700" metalness={0.9} roughness={0.1} />
+            {/* Simplified telescope representation */}
+            <group rotation={[0, deploymentState.overallProgress * Math.PI * 2, 0]}>
+              {/* Main mirror (golden hexagon) */}
+              <mesh position={[0, 0, 0]}>
+                <cylinderGeometry args={[0.8, 0.8, 0.1, 6]} />
+                <meshStandardMaterial color="#FFD700" metalness={0.9} roughness={0.1} />
+              </mesh>
+
+              {/* Sunshield (silver diamond) */}
+              <mesh position={[0, -1.2, 0]} rotation={[Math.PI / 2, 0, Math.PI / 4]}>
+                <boxGeometry args={[1.2, 1.2, 0.05]} />
+                <meshStandardMaterial
+                  color={deploymentState.overallProgress > 0.5 ? '#C0C0C0' : '#888888'}
+                  metalness={0.7}
+                  roughness={0.3}
+                />
+              </mesh>
+
+              {/* Deployment indicator (glowing point) */}
+              {deploymentState.overallProgress < 1 && (
+                <mesh
+                  position={[
+                    Math.sin(deploymentState.overallProgress * Math.PI * 8) * 1.5,
+                    0,
+                    Math.cos(deploymentState.overallProgress * Math.PI * 8) * 1.5,
+                  ]}
+                >
+                  <sphereGeometry args={[0.1, 8, 8]} />
+                  <meshBasicMaterial color="#60A5FA" />
                 </mesh>
+              )}
+            </group>
 
-                {/* Sunshield (silver diamond) */}
-                <mesh position={[0, -1.2, 0]} rotation={[Math.PI / 2, 0, Math.PI / 4]}>
-                  <boxGeometry args={[1.2, 1.2, 0.05]} />
-                  <meshStandardMaterial
-                    color={deploymentState.overallProgress > 0.5 ? '#C0C0C0' : '#888888'}
-                    metalness={0.7}
-                    roughness={0.3}
-                  />
-                </mesh>
+            {/* Direction indicators */}
+            <Html position={[0, 2, 0]} center style={{ pointerEvents: 'none' }}>
+              <div className="text-[8px] text-blue-400 font-bold">TOP</div>
+            </Html>
+          </Canvas>
 
-                {/* Deployment indicator (glowing point) */}
-                {deploymentState.overallProgress < 1 && (
-                  <mesh
-                    position={[
-                      Math.sin(deploymentState.overallProgress * Math.PI * 8) * 1.5,
-                      0,
-                      Math.cos(deploymentState.overallProgress * Math.PI * 8) * 1.5,
-                    ]}
-                  >
-                    <sphereGeometry args={[0.1, 8, 8]} />
-                    <meshBasicMaterial color="#60A5FA" />
-                  </mesh>
-                )}
-              </group>
-
-              {/* Direction indicators */}
-              <Html position={[0, 2, 0]} center style={{ pointerEvents: 'none' }}>
-                <div className="text-[8px] text-blue-400 font-bold">TOP</div>
-              </Html>
-            </Canvas>
-
-            {/* Progress ring overlay */}
-            <svg className="absolute inset-0 pointer-events-none" viewBox="0 0 128 128">
-              <circle cx="64" cy="64" r="60" fill="none" stroke="#374151" strokeWidth="2" />
-              <circle
-                cx="64"
-                cy="64"
-                r="60"
-                fill="none"
-                stroke="#3B82F6"
-                strokeWidth="2"
-                strokeDasharray={`${2 * Math.PI * 60}`}
-                strokeDashoffset={`${2 * Math.PI * 60 * (1 - deploymentState.overallProgress)}`}
-                strokeLinecap="round"
-                transform="rotate(-90 64 64)"
-              />
-            </svg>
-          </motion.div>
-        </AnimatePresence>
+          {/* Progress ring overlay */}
+          <svg className="absolute inset-0 pointer-events-none" viewBox="0 0 128 128">
+            <circle cx="64" cy="64" r="60" fill="none" stroke="#374151" strokeWidth="2" />
+            <circle
+              cx="64"
+              cy="64"
+              r="60"
+              fill="none"
+              stroke="#3B82F6"
+              strokeWidth="2"
+              strokeDasharray={`${2 * Math.PI * 60}`}
+              strokeDashoffset={`${2 * Math.PI * 60 * (1 - deploymentState.overallProgress)}`}
+              strokeLinecap="round"
+              transform="rotate(-90 64 64)"
+            />
+          </svg>
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   )
 }

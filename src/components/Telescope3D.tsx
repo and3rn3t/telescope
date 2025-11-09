@@ -12,16 +12,16 @@ import {
 } from '@/lib/performance-optimization'
 import { TelescopeComponent } from '@/lib/telescope-data'
 import {
-  ArrowsClockwise,
-  ArrowsOut,
+  ArrowClockwise,
+  ArrowsOutSimple,
   Cpu,
   Cube,
-  Eye,
-  HandTap,
-  House,
+  EyeSlash,
+  Hand,
+  HouseLine,
   Info,
   Lightning,
-  Play,
+  PlayCircle,
   Target,
 } from '@phosphor-icons/react'
 import { Environment, Html, MeshReflectorMaterial, OrbitControls, Stars } from '@react-three/drei'
@@ -29,6 +29,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import type { OrbitControls as OrbitControlsType } from 'three-stdlib'
 import { DeploymentAnimation } from './DeploymentAnimation3D'
 
 interface Telescope3DProps {
@@ -38,10 +39,10 @@ interface Telescope3DProps {
 }
 
 interface MirrorSegmentProps {
-  position: [number, number, number]
-  rotation: [number, number, number]
-  highlighted: boolean
-  segmentId: number
+  readonly position: readonly [number, number, number]
+  readonly rotation: readonly [number, number, number]
+  readonly highlighted: boolean
+  readonly segmentId: number
 }
 
 // Use enhanced materials from the materials library
@@ -54,7 +55,7 @@ function MirrorSegment({
   rotation,
   highlighted,
   segmentId: _segmentId,
-}: MirrorSegmentProps) {
+}: Readonly<MirrorSegmentProps>) {
   const meshRef = useRef<THREE.Mesh>(null)
 
   useFrame(state => {
@@ -81,7 +82,10 @@ function MirrorSegment({
 }
 
 // Primary mirror with 18 individual segments
-function PrimaryMirror({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+function PrimaryMirror({
+  highlighted,
+  exploded,
+}: Readonly<{ highlighted: boolean; exploded: number }>) {
   const groupRef = useRef<THREE.Group>(null)
 
   // Hexagonal arrangement of mirror segments
@@ -138,7 +142,10 @@ function PrimaryMirror({ highlighted, exploded }: { highlighted: boolean; explod
 }
 
 // Secondary mirror assembly
-function SecondaryMirror({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+function SecondaryMirror({
+  highlighted,
+  exploded,
+}: Readonly<{ highlighted: boolean; exploded: number }>) {
   return (
     <group position={[0, 0, 4 + exploded * 2]}>
       {/* Mirror */}
@@ -163,7 +170,10 @@ function SecondaryMirror({ highlighted, exploded }: { highlighted: boolean; expl
 }
 
 // Sunshield layers
-function Sunshield({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+function Sunshield({
+  highlighted,
+  exploded,
+}: Readonly<{ highlighted: boolean; exploded: number }>) {
   const layers = 5
 
   return (
@@ -176,13 +186,10 @@ function Sunshield({ highlighted, exploded }: { highlighted: boolean; exploded: 
         >
           <primitive object={JWSTGeometries.sunshieldLayer} />
           <primitive
-            object={
-              highlighted
-                ? Materials.highlighted
-                : i % 2 === 0
-                  ? Materials.sunshieldLayer1
-                  : Materials.sunshieldLayer2
-            }
+            object={(() => {
+              if (highlighted) return Materials.highlighted
+              return i % 2 === 0 ? Materials.sunshieldLayer1 : Materials.sunshieldLayer2
+            })()}
           />
         </mesh>
       ))}
@@ -191,7 +198,10 @@ function Sunshield({ highlighted, exploded }: { highlighted: boolean; exploded: 
 }
 
 // Scientific instruments cluster
-function InstrumentCluster({ highlighted, exploded }: { highlighted: boolean; exploded: number }) {
+function InstrumentCluster({
+  highlighted,
+  exploded,
+}: Readonly<{ highlighted: boolean; exploded: number }>) {
   const instruments = [
     { name: 'NIRCam', position: [0, -1.5, 0.5], color: '#FF6B6B' },
     { name: 'NIRSpec', position: [-1.2, -1.5, 0.5], color: '#4ECDC4' },
@@ -241,21 +251,19 @@ function JWSTModel({
   exploded,
   perfConfig,
   onPerformanceUpdate,
-}: {
+}: Readonly<{
   selectedComponent: TelescopeComponent | null
   onComponentClick: (component: TelescopeComponent) => void
   components: TelescopeComponent[]
   exploded: number
   perfConfig: PerformanceConfig
   onPerformanceUpdate?: (fps: number) => void
-}) {
+}>) {
   const groupRef = useRef<THREE.Group>(null)
-  const performanceMonitor = useRef<PerformanceMonitor>()
+  const performanceMonitor = useRef<PerformanceMonitor | null>(null)
 
   // Initialize performance monitor
-  if (!performanceMonitor.current) {
-    performanceMonitor.current = new PerformanceMonitor(perfConfig, true)
-  }
+  performanceMonitor.current ??= new PerformanceMonitor(perfConfig, true)
 
   // Rotation animation with performance monitoring
   useFrame(state => {
@@ -380,7 +388,7 @@ function Controls3D({
   onShowDeployment,
   fps,
   perfConfig,
-}: {
+}: Readonly<{
   exploded: number
   setExploded: (value: number) => void
   autoRotate: boolean
@@ -391,7 +399,7 @@ function Controls3D({
   onShowDeployment: () => void
   fps: number
   perfConfig: PerformanceConfig
-}) {
+}>) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -409,12 +417,12 @@ function Controls3D({
                 onClick={() => setAutoRotate(!autoRotate)}
                 className="flex-1 min-w-0"
               >
-                <ArrowsClockwise size={16} className={autoRotate ? 'animate-spin' : ''} />
+                <ArrowClockwise size={16} className={autoRotate ? 'animate-spin' : ''} />
                 <span className="ml-2 hidden sm:inline">Auto Rotate</span>
               </Button>
 
               <Button variant="outline" size="sm" onClick={onReset} className="flex-1 min-w-0">
-                <House size={16} />
+                <HouseLine size={16} />
                 <span className="ml-2 hidden sm:inline">Reset View</span>
               </Button>
 
@@ -424,7 +432,7 @@ function Controls3D({
                 onClick={() => setViewMode(viewMode === 'exploded' ? 'normal' : 'exploded')}
                 className="flex-1 min-w-0"
               >
-                <ArrowsOut size={16} />
+                <ArrowsOutSimple size={16} />
                 <span className="ml-2 hidden sm:inline">Exploded</span>
               </Button>
 
@@ -434,7 +442,7 @@ function Controls3D({
                 onClick={onShowDeployment}
                 className="flex-1 min-w-0 bg-linear-to-r from-blue-600 to-purple-600 border-blue-500 text-white hover:from-blue-700 hover:to-purple-700"
               >
-                <Play size={16} />
+                <PlayCircle size={16} />
                 <span className="ml-2 hidden sm:inline">Deployment</span>
               </Button>
             </div>
@@ -462,9 +470,11 @@ function Controls3D({
               <div className="text-white/60 flex items-center gap-2">
                 <span>Performance:</span>
                 <span
-                  className={
-                    fps >= 30 ? 'text-green-400' : fps >= 20 ? 'text-yellow-400' : 'text-red-400'
-                  }
+                  className={(() => {
+                    if (fps >= 30) return 'text-green-400'
+                    if (fps >= 20) return 'text-yellow-400'
+                    return 'text-red-400'
+                  })()}
                 >
                   {Math.round(fps)} FPS
                 </span>
@@ -478,7 +488,7 @@ function Controls3D({
 
             {/* Mobile touch hint */}
             <div className="text-xs text-white/60 flex items-center gap-2 sm:hidden">
-              <HandTap size={14} />
+              <Hand size={14} />
               <span>Pinch to zoom • Drag to rotate • Tap components for info</span>
             </div>
           </div>
@@ -492,14 +502,14 @@ function Controls3D({
 function ComponentInfoPanel({
   component,
   onClose,
-}: {
+}: Readonly<{
   component: TelescopeComponent | null
   onClose: () => void
-}) {
+}>) {
   if (!component) return null
 
   const categoryIcons = {
-    optics: Eye,
+    optics: EyeSlash,
     instruments: Cpu,
     structure: Cube,
     power: Lightning,
@@ -573,17 +583,21 @@ function ComponentInfoPanel({
 }
 
 // Main Telescope3D component
-export function Telescope3D({ onComponentClick, selectedComponent, components }: Telescope3DProps) {
+export function Telescope3D({
+  onComponentClick,
+  selectedComponent,
+  components,
+}: Readonly<Telescope3DProps>) {
   const [exploded, setExploded] = useState(0)
   const [autoRotate, setAutoRotate] = useState(true)
   const [viewMode, setViewMode] = useState('normal')
   const [showDeployment, setShowDeployment] = useState(false)
 
   // Performance optimization
-  const [perfConfig, setPerfConfig] = useState<PerformanceConfig>(() => detectDeviceCapabilities())
-  const performanceMonitor = useRef<PerformanceMonitor>()
+  const [perfConfig] = useState<PerformanceConfig>(() => detectDeviceCapabilities())
+  const performanceMonitor = useRef<PerformanceMonitor | null>(null)
   const [fps, setFps] = useState(60)
-  const controlsRef = useRef<unknown>()
+  const controlsRef = useRef<OrbitControlsType | null>(null)
 
   // Initialize performance monitoring
   useMemo(() => {
@@ -624,21 +638,34 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
             antialias: perfConfig.antialiasing,
             alpha: true,
             powerPreference: 'high-performance',
-            pixelRatio: perfConfig.devicePixelRatio,
           }}
           onCreated={({ gl }) => {
-            gl.setClearColor('#000011', 1)
+            try {
+              gl.setClearColor('#000011', 1)
 
-            // Shadow settings based on performance config
-            gl.shadowMap.enabled = perfConfig.shadowQuality !== 'off'
-            if (gl.shadowMap.enabled) {
-              gl.shadowMap.type =
-                perfConfig.shadowQuality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap
-            }
+              // Shadow settings based on performance config
+              gl.shadowMap.enabled = perfConfig.shadowQuality !== 'off'
+              if (gl.shadowMap.enabled) {
+                gl.shadowMap.type =
+                  perfConfig.shadowQuality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap
+              }
 
-            // Performance optimizations
-            if (perfConfig.frustumCulling) {
-              gl.setPixelRatio(perfConfig.devicePixelRatio)
+              // Performance optimizations
+              if (perfConfig.frustumCulling) {
+                gl.setPixelRatio(perfConfig.devicePixelRatio)
+              }
+
+              // Add context lost/restored handlers
+              gl.domElement.addEventListener('webglcontextlost', event => {
+                event.preventDefault()
+                console.warn('WebGL context lost, attempting to restore...')
+              })
+
+              gl.domElement.addEventListener('webglcontextrestored', () => {
+                console.warn('WebGL context restored')
+              })
+            } catch (error) {
+              console.error('WebGL setup error:', error)
             }
           }}
         >
@@ -709,6 +736,12 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
             minPolarAngle={Math.PI / 6}
             dampingFactor={0.05}
             enableDamping={true}
+            touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
+            mouseButtons={{
+              LEFT: THREE.MOUSE.ROTATE,
+              MIDDLE: THREE.MOUSE.DOLLY,
+              RIGHT: THREE.MOUSE.PAN,
+            }}
           />
         </Canvas>
 

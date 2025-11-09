@@ -467,7 +467,7 @@ function App() {
             )}
             {mainView === 'metrics' && (
               <Suspense fallback={<Skeleton className="w-full h-96 rounded-lg" />}>
-                <ObservationMetrics />
+                <ObservationMetrics images={images} />
               </Suspense>
             )}
           </main>

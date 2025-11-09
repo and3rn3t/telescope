@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { motion } from 'framer-motion'
 import {
   ChartBar,
@@ -17,7 +19,12 @@ import {
   Eye,
   Star,
   Atom,
+  Warning,
+  ArrowClockwise,
 } from '@phosphor-icons/react'
+import { fetchJWSTImages, calculateMetricsFromImages, type DerivedMetrics } from '@/lib/nasa-api'
+import type { JWSTImage } from '@/lib/types'
+import { toast } from 'sonner'
 
 interface MetricCardProps {
   icon: React.ReactNode
@@ -128,96 +135,153 @@ interface ScienceCategory {
   icon: React.ReactNode
 }
 
-export function ObservationMetrics() {
-  const [missionDays, setMissionDays] = useState(0)
+interface ObservationMetricsProps {
+  images?: JWSTImage[]
+}
+
+export function ObservationMetrics({ images: providedImages }: ObservationMetricsProps) {
+  const [metrics, setMetrics] = useState<DerivedMetrics | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const launchDate = new Date('2021-12-25')
-    const today = new Date()
-    const days = Math.floor((today.getTime() - launchDate.getTime()) / (1000 * 60 * 60 * 24))
-    setMissionDays(days)
-  }, [])
+    if (providedImages && providedImages.length > 0) {
+      // Use provided images if available
+      const calculatedMetrics = calculateMetricsFromImages(providedImages)
+      setMetrics(calculatedMetrics)
+      setLoading(false)
+    } else {
+      // Otherwise fetch from API
+      loadMetrics()
+    }
+  }, [providedImages])
 
-  const instruments: InstrumentStatsProps[] = [
-    {
-      name: 'NIRCam',
-      observations: 8742,
-      dataVolume: '156 TB',
-      hoursActive: 12430,
-      specialty: 'Near-Infrared Camera',
-      icon: <Camera size={20} className="text-primary" weight="fill" />,
-    },
-    {
-      name: 'NIRSpec',
-      observations: 4521,
-      dataVolume: '89 TB',
-      hoursActive: 8920,
-      specialty: 'Near-Infrared Spectrograph',
-      icon: <Atom size={20} className="text-secondary" weight="fill" />,
-    },
-    {
-      name: 'MIRI',
-      observations: 3108,
-      dataVolume: '67 TB',
-      hoursActive: 6234,
-      specialty: 'Mid-Infrared Instrument',
-      icon: <Eye size={20} className="text-accent" weight="fill" />,
-    },
-    {
-      name: 'NIRISS',
-      observations: 2894,
-      dataVolume: '52 TB',
-      hoursActive: 5681,
-      specialty: 'Near-Infrared Imager',
-      icon: <Star size={20} className="text-primary" weight="fill" />,
-    },
-  ]
+  const loadMetrics = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Fetch images from NASA API
+      const images = await fetchJWSTImages()
+      
+      // Calculate metrics from the fetched images
+      const calculatedMetrics = calculateMetricsFromImages(images)
+      setMetrics(calculatedMetrics)
+      
+      toast.success(`Loaded metrics from ${images.length} JWST observations`)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load metrics'
+      setError(errorMessage)
+      toast.error('Failed to load observation metrics')
+      console.error('Error loading metrics:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const scienceCategories: ScienceCategory[] = [
-    {
-      category: 'Galaxies & Early Universe',
-      observations: 6847,
-      percentage: 35,
-      color: 'bg-primary',
-      icon: <Target size={16} weight="fill" />,
-    },
-    {
-      category: 'Stars & Stellar Evolution',
-      observations: 5234,
-      percentage: 27,
-      color: 'bg-secondary',
-      icon: <Star size={16} weight="fill" />,
-    },
-    {
-      category: 'Exoplanets & Atmospheres',
-      observations: 3921,
-      percentage: 20,
-      color: 'bg-accent',
-      icon: <Eye size={16} weight="fill" />,
-    },
-    {
-      category: 'Nebulae & Star Formation',
-      observations: 3463,
-      percentage: 18,
-      color: 'bg-muted',
-      icon: <Atom size={16} weight="fill" />,
-    },
-  ]
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-8 w-64 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-10 w-10" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-24 mb-2" />
+                <Skeleton className="h-4 w-32" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
-  const totalObservations = 19465
-  const totalDataVolume = 364
-  const successRate = 98.7
-  const papersPublished = 847
-  const activePrograms = 134
+  // Show error state
+  if (error || !metrics) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Mission Performance & Scientific Output</h2>
+          <p className="text-muted-foreground">
+            Real-time metrics tracking JWST's observations, data collection, and scientific
+            discoveries
+          </p>
+        </div>
+        <Alert variant="destructive">
+          <Warning size={20} />
+          <AlertDescription>
+            {error || 'Failed to load metrics data. Please try again later.'}
+          </AlertDescription>
+        </Alert>
+        <div className="flex justify-center">
+          <button
+            onClick={loadMetrics}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+          >
+            Retry Loading Metrics
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Map metrics to component data structures
+  const instruments: InstrumentStatsProps[] = metrics.instruments.map((inst, idx) => ({
+    ...inst,
+    icon: [
+      <Camera size={20} className="text-primary" weight="fill" key="nircam" />,
+      <Atom size={20} className="text-secondary" weight="fill" key="nirspec" />,
+      <Eye size={20} className="text-accent" weight="fill" key="miri" />,
+      <Star size={20} className="text-primary" weight="fill" key="niriss" />,
+    ][idx],
+  }))
+
+  const scienceCategories: ScienceCategory[] = metrics.scienceCategories.map((cat, idx) => ({
+    ...cat,
+    color: ['bg-primary', 'bg-secondary', 'bg-accent', 'bg-muted'][idx],
+    icon: [
+      <Target size={16} weight="fill" key="galaxies" />,
+      <Star size={16} weight="fill" key="stars" />,
+      <Eye size={16} weight="fill" key="exoplanets" />,
+      <Atom size={16} weight="fill" key="nebulae" />,
+    ][idx],
+  }))
+
+  const { totalObservations, totalDataVolume, missionDays, successRate, papersPublished, activePrograms, uniqueTargets } = metrics
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Mission Performance & Scientific Output</h2>
-        <p className="text-muted-foreground">
-          Real-time metrics tracking JWST's observations, data collection, and scientific
-          discoveries
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <h2 className="text-2xl font-bold">Mission Performance & Scientific Output</h2>
+            <Badge variant="outline" className="gap-1">
+              <Database size={12} />
+              Live Data
+            </Badge>
+          </div>
+          <p className="text-muted-foreground">
+            Metrics calculated from {providedImages?.length || metrics?.totalObservations.toLocaleString() || 'NASA'} real JWST observations via NASA API
+          </p>
+        </div>
+        {!providedImages && (
+          <button
+            onClick={loadMetrics}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ArrowClockwise size={16} className={loading ? 'animate-spin' : ''} />
+            <span className="text-sm">Refresh</span>
+          </button>
+        )}
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
@@ -237,13 +301,21 @@ export function ObservationMetrics() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          <Alert className="bg-primary/5 border-primary/20">
+            <Database size={16} className="text-primary" />
+            <AlertDescription className="text-sm">
+              These metrics are calculated from live NASA API data and extrapolated based on JWST's actual mission performance. 
+              Observation counts, instrument usage, and science distributions reflect real patterns from {providedImages?.length || 'fetched'} API observations.
+            </AlertDescription>
+          </Alert>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard
               icon={<Target size={24} className="text-primary" weight="fill" />}
               label="Total Observations Completed"
               value={totalObservations.toLocaleString()}
               subtext={`${missionDays} days of operations`}
-              trend="+2.4%"
+              trend={`+${metrics.averageObservationsPerDay.toFixed(1)}/day`}
               color="primary"
             />
             <MetricCard
@@ -251,7 +323,7 @@ export function ObservationMetrics() {
               label="Scientific Data Collected"
               value={`${totalDataVolume} TB`}
               subtext="Stored in MAST archive"
-              trend="+12 TB"
+              trend={`+${metrics.dataCollectionRate.toFixed(1)} TB/mo`}
               color="secondary"
             />
             <MetricCard
@@ -322,14 +394,14 @@ export function ObservationMetrics() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-accent">7,342</div>
+                <div className="text-3xl font-bold text-accent">{uniqueTargets.toLocaleString()}</div>
                 <div className="text-sm text-muted-foreground mt-1">Celestial objects observed</div>
                 <div className="mt-4 flex gap-2">
                   <Badge variant="secondary" className="text-xs">
-                    1,247 Galaxies
+                    {metrics.objectTypeDistribution.galaxy || 0} Galaxies
                   </Badge>
                   <Badge variant="secondary" className="text-xs">
-                    892 Stars
+                    {metrics.objectTypeDistribution.star || 0} Stars
                   </Badge>
                 </div>
               </CardContent>
@@ -393,7 +465,7 @@ export function ObservationMetrics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {instruments.map((instrument, index) => {
+                {instruments.map((instrument) => {
                   const maxObs = Math.max(...instruments.map(i => i.observations))
                   const percentage = (instrument.observations / maxObs) * 100
 

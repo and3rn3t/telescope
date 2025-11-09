@@ -191,6 +191,7 @@ export function TelescopeAnatomy() {
                 <h3 className="font-semibold text-lg mb-2">Specifications</h3>
                 <div className="grid grid-cols-1 gap-3">
                   {selectedComponent &&
+                    selectedComponent.specifications &&
                     Object.entries(selectedComponent.specifications).map(([key, value]) => (
                       <div
                         key={key}

@@ -4,10 +4,18 @@ import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
 import { JWSTGeometries } from '@/lib/jwst-geometries'
 import { JWSTMaterials, SpaceEnvironment } from '@/lib/jwst-materials'
-import { Calendar, House, Pause, Play, Rewind, SkipForward } from '@phosphor-icons/react'
+import {
+  CalendarBlank,
+  Compass,
+  House,
+  Pause,
+  Play,
+  Rewind,
+  SkipForward,
+} from '@phosphor-icons/react'
 import { Environment, Html, OrbitControls, Stars } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
@@ -515,7 +523,7 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
-              <Calendar size={20} />
+              <CalendarBlank size={20} />
               JWST Deployment Timeline
             </CardTitle>
           </CardHeader>
@@ -682,7 +690,7 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
               <pointLight position={[5, 5, 5]} intensity={0.8} />
 
               {/* Simplified telescope representation */}
-              <group rotation={[0, progress * Math.PI * 2, 0]}>
+              <group rotation={[0, deploymentState.overallProgress * Math.PI * 2, 0]}>
                 {/* Main mirror (golden hexagon) */}
                 <mesh position={[0, 0, 0]}>
                   <cylinderGeometry args={[0.8, 0.8, 0.1, 6]} />
@@ -693,19 +701,19 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
                 <mesh position={[0, -1.2, 0]} rotation={[Math.PI / 2, 0, Math.PI / 4]}>
                   <boxGeometry args={[1.2, 1.2, 0.05]} />
                   <meshStandardMaterial
-                    color={progress > 0.5 ? '#C0C0C0' : '#888888'}
+                    color={deploymentState.overallProgress > 0.5 ? '#C0C0C0' : '#888888'}
                     metalness={0.7}
                     roughness={0.3}
                   />
                 </mesh>
 
                 {/* Deployment indicator (glowing point) */}
-                {progress < 1 && (
+                {deploymentState.overallProgress < 1 && (
                   <mesh
                     position={[
-                      Math.sin(progress * Math.PI * 8) * 1.5,
+                      Math.sin(deploymentState.overallProgress * Math.PI * 8) * 1.5,
                       0,
-                      Math.cos(progress * Math.PI * 8) * 1.5,
+                      Math.cos(deploymentState.overallProgress * Math.PI * 8) * 1.5,
                     ]}
                   >
                     <sphereGeometry args={[0.1, 8, 8]} />
@@ -731,7 +739,7 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
                 stroke="#3B82F6"
                 strokeWidth="2"
                 strokeDasharray={`${2 * Math.PI * 60}`}
-                strokeDashoffset={`${2 * Math.PI * 60 * (1 - progress)}`}
+                strokeDashoffset={`${2 * Math.PI * 60 * (1 - deploymentState.overallProgress)}`}
                 strokeLinecap="round"
                 transform="rotate(-90 64 64)"
               />

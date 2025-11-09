@@ -27,7 +27,7 @@ import {
 import { Environment, Html, MeshReflectorMaterial, OrbitControls, Stars } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsType } from 'three-stdlib'
 import { DeploymentAnimation } from './DeploymentAnimation3D'
@@ -340,6 +340,12 @@ function JWSTModel({
       {/* Primary Mirror */}
       <PrimaryMirror highlighted={selectedComponent?.id === 'primary-mirror'} exploded={exploded} />
 
+      {/* Backplane structure connecting mirror to instruments */}
+      <mesh position={[0, 0, -0.3]} castShadow receiveShadow>
+        <boxGeometry args={[5, 5, 0.2]} />
+        <primitive object={Materials.structure} />
+      </mesh>
+
       {/* Secondary Mirror */}
       <SecondaryMirror
         highlighted={selectedComponent?.id === 'secondary-mirror'}
@@ -348,6 +354,12 @@ function JWSTModel({
 
       {/* Sunshield */}
       <Sunshield highlighted={selectedComponent?.id === 'sunshield'} exploded={exploded} />
+
+      {/* Optical Bench - connects primary mirror to instruments */}
+      <mesh position={[0, -1.2, 0.2]} rotation={[0, 0, 0]} castShadow receiveShadow>
+        <primitive object={JWSTGeometries.opticalBench} />
+        <primitive object={Materials.opticalBench} />
+      </mesh>
 
       {/* Instruments */}
       <InstrumentCluster
@@ -433,6 +445,17 @@ function getComponentPosition(componentId: string, exploded: number): [number, n
   return positions[componentId] || [0, 0, 0]
 }
 
+// Camera preset positions for quick navigation
+type CameraPreset = 'default' | 'top' | 'side' | 'front' | 'closeup'
+
+const CAMERA_PRESETS: Record<CameraPreset, { position: [number, number, number]; target?: [number, number, number] }> = {
+  default: { position: [8, 8, 8], target: [0, 0, 0] },
+  top: { position: [0, 15, 0], target: [0, 0, 0] },
+  side: { position: [15, 0, 0], target: [0, 0, 0] },
+  front: { position: [0, 0, 15], target: [0, 0, 0] },
+  closeup: { position: [4, 4, 4], target: [0, 0, 0] },
+}
+
 // Enhanced 3D controls component
 function Controls3D({
   exploded,
@@ -445,6 +468,8 @@ function Controls3D({
   onShowDeployment,
   fps,
   perfConfig,
+  onCameraPreset,
+  onScreenshot,
 }: Readonly<{
   exploded: number
   setExploded: (value: number) => void
@@ -456,7 +481,11 @@ function Controls3D({
   onShowDeployment: () => void
   fps: number
   perfConfig: PerformanceConfig
+  onCameraPreset?: (preset: CameraPreset) => void
+  onScreenshot?: () => void
 }>) {
+  const [showAdvanced, setShowAdvanced] = useState(false)
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -466,19 +495,26 @@ function Controls3D({
       <Card className="backdrop-blur-md bg-black/20 border-white/20">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4">
-            {/* Mobile-first control buttons */}
+            {/* Mobile-first control buttons - Row 1 */}
             <div className="flex flex-wrap gap-2">
               <Button
                 variant={autoRotate ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setAutoRotate(!autoRotate)}
                 className="flex-1 min-w-0"
+                title="Toggle automatic rotation"
               >
                 <ArrowClockwise size={16} className={autoRotate ? 'animate-spin' : ''} />
                 <span className="ml-2 hidden sm:inline">Auto Rotate</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={onReset} className="flex-1 min-w-0">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onReset} 
+                className="flex-1 min-w-0"
+                title="Reset camera to default view"
+              >
                 <HouseLine size={16} />
                 <span className="ml-2 hidden sm:inline">Reset View</span>
               </Button>
@@ -488,6 +524,7 @@ function Controls3D({
                 size="sm"
                 onClick={() => setViewMode(viewMode === 'exploded' ? 'normal' : 'exploded')}
                 className="flex-1 min-w-0"
+                title="Toggle exploded view"
               >
                 <ArrowsOutSimple size={16} />
                 <span className="ml-2 hidden sm:inline">Exploded</span>
@@ -498,11 +535,69 @@ function Controls3D({
                 size="sm"
                 onClick={onShowDeployment}
                 className="flex-1 min-w-0 bg-linear-to-r from-blue-600 to-purple-600 border-blue-500 text-white hover:from-blue-700 hover:to-purple-700"
+                title="Watch deployment animation"
               >
                 <PlayCircle size={16} />
                 <span className="ml-2 hidden sm:inline">Deployment</span>
               </Button>
             </div>
+
+            {/* Camera & View Controls - Row 2 */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex-1"
+                title="Show camera presets and advanced controls"
+              >
+                <Cube size={16} />
+                <span className="ml-2">
+                  {showAdvanced ? 'Hide' : 'Show'} Views
+                </span>
+              </Button>
+              
+              {onScreenshot && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onScreenshot}
+                  className="flex-1"
+                  title="Capture screenshot"
+                >
+                  <Target size={16} />
+                  <span className="ml-2">Capture</span>
+                </Button>
+              )}
+            </div>
+
+            {/* Camera Presets - Collapsible */}
+            <AnimatePresence>
+              {showAdvanced && onCameraPreset && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+                    <span className="text-xs text-white/60 w-full mb-1">Camera Views:</span>
+                    {(['top', 'side', 'front', 'closeup'] as CameraPreset[]).map(preset => (
+                      <Button
+                        key={preset}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onCameraPreset(preset)}
+                        className="flex-1 min-w-[70px] bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-xs h-8"
+                        title={`View from ${preset}`}
+                      >
+                        {preset.charAt(0).toUpperCase() + preset.slice(1)}
+                      </Button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Exploded view slider */}
             <div className="space-y-2">
@@ -678,24 +773,119 @@ export function Telescope3D({
     [onComponentClick]
   )
 
+  // Camera preset handler with smooth transition
+  const handleCameraPreset = useCallback((preset: CameraPreset) => {
+    if (!controlsRef.current) return
+    
+    const { position, target } = CAMERA_PRESETS[preset]
+    const controls = controlsRef.current
+    
+    // Smoothly transition camera
+    controls.object.position.set(...position)
+    if (target) {
+      controls.target.set(...target)
+    }
+    controls.update()
+  }, [])
+
+  // Screenshot functionality
+  const handleScreenshot = useCallback(() => {
+    const canvas = document.querySelector('canvas')
+    if (!canvas) return
+
+    try {
+      // Create a link element and trigger download
+      const link = document.createElement('a')
+      link.download = `jwst-telescope-${Date.now()}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (error) {
+      console.error('Screenshot failed:', error)
+    }
+  }, [])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      switch (e.key.toLowerCase()) {
+        case 'r':
+          handleReset()
+          break
+        case 'e':
+          setExploded(prev => (prev > 0 ? 0 : 1))
+          break
+        case 'a':
+          setAutoRotate(prev => !prev)
+          break
+        case 's':
+          handleScreenshot()
+          break
+        case '1':
+          handleCameraPreset('top')
+          break
+        case '2':
+          handleCameraPreset('side')
+          break
+        case '3':
+          handleCameraPreset('front')
+          break
+        case '4':
+          handleCameraPreset('closeup')
+          break
+        case '0':
+          handleCameraPreset('default')
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [handleReset, handleScreenshot, handleCameraPreset])
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Interactive 3D Model</h2>
-        <p className="text-muted-foreground mt-2">
-          Explore JWST's revolutionary design in stunning detail
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Interactive 3D Model</h2>
+          <p className="text-muted-foreground mt-2">
+            Explore JWST's revolutionary design in stunning detail
+          </p>
+        </div>
+        
+        {/* Keyboard shortcuts hint */}
+        <div className="hidden lg:block text-xs text-muted-foreground space-y-1 bg-secondary/20 p-3 rounded-lg">
+          <div className="font-semibold mb-2">Keyboard Shortcuts:</div>
+          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">R</kbd> Reset</div>
+          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">E</kbd> Exploded</div>
+          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">A</kbd> Auto-rotate</div>
+          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">S</kbd> Screenshot</div>
+          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">1-4</kbd> Views</div>
+        </div>
       </div>
 
       <Card className="relative h-[70vh] overflow-hidden border-2 border-primary/20">
-        <Canvas
-          camera={{ position: [8, 8, 8], fov: 50 }}
-          dpr={perfConfig.devicePixelRatio}
-          gl={{
-            antialias: perfConfig.antialiasing,
-            alpha: true,
-            powerPreference: 'high-performance',
-          }}
+        {/* Loading indicator */}
+        <Suspense
+          fallback={
+            <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-50">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto" />
+                <p className="text-white/80">Loading 3D Model...</p>
+              </div>
+            </div>
+          }
+        >
+          <Canvas
+            camera={{ position: [8, 8, 8], fov: 50 }}
+            dpr={perfConfig.devicePixelRatio}
+            gl={{
+              antialias: perfConfig.antialiasing,
+              alpha: true,
+              powerPreference: 'high-performance',
+            }}
           onCreated={({ gl }) => {
             try {
               gl.setClearColor('#000011', 1)
@@ -801,6 +991,7 @@ export function Telescope3D({
             }}
           />
         </Canvas>
+        </Suspense>
 
         {/* 3D Controls Overlay */}
         <Controls3D
@@ -814,6 +1005,8 @@ export function Telescope3D({
           onShowDeployment={() => setShowDeployment(true)}
           fps={fps}
           perfConfig={perfConfig}
+          onCameraPreset={handleCameraPreset}
+          onScreenshot={handleScreenshot}
         />
 
         {/* Component Info Panel */}

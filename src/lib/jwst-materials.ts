@@ -10,49 +10,53 @@ import * as THREE from 'three'
 
 // Base materials with physically accurate properties
 export const JWSTMaterials = {
-  // Primary mirror segments - Gold-plated beryllium
+  // Primary mirror segments - Gold-plated beryllium (18kt gold, 100nm thick)
   primaryMirror: new THREE.MeshStandardMaterial({
     name: 'PrimaryMirror',
     color: '#FFD700',
-    metalness: 0.95,
-    roughness: 0.05,
-    emissive: '#332200',
-    emissiveIntensity: 0.02,
-    envMapIntensity: 1.5,
+    metalness: 0.98,
+    roughness: 0.02,
+    emissive: '#442200',
+    emissiveIntensity: 0.03,
+    envMapIntensity: 2,
     // Add subtle normal map for surface detail
-    normalScale: new THREE.Vector2(0.1, 0.1),
+    normalScale: new THREE.Vector2(0.05, 0.05),
   }),
 
   // Secondary mirror - Beryllium with gold coating
   secondaryMirror: new THREE.MeshStandardMaterial({
     name: 'SecondaryMirror',
-    color: '#E8E8E8',
-    metalness: 0.9,
-    roughness: 0.08,
-    envMapIntensity: 1.3,
+    color: '#FFE4B5',
+    metalness: 0.95,
+    roughness: 0.04,
+    envMapIntensity: 1.8,
+    emissive: '#332200',
+    emissiveIntensity: 0.02,
   }),
 
-  // Sunshield layers - Kapton with aluminum coating
+  // Sunshield layers - Kapton with aluminum and silicon coatings
   sunshieldLayer1: new THREE.MeshStandardMaterial({
     name: 'SunshieldLayer1',
-    color: '#FFB347', // Kapton orange
-    metalness: 0.3,
-    roughness: 0.7,
+    color: '#FFA726', // Kapton polyimide orange
+    metalness: 0.4,
+    roughness: 0.6,
     transparent: true,
-    opacity: 0.8,
+    opacity: 0.75,
     side: THREE.DoubleSide,
-    emissive: '#221100',
-    emissiveIntensity: 0.05,
+    emissive: '#FF6B00',
+    emissiveIntensity: 0.08,
+    envMapIntensity: 0.5,
   }),
 
   sunshieldLayer2: new THREE.MeshStandardMaterial({
     name: 'SunshieldLayer2',
-    color: '#C0C0C0', // Aluminum silver
-    metalness: 0.8,
-    roughness: 0.4,
+    color: '#E0E0E0', // Aluminum coating
+    metalness: 0.85,
+    roughness: 0.3,
     transparent: true,
-    opacity: 0.7,
+    opacity: 0.65,
     side: THREE.DoubleSide,
+    envMapIntensity: 1.2,
   }),
 
   // Instrument housing - Aluminum with anodized finish
@@ -73,14 +77,15 @@ export const JWSTMaterials = {
     normalScale: new THREE.Vector2(0.5, 0.5), // Carbon fiber weave
   }),
 
-  // Solar panels - Photovoltaic cells
+  // Solar panels - Triple-junction gallium arsenide photovoltaic cells
   solarPanel: new THREE.MeshStandardMaterial({
     name: 'SolarPanel',
-    color: '#001122',
-    metalness: 0.1,
-    roughness: 0.2,
-    emissive: '#000044',
-    emissiveIntensity: 0.1,
+    color: '#0A1628',
+    metalness: 0.3,
+    roughness: 0.15,
+    emissive: '#001144',
+    emissiveIntensity: 0.15,
+    envMapIntensity: 0.6,
   }),
 
   // Highlighted component material
@@ -255,17 +260,17 @@ export const MaterialAnimations = {
 
 // Dispose function for cleanup
 export function disposeMaterials() {
-  Object.values(JWSTMaterials).forEach(material => {
+  for (const material of Object.values(JWSTMaterials)) {
     if (material instanceof THREE.Material) {
       material.dispose()
     }
-  })
+  }
 
-  Object.values(InstrumentMaterials).forEach(material => {
+  for (const material of Object.values(InstrumentMaterials)) {
     if (material instanceof THREE.Material) {
       material.dispose()
     }
-  })
+  }
 }
 
 export default JWSTMaterials

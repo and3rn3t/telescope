@@ -28,6 +28,9 @@ const TelemetryMonitor = lazy(() =>
 const TelescopeAnatomy = lazy(() =>
   import('@/components/TelescopeAnatomy').then(m => ({ default: m.TelescopeAnatomy }))
 )
+const NASAApiTester = lazy(() =>
+  import('@/components/NASAApiTester').then(m => ({ default: m.NASAApiTester }))
+)
 // Temporarily import Timeline directly for debugging
 import { Timeline } from '@/components/Timeline'
 // import { ImageTest } from '@/components/ImageTest'
@@ -221,21 +224,21 @@ function App() {
         <div className="absolute inset-0 bg-linear-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none" />{' '}
         <div className="relative">
           <header className="border-b backdrop-blur-sm cosmic-header">
-            <div className="cosmic-container py-4 sm:py-6">
-              <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="cosmic-container py-3 sm:py-6">
+              <div className="flex flex-col gap-2.5 sm:gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <div className="p-1.5 sm:p-2 rounded-lg cosmic-logo cosmic-glow shrink-0">
-                      <Sparkle size={24} weight="fill" className="text-white sm:w-7 sm:h-7" />
+                      <Sparkle size={20} weight="fill" className="text-white sm:w-7 sm:h-7" />
                     </div>
                     <div className="min-w-0 flex-1">
                       {/* Improved mobile title handling */}
-                      <h1 className="cosmic-heading-xl font-bold text-white leading-tight">
+                      <h1 className="text-lg sm:text-2xl font-bold text-white leading-tight">
                         <span className="hidden sm:inline">JWST Deep Sky Explorer</span>
                         <span className="sm:hidden">JWST Explorer</span>
                       </h1>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="cosmic-body-improved text-slate-200 leading-relaxed">
+                      <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
+                        <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed">
                           <span className="hidden sm:inline">Journey through space and time</span>
                           <span className="sm:hidden">Explore the cosmos</span>
                         </p>
@@ -261,63 +264,112 @@ function App() {
                     setMainView(v as typeof mainView)
                   }}
                 >
-                  <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 scrollbar-hide">
-                    <TabsList className="cosmic-nav-tabs w-max sm:w-fit min-w-max">
+                  {/* Desktop Navigation - Horizontal Tabs */}
+                  <div className="hidden sm:block">
+                    <TabsList className="cosmic-nav-tabs w-fit">
                       <TabsTrigger
                         value="live"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
+                        className="cosmic-nav-tab gap-2 text-sm px-4 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <Broadcast size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden xs:inline">Live Status</span>
-                        <span className="xs:hidden">Live</span>
+                        <Broadcast size={16} className="shrink-0" />
+                        <span>Live Status</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="explore"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
+                        className="cosmic-nav-tab gap-2 text-sm px-4 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <Sparkle size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden xs:inline">Explorer</span>
-                        <span className="xs:hidden">Images</span>
+                        <Sparkle size={16} className="shrink-0" />
+                        <span>Explorer</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="anatomy"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
+                        className="cosmic-nav-tab gap-2 text-sm px-4 touch-manipulation"
                         data-slot="trigger"
                         {...preloadOnHover('anatomy')}
                       >
-                        <Cube size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden xs:inline">Anatomy</span>
-                        <span className="xs:hidden">Parts</span>
+                        <Cube size={16} className="shrink-0" />
+                        <span>Anatomy</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="trajectory"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
+                        className="cosmic-nav-tab gap-2 text-sm px-4 touch-manipulation"
                         data-slot="trigger"
                         {...preloadOnHover('trajectory')}
                       >
-                        <Planet size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden xs:inline">Mission</span>
-                        <span className="xs:hidden">Orbit</span>
+                        <Planet size={16} className="shrink-0" />
+                        <span>Mission</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="metrics"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
+                        className="cosmic-nav-tab gap-2 text-sm px-4 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <ChartBar size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden xs:inline">Metrics</span>
-                        <span className="xs:hidden">Data</span>
+                        <ChartBar size={16} className="shrink-0" />
+                        <span>Metrics</span>
                       </TabsTrigger>
                       <TabsTrigger
                         value="api-test"
-                        className="cosmic-nav-tab gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 touch-manipulation whitespace-nowrap"
+                        className="cosmic-nav-tab gap-2 text-sm px-4 touch-manipulation"
                         data-slot="trigger"
                       >
-                        <WifiHigh size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                        <span className="hidden xs:inline">API Test</span>
-                        <span className="xs:hidden">Test</span>
+                        <WifiHigh size={16} className="shrink-0" />
+                        <span>API Test</span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+
+                  {/* Mobile Navigation - Compact with Scroll Snap */}
+                  <div className="sm:hidden overflow-x-auto -mx-4 px-4 snap-x snap-mandatory scroll-smooth scrollbar-hide">
+                    <TabsList className="cosmic-nav-tabs inline-flex w-max min-w-full gap-1.5">
+                      <TabsTrigger
+                        value="live"
+                        className="cosmic-nav-tab flex-col gap-1 min-w-[70px] px-2 py-2 touch-manipulation snap-start"
+                        data-slot="trigger"
+                      >
+                        <Broadcast size={20} className="shrink-0" />
+                        <span className="text-[10px] leading-none">Live</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="explore"
+                        className="cosmic-nav-tab flex-col gap-1 min-w-[70px] px-2 py-2 touch-manipulation snap-start"
+                        data-slot="trigger"
+                      >
+                        <Sparkle size={20} className="shrink-0" />
+                        <span className="text-[10px] leading-none">Explore</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="anatomy"
+                        className="cosmic-nav-tab flex-col gap-1 min-w-[70px] px-2 py-2 touch-manipulation snap-start"
+                        data-slot="trigger"
+                      >
+                        <Cube size={20} className="shrink-0" />
+                        <span className="text-[10px] leading-none">3D View</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="trajectory"
+                        className="cosmic-nav-tab flex-col gap-1 min-w-[70px] px-2 py-2 touch-manipulation snap-start"
+                        data-slot="trigger"
+                      >
+                        <Planet size={20} className="shrink-0" />
+                        <span className="text-[10px] leading-none">Orbit</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="metrics"
+                        className="cosmic-nav-tab flex-col gap-1 min-w-[70px] px-2 py-2 touch-manipulation snap-start"
+                        data-slot="trigger"
+                      >
+                        <ChartBar size={20} className="shrink-0" />
+                        <span className="text-[10px] leading-none">Data</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="api-test"
+                        className="cosmic-nav-tab flex-col gap-1 min-w-[70px] px-2 py-2 touch-manipulation snap-start"
+                        data-slot="trigger"
+                      >
+                        <WifiHigh size={20} className="shrink-0" />
+                        <span className="text-[10px] leading-none">API</span>
                       </TabsTrigger>
                     </TabsList>
                   </div>
@@ -328,33 +380,37 @@ function App() {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                       <Tabs
                         value={activeTab}
-                        onValueChange={v => setActiveTab(v as 'all' | 'favorites')}
+                        onValueChange={v => {
+                          // Haptic feedback for sub-tab selection
+                          import('@/lib/haptic-feedback').then(({ selectionFeedback }) => {
+                            selectionFeedback()
+                          })
+                          setActiveTab(v as 'all' | 'favorites')
+                        }}
                       >
-                        <TabsList className="cosmic-nav-tabs w-full sm:w-fit">
+                        <TabsList className="cosmic-nav-tabs w-full sm:w-fit grid grid-cols-2 sm:inline-flex">
                           <TabsTrigger
                             value="all"
-                            className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm px-4 py-2"
+                            className="cosmic-nav-tab gap-2 text-sm px-4 py-2.5 touch-manipulation"
                             data-slot="trigger"
                           >
-                            <Sparkle size={16} className="sm:w-4 sm:h-4 shrink-0" />
-                            <span className="hidden xs:inline">Explore All</span>
-                            <span className="xs:hidden">All</span>
+                            <Sparkle size={18} className="shrink-0" />
+                            <span>All Images</span>
                           </TabsTrigger>
                           <TabsTrigger
                             value="favorites"
-                            className="cosmic-nav-tab gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm px-4 py-2"
+                            className="cosmic-nav-tab gap-2 text-sm px-4 py-2.5 touch-manipulation relative"
                             data-slot="trigger"
                           >
                             <Heart
-                              size={16}
+                              size={18}
                               weight={(favorites?.length || 0) > 0 ? 'fill' : 'regular'}
-                              className="sm:w-4 sm:h-4 shrink-0"
+                              className="shrink-0"
                             />
-                            <span className="hidden xs:inline">Collection</span>
-                            <span className="xs:hidden">Saved</span>
+                            <span>Favorites</span>
                             {(favorites?.length || 0) > 0 && (
-                              <span className="ml-1 px-2 py-1 rounded-full bg-yellow-400 text-slate-900 text-xs font-semibold">
-                                {favorites?.length || 0}
+                              <span className="ml-1.5 px-1.5 py-0.5 min-w-5 text-center rounded-full bg-yellow-400 text-slate-900 text-xs font-bold leading-none">
+                                {favorites.length}
                               </span>
                             )}
                           </TabsTrigger>
@@ -468,6 +524,11 @@ function App() {
             {mainView === 'metrics' && (
               <Suspense fallback={<Skeleton className="w-full h-96 rounded-lg" />}>
                 <ObservationMetrics images={images} />
+              </Suspense>
+            )}
+            {mainView === 'api-test' && (
+              <Suspense fallback={<Skeleton className="w-full h-96 rounded-lg" />}>
+                <NASAApiTester />
               </Suspense>
             )}
           </main>

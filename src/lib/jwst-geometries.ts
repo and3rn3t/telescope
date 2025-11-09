@@ -71,46 +71,101 @@ function createDetailedCylinder(
 // JWST Component Geometries
 export const JWSTGeometries = {
   // Primary mirror segment - Hexagonal with precise JWST proportions
-  primaryMirrorSegment: createHexagonGeometry(0.65, 0.05),
+  // Enhanced with more accurate flat-to-flat distance and beveling
+  primaryMirrorSegment: (() => {
+    const geometry = createHexagonGeometry(0.65, 0.08)
 
-  // Secondary mirror - Circular with support structure
-  secondaryMirror: createDetailedCylinder(0.35, 0.35, 0.03, 32),
+    // Add subtle curvature to mirror surface for realism
+    const positions = geometry.attributes.position
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i)
+      const y = positions.getY(i)
+      const z = positions.getZ(i)
+      const radius = Math.hypot(x, y)
 
-  // Sunshield layer - Large rectangular with curved edges
+      // Add very slight concave curvature (parabolic mirror surface)
+      if (z > 0.03 && radius > 0.1) {
+        const curvature = -0.002 * radius * radius
+        positions.setZ(i, z + curvature)
+      }
+    }
+    positions.needsUpdate = true
+    geometry.computeVertexNormals()
+
+    return geometry
+  })(), // Secondary mirror - Circular convex mirror with support structure
+  // Enhanced with more accurate convex curvature
+  secondaryMirror: (() => {
+    const geometry = createDetailedCylinder(0.35, 0.35, 0.05, 48)
+
+    // Create convex surface
+    const positions = geometry.attributes.position
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i)
+      const z = positions.getZ(i)
+      const y = positions.getY(i)
+      const radius = Math.hypot(x, z)
+
+      // Add convex curvature to top surface
+      if (y > 0 && radius < 0.35) {
+        const curvature = 0.03 * (1 - (radius / 0.35) ** 2)
+        positions.setY(i, y + curvature)
+      }
+    }
+    positions.needsUpdate = true
+    geometry.computeVertexNormals()
+
+    return geometry
+  })(), // Sunshield layer - Kite-shaped with accurate JWST proportions
+  // Enhanced to match the actual diamond/kite shape
   sunshieldLayer: (() => {
     const shape = new THREE.Shape()
-    const width = 12
-    const height = 8
-    const cornerRadius = 0.5
+    const width = 14 // ~21.2m scaled
+    const height = 11 // ~14.2m scaled
 
-    shape.moveTo(-width / 2 + cornerRadius, -height / 2)
-    shape.lineTo(width / 2 - cornerRadius, -height / 2)
-    shape.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + cornerRadius)
-    shape.lineTo(width / 2, height / 2 - cornerRadius)
-    shape.quadraticCurveTo(width / 2, height / 2, width / 2 - cornerRadius, height / 2)
-    shape.lineTo(-width / 2 + cornerRadius, height / 2)
-    shape.quadraticCurveTo(-width / 2, height / 2, -width / 2, height / 2 - cornerRadius)
-    shape.lineTo(-width / 2, -height / 2 + cornerRadius)
-    shape.quadraticCurveTo(-width / 2, -height / 2, -width / 2 + cornerRadius, -height / 2)
+    // Create kite/diamond shape matching JWST sunshield
+    // Top point
+    shape.moveTo(0, height / 2)
+    // Right side
+    shape.quadraticCurveTo(width / 4, height / 4, width / 2, 0)
+    // Bottom right
+    shape.quadraticCurveTo(width / 3, -height / 4, 0, -height / 2)
+    // Bottom left
+    shape.quadraticCurveTo(-width / 3, -height / 4, -width / 2, 0)
+    // Left side back to top
+    shape.quadraticCurveTo(-width / 4, height / 4, 0, height / 2)
 
-    return new THREE.ShapeGeometry(shape)
+    const extrudeSettings = {
+      depth: 0.01,
+      bevelEnabled: true,
+      bevelThickness: 0.005,
+      bevelSize: 0.005,
+      bevelSegments: 2,
+    }
+
+    return new THREE.ExtrudeGeometry(shape, extrudeSettings)
   })(),
 
-  // Instrument housing - Detailed rectangular housing
+  // Instrument housing - Enhanced detailed rectangular housing
   instrumentHousing: (() => {
-    const geometry = new THREE.BoxGeometry(0.4, 0.3, 0.2, 4, 3, 2)
+    const geometry = new THREE.BoxGeometry(0.5, 0.4, 0.3, 6, 5, 4)
 
     // Add detail panels and mounting points
     const positions = geometry.attributes.position
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i)
       const y = positions.getY(i)
+      const z = positions.getZ(i)
 
-      // Add slight bevel to corners
-      if (Math.abs(x) > 0.18 && Math.abs(y) > 0.13) {
-        positions.setX(i, x * 0.95)
-        positions.setY(i, y * 0.95)
+      // Add chamfered edges for realism
+      if (Math.abs(x) > 0.2 && Math.abs(y) > 0.15) {
+        positions.setX(i, x * 0.96)
+        positions.setY(i, y * 0.96)
       }
+
+      // Add panel detail variations
+      const panelFactor = Math.abs(z) > 0.12 ? 0.98 : 1
+      positions.setZ(i, z * panelFactor)
     }
     positions.needsUpdate = true
     geometry.computeVertexNormals()
@@ -118,56 +173,69 @@ export const JWSTGeometries = {
     return geometry
   })(),
 
-  // Support strut - Hollow cylinder for structural members
+  // Support strut - Enhanced tripod legs with realistic taper
   supportStrut: (() => {
-    const outerRadius = 0.025
+    const topRadius = 0.03
+    const bottomRadius = 0.02
     const length = 4
 
-    // Create cylinder for structural members
-    return new THREE.CylinderGeometry(outerRadius, outerRadius, length, 16)
+    // Tapered cylinder for more realistic struts
+    return new THREE.CylinderGeometry(topRadius, bottomRadius, length, 24, 4)
   })(),
 
-  // Spacecraft bus - Complex hexagonal structure
+  // Spacecraft bus - Enhanced hexagonal structure with more detail
   spacecraftBus: (() => {
-    const geometry = new THREE.BoxGeometry(2, 1.5, 1, 8, 6, 4)
+    const geometry = new THREE.BoxGeometry(2.2, 1.8, 1.2, 12, 8, 6)
 
-    // Add structural details
+    // Add structural details and hexagonal shaping
     const positions = geometry.attributes.position
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i)
       const z = positions.getZ(i)
 
-      // Create hexagonal cross-section approximation
-      if (Math.abs(x) > 0.8 && Math.abs(z) > 0.4) {
-        const factor = 0.9
-        positions.setX(i, x * factor)
-        positions.setZ(i, z * factor)
+      // Create more accurate hexagonal cross-section
+      const angle = Math.atan2(z, x)
+      const radius = Math.hypot(x, z)
+
+      if (radius > 0.6) {
+        // Hexagonal shaping
+        const hexAngle = Math.floor(angle / (Math.PI / 3)) * (Math.PI / 3)
+        const hexFactor = Math.cos(angle - hexAngle)
+        const newRadius = radius * (0.85 + 0.15 * hexFactor)
+
+        positions.setX(i, (x / radius) * newRadius)
+        positions.setZ(i, (z / radius) * newRadius)
       }
     }
     positions.needsUpdate = true
     geometry.computeVertexNormals()
 
     return geometry
-  })(),
-
-  // Solar panel - Detailed photovoltaic array
+  })(), // Solar panel - Enhanced photovoltaic array with cell detail
   solarPanel: (() => {
-    const geometry = new THREE.BoxGeometry(3, 0.05, 2, 15, 1, 10)
+    const geometry = new THREE.BoxGeometry(3.2, 0.06, 2.2, 20, 1, 15)
 
-    // Add cell divisions
+    // Add realistic cell divisions and mounting structure
     const positions = geometry.attributes.position
 
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i)
       const z = positions.getZ(i)
 
-      // Create subtle cell grid pattern
-      const cellX = Math.floor((x + 1.5) / 0.2)
-      const cellZ = Math.floor((z + 1) / 0.2)
+      // Create cell grid pattern with proper spacing
+      const cellX = Math.floor((x + 1.6) / 0.16)
+      const cellZ = Math.floor((z + 1.1) / 0.146)
 
+      // Alternate cell heights for depth
       if ((cellX + cellZ) % 2 === 0) {
         const y = positions.getY(i)
-        positions.setY(i, y + 0.002)
+        positions.setY(i, y + 0.003)
+      }
+
+      // Add frame structure around edges
+      if (Math.abs(x) > 1.5 || Math.abs(z) > 1.05) {
+        const y = positions.getY(i)
+        positions.setY(i, y + 0.006)
       }
     }
     positions.needsUpdate = true
@@ -213,7 +281,7 @@ export const JWSTGeometries = {
       const x = positions.getX(i)
       const z = positions.getZ(i)
       const y = positions.getY(i)
-      const radius = Math.sqrt(x * x + z * z)
+      const radius = Math.hypot(x, z)
 
       if (radius > 0.1) {
         const parabolaFactor = radius * radius * 0.3
@@ -278,29 +346,29 @@ export const LODGeometries = {
 export const GeometryUtils = {
   // Dispose all geometries for cleanup
   disposeAll: () => {
-    Object.values(JWSTGeometries).forEach(geometry => {
+    for (const geometry of Object.values(JWSTGeometries)) {
       if (geometry instanceof THREE.BufferGeometry) {
         geometry.dispose()
       }
-    })
+    }
 
-    Object.values(DeploymentGeometries).forEach(geometry => {
+    for (const geometry of Object.values(DeploymentGeometries)) {
       if (geometry instanceof THREE.BufferGeometry) {
         geometry.dispose()
       }
-    })
+    }
 
-    Object.values(LODGeometries.medium).forEach(geometry => {
+    for (const geometry of Object.values(LODGeometries.medium)) {
       if (geometry instanceof THREE.BufferGeometry) {
         geometry.dispose()
       }
-    })
+    }
 
-    Object.values(LODGeometries.low).forEach(geometry => {
+    for (const geometry of Object.values(LODGeometries.low)) {
       if (geometry instanceof THREE.BufferGeometry) {
         geometry.dispose()
       }
-    })
+    }
   },
 }
 

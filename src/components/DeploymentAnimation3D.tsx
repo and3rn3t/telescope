@@ -411,7 +411,28 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
       {/* 3D Canvas */}
       <div className="flex-1 relative">
         <Canvas camera={{ position: [8, 8, 8], fov: 50 }}>
-          <SpaceEnvironment />
+          {/* Space environment lighting */}
+          <ambientLight
+            color={SpaceEnvironment.ambientLight.color}
+            intensity={SpaceEnvironment.ambientLight.intensity}
+          />
+          <directionalLight
+            color={SpaceEnvironment.sunLight.color}
+            intensity={SpaceEnvironment.sunLight.intensity}
+            position={SpaceEnvironment.sunLight.position}
+            castShadow={SpaceEnvironment.sunLight.castShadow}
+          />
+          <directionalLight
+            color={SpaceEnvironment.fillLight.color}
+            intensity={SpaceEnvironment.fillLight.intensity}
+            position={SpaceEnvironment.fillLight.position}
+          />
+          <directionalLight
+            color={SpaceEnvironment.rimLight.color}
+            intensity={SpaceEnvironment.rimLight.intensity}
+            position={SpaceEnvironment.rimLight.position}
+          />
+
           <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
           <DeployingJWST deploymentState={deploymentState} />

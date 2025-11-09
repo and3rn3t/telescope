@@ -3,15 +3,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
+  calculateLightTime,
+  fetchWebbTelemetry,
+  formatDistance,
+  type WebbTelemetry,
+} from '@/lib/webb-tracking-api'
+import {
   Broadcast,
   CheckCircle,
   Clock,
   Database,
   Eye,
   Gauge,
+  Globe,
   HardDrive,
   Lightning,
+  MapPin,
   Pulse,
+  Rocket,
   Target,
   Thermometer,
   WifiHigh,
@@ -88,6 +97,7 @@ Make it scientifically plausible. Return ONLY the JSON object:
     }
   } catch {
     // Silently fall back to mock data - this is expected outside Spark environment
+    // or if LLM call fails
   }
 
   // Fallback: Generate realistic mock data
@@ -187,6 +197,7 @@ const _statusTextColors = {
 export function LiveStatusDashboard() {
   const [status, setStatus] = useState<TelescopeStatus | null>(null)
   const [health, setHealth] = useState<SystemHealth | null>(null)
+  const [webbTelemetry, setWebbTelemetry] = useState<WebbTelemetry | null>(null)
   const [loading, setLoading] = useState(true)
   const [liveProgress, setLiveProgress] = useState(0)
   const [dataRate, setDataRate] = useState(0)
@@ -225,9 +236,14 @@ export function LiveStatusDashboard() {
   const loadStatus = async () => {
     setLoading(true)
     try {
-      const [statusData, healthData] = await Promise.all([fetchLiveStatus(), fetchSystemHealth()])
+      const [statusData, healthData, telemetryData] = await Promise.all([
+        fetchLiveStatus(),
+        fetchSystemHealth(),
+        fetchWebbTelemetry(),
+      ])
       setStatus(statusData)
       setHealth(healthData)
+      setWebbTelemetry(telemetryData)
     } catch (error) {
       console.warn('Failed to load telescope status:', error)
       toast.error('Failed to load telescope status')
@@ -267,7 +283,7 @@ export function LiveStatusDashboard() {
         </p>
       </div>
 
-      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden">
+      <Card className="border-primary/30 bg-linear-to-br from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
 
         <CardHeader className="relative">
@@ -303,22 +319,22 @@ export function LiveStatusDashboard() {
                 />
               </motion.div>
               <div className="flex-1">
-                <CardTitle className="text-xl flex items-center gap-2 flex-wrap">
+                <CardTitle className="text-xl flex items-center gap-2 flex-wrap text-foreground">
                   Currently Observing
                   <Badge
                     variant="outline"
-                    className="gap-1 bg-green-500/10 border-green-500/30 text-green-500"
+                    className="gap-1 bg-green-500/10 border-green-500/30 text-green-400"
                   >
                     <Pulse size={12} weight="bold" />
                     LIVE
                   </Badge>
                 </CardTitle>
-                <CardDescription className="mt-1 font-mono text-xs">
+                <CardDescription className="mt-1 font-mono text-xs text-muted-foreground">
                   {status.observationId}
                 </CardDescription>
               </div>
             </div>
-            <Badge className="bg-green-500 hover:bg-green-600">
+            <Badge className="bg-green-500 hover:bg-green-600 text-white">
               <CheckCircle size={14} weight="fill" className="mr-1" />
               OPERATIONAL
             </Badge>
@@ -326,12 +342,12 @@ export function LiveStatusDashboard() {
         </CardHeader>
 
         <CardContent className="space-y-6 relative">
-          <div className="p-5 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50">
+          <div className="p-5 rounded-lg bg-card/50 backdrop-blur-sm border border-border">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <Target size={20} weight="fill" className="text-primary" />
-                  <h3 className="font-semibold text-2xl">{status.currentTarget}</h3>
+                  <h3 className="font-semibold text-2xl text-foreground">{status.currentTarget}</h3>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
                   <Badge variant="secondary">{status.targetType}</Badge>
@@ -348,7 +364,9 @@ export function LiveStatusDashboard() {
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Observation Progress</span>
-                <span className="font-mono font-medium">{Math.floor(liveProgress)}%</span>
+                <span className="font-mono font-medium text-foreground">
+                  {Math.floor(liveProgress)}%
+                </span>
               </div>
               <div className="relative">
                 <Progress value={liveProgress} className="h-2" />
@@ -369,36 +387,40 @@ export function LiveStatusDashboard() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="p-4 rounded-lg bg-card/30 backdrop-blur-sm border border-border/30">
+            <div className="p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Clock size={16} className="text-primary" />
                 <span className="text-xs text-muted-foreground">Started</span>
               </div>
-              <p className="text-sm font-medium">{status.startTime}</p>
+              <p className="text-sm font-medium text-foreground">{status.startTime}</p>
             </div>
 
-            <div className="p-4 rounded-lg bg-card/30 backdrop-blur-sm border border-border/30">
+            <div className="p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Clock size={16} className="text-secondary" />
                 <span className="text-xs text-muted-foreground">Time Remaining</span>
               </div>
-              <p className="text-sm font-medium">{status.estimatedCompletion}</p>
+              <p className="text-sm font-medium text-foreground">{status.estimatedCompletion}</p>
             </div>
 
-            <div className="p-4 rounded-lg bg-card/30 backdrop-blur-sm border border-border/30">
+            <div className="p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Database size={16} className="text-accent" />
                 <span className="text-xs text-muted-foreground">Data Collected</span>
               </div>
-              <p className="text-sm font-medium">{status.dataCollected.toFixed(1)} GB</p>
+              <p className="text-sm font-medium text-foreground">
+                {status.dataCollected.toFixed(1)} GB
+              </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-card/30 backdrop-blur-sm border border-border/30">
+            <div className="p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Pulse size={16} className="text-primary" />
                 <span className="text-xs text-muted-foreground">Data Rate</span>
               </div>
-              <p className="text-sm font-medium font-mono">{dataRate.toFixed(2)} MB/s</p>
+              <p className="text-sm font-medium font-mono text-foreground">
+                {dataRate.toFixed(2)} MB/s
+              </p>
             </div>
           </div>
         </CardContent>
@@ -408,20 +430,22 @@ export function LiveStatusDashboard() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Gauge size={24} weight="fill" className="text-primary" />
-            <CardTitle>System Health</CardTitle>
+            <CardTitle className="text-foreground">System Health</CardTitle>
           </div>
-          <CardDescription>Real-time monitoring of critical telescope subsystems</CardDescription>
+          <CardDescription className="text-muted-foreground">
+            Real-time monitoring of critical telescope subsystems
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg border border-border/50 space-y-3">
+            <div className="p-4 rounded-lg border border-border bg-card/50 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Eye size={20} weight="fill" className="text-primary" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium">Primary Mirror</div>
+                    <div className="text-sm font-medium text-foreground">Primary Mirror</div>
                     <div className="text-xs text-muted-foreground">
                       {health.primaryMirror.alignment}
                     </div>
@@ -433,20 +457,20 @@ export function LiveStatusDashboard() {
               </div>
               <div className="flex items-baseline gap-2">
                 <Thermometer size={16} className="text-muted-foreground" />
-                <span className="text-2xl font-bold font-mono">
+                <span className="text-2xl font-bold font-mono text-foreground">
                   {health.primaryMirror.temperature.toFixed(1)}°C
                 </span>
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-border/50 space-y-3">
+            <div className="p-4 rounded-lg border border-border bg-card/50 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-secondary/10">
                     <Lightning size={20} weight="fill" className="text-secondary" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium">Power System</div>
+                    <div className="text-sm font-medium text-foreground">Power System</div>
                     <div className="text-xs text-muted-foreground">Solar Array</div>
                   </div>
                 </div>
@@ -455,7 +479,7 @@ export function LiveStatusDashboard() {
                 />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold font-mono">
+                <span className="text-2xl font-bold font-mono text-foreground">
                   {health.powerSystem.voltage.toFixed(1)}V
                 </span>
                 <span className="text-sm text-muted-foreground">
@@ -464,14 +488,14 @@ export function LiveStatusDashboard() {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-border/50 space-y-3">
+            <div className="p-4 rounded-lg border border-border bg-card/50 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-accent/10">
                     <WifiHigh size={20} weight="fill" className="text-accent" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium">Communications</div>
+                    <div className="text-sm font-medium text-foreground">Communications</div>
                     <div className="text-xs text-muted-foreground">Deep Space Network</div>
                   </div>
                 </div>
@@ -481,7 +505,7 @@ export function LiveStatusDashboard() {
               </div>
               <div className="flex items-baseline gap-2">
                 <WifiHigh size={16} className="text-muted-foreground" />
-                <span className="text-2xl font-bold font-mono">
+                <span className="text-2xl font-bold font-mono text-foreground">
                   {health.communications.bandwidth} Mbps
                 </span>
                 <span className="text-sm text-muted-foreground">
@@ -490,14 +514,14 @@ export function LiveStatusDashboard() {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-border/50 space-y-3">
+            <div className="p-4 rounded-lg border border-border bg-card/50 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-primary/10">
                     <HardDrive size={20} weight="fill" className="text-primary" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium">Data Storage</div>
+                    <div className="text-sm font-medium text-foreground">Data Storage</div>
                     <div className="text-xs text-muted-foreground">Solid State Recorder</div>
                   </div>
                 </div>
@@ -507,7 +531,9 @@ export function LiveStatusDashboard() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold font-mono">{health.dataStorage.used} GB</span>
+                  <span className="text-2xl font-bold font-mono text-foreground">
+                    {health.dataStorage.used} GB
+                  </span>
                   <span className="text-sm text-muted-foreground">
                     / {health.dataStorage.total} GB
                   </span>
@@ -533,6 +559,114 @@ export function LiveStatusDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Real-Time Spacecraft Telemetry */}
+      {webbTelemetry && (
+        <Card className="border-blue-500/30 bg-card">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Rocket size={20} weight="fill" className="text-blue-400" />
+                  Real-Time Spacecraft Position
+                </CardTitle>
+                <CardDescription>
+                  Live data from NASA Webb Tracking{' '}
+                  {webbTelemetry.isLive && (
+                    <Badge
+                      variant="outline"
+                      className="ml-2 gap-1 border-green-500/50 bg-green-500/20 text-green-400"
+                    >
+                      <Pulse size={12} weight="fill" className="text-green-400 animate-pulse" />
+                      Live
+                    </Badge>
+                  )}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Distance from Earth */}
+              <div className="p-4 rounded-lg border border-border bg-card/50 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Globe size={18} className="text-blue-400" />
+                  <div className="text-sm font-medium text-foreground">Distance from Earth</div>
+                </div>
+                <div className="text-2xl font-bold font-mono text-foreground">
+                  {formatDistance(webbTelemetry.distanceEarthKm)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {calculateLightTime(webbTelemetry.distanceEarthKm)} •{' '}
+                  {webbTelemetry.distanceEarthMiles.toLocaleString()} miles
+                </div>
+              </div>
+
+              {/* Distance from L2 */}
+              <div className="p-4 rounded-lg border border-border bg-card/50 space-y-2">
+                <div className="flex items-center gap-2">
+                  <MapPin size={18} className="text-purple-400" />
+                  <div className="text-sm font-medium text-foreground">Distance from L2</div>
+                </div>
+                <div className="text-2xl font-bold font-mono text-foreground">
+                  {formatDistance(webbTelemetry.distanceL2Km)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Lagrange Point 2 orbit • {webbTelemetry.distanceL2Miles.toLocaleString()} miles
+                </div>
+              </div>
+
+              {/* Velocity */}
+              <div className="p-4 rounded-lg border border-border bg-card/50 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Gauge size={18} className="text-green-400" />
+                  <div className="text-sm font-medium text-foreground">Orbital Velocity</div>
+                </div>
+                <div className="text-2xl font-bold font-mono text-foreground">
+                  {webbTelemetry.velocityKmS.toFixed(2)} km/s
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {webbTelemetry.velocityMph.toLocaleString()} mph relative to Earth
+                </div>
+              </div>
+
+              {/* Temperatures */}
+              <div className="p-4 rounded-lg border border-border bg-card/50 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Thermometer size={18} className="text-red-400" />
+                  <div className="text-sm font-medium text-foreground">Temperature Range</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Hot side:</span>
+                    <span className="font-mono font-semibold text-foreground">
+                      {webbTelemetry.tempC.tempWarmSide1C.toFixed(1)}°C
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Cold side:</span>
+                    <span className="font-mono font-semibold text-cyan-400">
+                      {webbTelemetry.tempC.tempCoolSide1C.toFixed(1)}°C
+                    </span>
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  ΔT:{' '}
+                  {(
+                    webbTelemetry.tempC.tempWarmSide1C - webbTelemetry.tempC.tempCoolSide1C
+                  ).toFixed(0)}
+                  °C gradient
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 text-xs text-muted-foreground text-center">
+              Updated: {new Date(webbTelemetry.time).toLocaleString()} • Data refreshes every 60
+              seconds
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

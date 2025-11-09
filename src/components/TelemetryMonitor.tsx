@@ -347,7 +347,7 @@ export function TelemetryMonitor() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+      <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -355,8 +355,8 @@ export function TelemetryMonitor() {
                 <Gauge size={28} weight="fill" className="text-primary" />
               </div>
               <div>
-                <CardTitle className="text-2xl">Real-Time Telemetry</CardTitle>
-                <CardDescription className="mt-1">
+                <CardTitle className="text-2xl text-foreground">Real-Time Telemetry</CardTitle>
+                <CardDescription className="mt-1 text-muted-foreground">
                   Live subsystem monitoring and diagnostic data
                 </CardDescription>
               </div>
@@ -378,26 +378,26 @@ export function TelemetryMonitor() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/50">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={16} weight="fill" className="text-green-500" />
-                <span className="text-xs font-medium text-green-500">NOMINAL</span>
+                <CheckCircle size={16} weight="fill" className="text-green-400" />
+                <span className="text-xs font-medium text-green-400">NOMINAL</span>
               </div>
-              <p className="text-3xl font-bold text-green-500">{nominalCount}</p>
+              <p className="text-3xl font-bold text-green-400">{nominalCount}</p>
             </div>
-            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/50">
               <div className="flex items-center gap-2 mb-1">
-                <Warning size={16} weight="fill" className="text-yellow-500" />
-                <span className="text-xs font-medium text-yellow-500">WARNING</span>
+                <Warning size={16} weight="fill" className="text-yellow-400" />
+                <span className="text-xs font-medium text-yellow-400">WARNING</span>
               </div>
-              <p className="text-3xl font-bold text-yellow-500">{warningCount}</p>
+              <p className="text-3xl font-bold text-yellow-400">{warningCount}</p>
             </div>
-            <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/50">
               <div className="flex items-center gap-2 mb-1">
-                <Warning size={16} weight="fill" className="text-destructive" />
-                <span className="text-xs font-medium text-destructive">CRITICAL</span>
+                <Warning size={16} weight="fill" className="text-red-400" />
+                <span className="text-xs font-medium text-red-400">CRITICAL</span>
               </div>
-              <p className="text-3xl font-bold text-destructive">{criticalCount}</p>
+              <p className="text-3xl font-bold text-red-400">{criticalCount}</p>
             </div>
           </div>
           <Separator className="my-4" />

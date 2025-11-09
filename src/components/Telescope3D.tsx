@@ -49,7 +49,7 @@ interface MirrorSegmentProps {
 const Materials = JWSTMaterials
 
 // Individual mirror segment component
-// Optimized mirror segment component with LOD
+// Optimized mirror segment component with smooth animations
 function MirrorSegment({
   position,
   rotation,
@@ -57,24 +57,29 @@ function MirrorSegment({
   segmentId: _segmentId,
 }: Readonly<MirrorSegmentProps>) {
   const meshRef = useRef<THREE.Mesh>(null)
+  const targetScale = useRef(1)
+  const currentScale = useRef(1)
 
   useFrame(state => {
     if (!meshRef.current) return
 
-    // Material and animation updates
+    // Smooth material transitions and animations
     if (highlighted) {
       meshRef.current.material = Materials.highlighted
-      // Optimized animation for performance
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.03
-      meshRef.current.scale.setScalar(scale)
+      // Smoother breathing animation
+      targetScale.current = 1 + Math.sin(state.clock.elapsedTime * 2.5) * 0.025
     } else {
       meshRef.current.material = Materials.primaryMirror
-      meshRef.current.scale.setScalar(1)
+      targetScale.current = 1
     }
+
+    // Smooth scale interpolation for better performance
+    currentScale.current += (targetScale.current - currentScale.current) * 0.1
+    meshRef.current.scale.setScalar(currentScale.current)
   })
 
   return (
-    <mesh ref={meshRef} position={position} rotation={rotation} frustumCulled>
+    <mesh ref={meshRef} position={position} rotation={rotation} frustumCulled castShadow>
       <primitive object={JWSTGeometries.primaryMirrorSegment} />
       <primitive object={highlighted ? Materials.highlighted : Materials.primaryMirror} />
     </mesh>
@@ -88,34 +93,37 @@ function PrimaryMirror({
 }: Readonly<{ highlighted: boolean; exploded: number }>) {
   const groupRef = useRef<THREE.Group>(null)
 
-  // Hexagonal arrangement of mirror segments
+  // Accurate hexagonal arrangement of 18 mirror segments matching JWST
   const mirrorSegments = useMemo(() => {
     const segments = []
-    // Center segment
+    const hexRadius = 1.32 // Flat-to-flat distance for accurate hexagon packing
+
+    // Center segment (A1)
     segments.push({ id: 0, position: [0, 0, 0], rotation: [0, 0, 0] })
 
-    // Inner ring (6 segments)
+    // Inner ring (6 segments: A2-A6, B1)
     for (let i = 0; i < 6; i++) {
       const angle = (i * Math.PI) / 3
-      const x = Math.cos(angle) * 1.4
-      const y = Math.sin(angle) * 1.4
+      const x = Math.cos(angle) * hexRadius
+      const y = Math.sin(angle) * hexRadius
       segments.push({
         id: i + 1,
         position: [x, y, 0],
-        rotation: [0, 0, angle],
+        rotation: [0, 0, 0],
       })
     }
 
-    // Outer ring (12 segments)
+    // Outer ring (12 segments: B2-B6, C1-C6)
+    // Alternating pattern for proper hexagonal packing
     for (let i = 0; i < 12; i++) {
-      const angle = (i * Math.PI) / 6
-      const radius = i % 2 === 0 ? 2.8 : 2.4
+      const angle = (i * Math.PI) / 6 + Math.PI / 6
+      const radius = i % 2 === 0 ? hexRadius * Math.sqrt(3) : hexRadius * 2
       const x = Math.cos(angle) * radius
       const y = Math.sin(angle) * radius
       segments.push({
         id: i + 7,
         position: [x, y, 0],
-        rotation: [0, 0, angle],
+        rotation: [0, 0, 0],
       })
     }
 
@@ -141,104 +149,131 @@ function PrimaryMirror({
   )
 }
 
-// Secondary mirror assembly
+// Secondary mirror assembly with accurate tripod positioning
 function SecondaryMirror({
   highlighted,
   exploded,
 }: Readonly<{ highlighted: boolean; exploded: number }>) {
+  const meshRef = useRef<THREE.Mesh>(null)
+
   return (
-    <group position={[0, 0, 4 + exploded * 2]}>
-      {/* Mirror */}
-      <mesh>
+    <group position={[0, 0, 4.5 + exploded * 2.5]}>
+      {/* Secondary Mirror with enhanced shadow */}
+      <mesh ref={meshRef} castShadow receiveShadow>
         <primitive object={JWSTGeometries.secondaryMirror} />
         <primitive object={highlighted ? Materials.highlighted : Materials.secondaryMirror} />
       </mesh>
 
-      {/* Support struts */}
-      {[0, 1, 2].map(i => (
-        <mesh
-          key={i}
-          position={[Math.cos((i * Math.PI * 2) / 3) * 2, Math.sin((i * Math.PI * 2) / 3) * 2, -2]}
-          rotation={[0, 0, (i * Math.PI * 2) / 3]}
-        >
-          <primitive object={JWSTGeometries.supportStrut} />
-          <primitive object={Materials.supportStrut} />
-        </mesh>
-      ))}
+      {/* Three support struts in tripod configuration */}
+      {[0, 1, 2].map(i => {
+        const angle = (i * Math.PI * 2) / 3
+        const strutRadius = 2.5
+        const strutX = Math.cos(angle) * strutRadius
+        const strutY = Math.sin(angle) * strutRadius
+
+        // Calculate strut angle to point toward center
+        const strutAngle = Math.atan2(-strutY, -strutX)
+
+        return (
+          <mesh
+            key={i}
+            position={[strutX, strutY, -2.25]}
+            rotation={[Math.PI / 2, 0, strutAngle + Math.PI / 2]}
+            castShadow
+          >
+            <primitive object={JWSTGeometries.supportStrut} />
+            <primitive object={Materials.supportStrut} />
+          </mesh>
+        )
+      })}
     </group>
   )
 }
 
-// Sunshield layers
+// Sunshield with 5 distinct layers and accurate positioning
 function Sunshield({
   highlighted,
   exploded,
 }: Readonly<{ highlighted: boolean; exploded: number }>) {
   const layers = 5
+  const layerColors = [
+    Materials.sunshieldLayer1, // Layer 1 (hottest)
+    Materials.sunshieldLayer2,
+    Materials.sunshieldLayer1,
+    Materials.sunshieldLayer2,
+    Materials.sunshieldLayer1, // Layer 5 (coldest)
+  ]
 
   return (
-    <group position={[0, -3, -2]}>
-      {Array.from({ length: layers }, (_, i) => (
-        <mesh
-          key={i}
-          position={[0, 0, -i * (0.2 + exploded * 0.5)]}
-          rotation={[0, 0, (i * Math.PI) / 8]} // Slight rotation for each layer
-        >
-          <primitive object={JWSTGeometries.sunshieldLayer} />
-          <primitive
-            object={(() => {
-              if (highlighted) return Materials.highlighted
-              return i % 2 === 0 ? Materials.sunshieldLayer1 : Materials.sunshieldLayer2
-            })()}
-          />
-        </mesh>
-      ))}
+    <group position={[0, -4, -1.5]} rotation={[Math.PI * 0.05, 0, 0]}>
+      {Array.from({ length: layers }, (_, i) => {
+        // Progressive spacing between layers (closer at bottom)
+        const spacing = 0.15 + i * 0.05
+        const zOffset = -i * (spacing + exploded * 0.6)
+        // Each layer rotates slightly for membrane tension effect
+        const layerRotation = (i * Math.PI) / 12 + Math.sin(i) * 0.1
+
+        return (
+          <mesh
+            key={i}
+            position={[0, 0, zOffset]}
+            rotation={[0, 0, layerRotation]}
+            castShadow
+            receiveShadow
+          >
+            <primitive object={JWSTGeometries.sunshieldLayer} />
+            <primitive object={highlighted ? Materials.highlighted : layerColors[i]} />
+          </mesh>
+        )
+      })}
     </group>
   )
 }
 
-// Scientific instruments cluster
+// Scientific instruments cluster - ISIM (Integrated Science Instrument Module)
 function InstrumentCluster({
   highlighted,
   exploded,
 }: Readonly<{ highlighted: boolean; exploded: number }>) {
+  // Accurate instrument positions in ISIM module
   const instruments = [
-    { name: 'NIRCam', position: [0, -1.5, 0.5], color: '#FF6B6B' },
-    { name: 'NIRSpec', position: [-1.2, -1.5, 0.5], color: '#4ECDC4' },
-    { name: 'MIRI', position: [1.2, -1.5, 0.5], color: '#45B7D1' },
-    { name: 'NIRISS', position: [0.6, -1.5, 0.5], color: '#96CEB4' },
-    { name: 'FGS', position: [-0.6, -1.5, 0.5], color: '#FFEAA7' },
+    { name: 'NIRCam', position: [0.8, -2, 0.3], scale: 1.2 }, // Main near-infrared imager
+    { name: 'NIRSpec', position: [-0.9, -2, 0.3], scale: 1.1 }, // Near-infrared spectrograph
+    { name: 'MIRI', position: [0, -2.2, 0.1], scale: 1 }, // Mid-infrared instrument (coldest)
+    { name: 'NIRISS', position: [0, -1.8, 0.5], scale: 0.9 }, // Near-infrared imager and slitless spectrograph
+    { name: 'FGS', position: [-0.4, -1.8, 0.4], scale: 0.85 }, // Fine guidance sensor
   ]
 
   return (
     <group>
-      {instruments.map(inst => (
-        <group
-          key={inst.name}
-          position={[
-            inst.position[0] * (1 + exploded * 0.5),
-            inst.position[1],
-            inst.position[2] + exploded * 1,
-          ]}
-        >
-          <mesh>
-            <primitive object={JWSTGeometries.instrumentHousing} />
-            <primitive
-              object={
-                highlighted
-                  ? Materials.highlighted
-                  : InstrumentMaterials[inst.name as keyof typeof InstrumentMaterials] ||
-                    Materials.instrumentHousing
-              }
-            />
-          </mesh>
-          <Html distanceFactor={10}>
-            <div className="text-xs text-white bg-black/80 px-2 py-1 rounded pointer-events-none">
-              {inst.name}
-            </div>
-          </Html>
-        </group>
-      ))}
+      {instruments.map(inst => {
+        const explodedX = inst.position[0] * (1 + exploded * 0.6)
+        const explodedY = inst.position[1] - exploded * 0.5
+        const explodedZ = inst.position[2] + exploded * 1.2
+
+        return (
+          <group key={inst.name} position={[explodedX, explodedY, explodedZ]} scale={inst.scale}>
+            <mesh castShadow receiveShadow>
+              <primitive object={JWSTGeometries.instrumentHousing} />
+              <primitive
+                object={
+                  highlighted
+                    ? Materials.highlighted
+                    : InstrumentMaterials[inst.name as keyof typeof InstrumentMaterials] ||
+                      Materials.instrumentHousing
+                }
+              />
+            </mesh>
+            {exploded > 0.3 && (
+              <Html distanceFactor={10} center>
+                <div className="text-xs text-white bg-black/90 px-2 py-1 rounded pointer-events-none whitespace-nowrap font-semibold">
+                  {inst.name}
+                </div>
+              </Html>
+            )}
+          </group>
+        )
+      })}
     </group>
   )
 }
@@ -265,12 +300,19 @@ function JWSTModel({
   // Initialize performance monitor
   performanceMonitor.current ??= new PerformanceMonitor(perfConfig, true)
 
-  // Rotation animation with performance monitoring
+  // Smooth rotation animation with performance monitoring
   useFrame(state => {
     if (groupRef.current) {
-      // Reduce animation complexity based on performance
-      const animationIntensity = perfConfig.textureResolution === 'low' ? 0.05 : 0.1
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * animationIntensity
+      // Smoother, more subtle breathing rotation
+      const time = state.clock.elapsedTime
+      const animationIntensity = perfConfig.textureResolution === 'low' ? 0.03 : 0.06
+
+      // Gentle floating motion
+      groupRef.current.rotation.y = Math.sin(time * 0.15) * animationIntensity
+      groupRef.current.rotation.x = Math.cos(time * 0.12) * (animationIntensity * 0.5)
+
+      // Very subtle vertical floating
+      groupRef.current.position.y = Math.sin(time * 0.2) * 0.05
     }
 
     // Monitor performance
@@ -313,8 +355,13 @@ function JWSTModel({
         exploded={exploded}
       />
 
-      {/* Spacecraft Bus */}
-      <mesh position={[0, -2 - exploded * 1, -1]}>
+      {/* Spacecraft Bus - Main structural hub */}
+      <mesh
+        position={[0, -2.8 - exploded * 1.5, -0.8]}
+        rotation={[0, Math.PI / 12, 0]}
+        castShadow
+        receiveShadow
+      >
         <primitive object={JWSTGeometries.spacecraftBus} />
         <primitive
           object={
@@ -323,8 +370,13 @@ function JWSTModel({
         />
       </mesh>
 
-      {/* Solar Arrays */}
-      <mesh position={[3 + exploded * 2, -2, -1]} rotation={[0, 0, Math.PI / 2]}>
+      {/* Solar Arrays - Two panels with proper orientation */}
+      <mesh
+        position={[3.5 + exploded * 2.5, -2.5, -1.2]}
+        rotation={[Math.PI * 0.1, 0, 0]}
+        castShadow
+        receiveShadow
+      >
         <primitive object={JWSTGeometries.solarPanel} />
         <primitive
           object={
@@ -333,7 +385,12 @@ function JWSTModel({
         />
       </mesh>
 
-      <mesh position={[-3 - exploded * 2, -2, -1]} rotation={[0, 0, Math.PI / 2]}>
+      <mesh
+        position={[-3.5 - exploded * 2.5, -2.5, -1.2]}
+        rotation={[Math.PI * 0.1, 0, 0]}
+        castShadow
+        receiveShadow
+      >
         <primitive object={JWSTGeometries.solarPanel} />
         <primitive
           object={
@@ -361,17 +418,17 @@ function JWSTModel({
   )
 }
 
-// Helper function to get component positions
+// Helper function to get component positions for interaction
 function getComponentPosition(componentId: string, exploded: number): [number, number, number] {
   const positions: Record<string, [number, number, number]> = {
     'primary-mirror': [0, 0, 0],
-    'secondary-mirror': [0, 0, 4 + exploded * 2],
-    sunshield: [0, -3, -2 - exploded * 2],
-    nircam: [0, -1.5, 0.5 + exploded * 1],
-    nirspec: [-1.2 * (1 + exploded * 0.5), -1.5, 0.5 + exploded * 1],
-    miri: [1.2 * (1 + exploded * 0.5), -1.5, 0.5 + exploded * 1],
-    'spacecraft-bus': [0, -2 - exploded * 1, -1],
-    'solar-arrays': [0, -2, -1],
+    'secondary-mirror': [0, 0, 4.5 + exploded * 2.5],
+    sunshield: [0, -4, -1.5 - exploded * 2],
+    nircam: [0.8 * (1 + exploded * 0.6), -2 - exploded * 0.5, 0.3 + exploded * 1.2],
+    nirspec: [-0.9 * (1 + exploded * 0.6), -2 - exploded * 0.5, 0.3 + exploded * 1.2],
+    miri: [0, -2.2 - exploded * 0.5, 0.1 + exploded * 1.2],
+    'spacecraft-bus': [0, -2.8 - exploded * 1.5, -0.8],
+    'solar-arrays': [0, -2.5, -1.2],
   }
   return positions[componentId] || [0, 0, 0]
 }

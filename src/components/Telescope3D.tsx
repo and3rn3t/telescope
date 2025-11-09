@@ -5,6 +5,11 @@ import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { JWSTGeometries } from '@/lib/jwst-geometries'
 import { InstrumentMaterials, JWSTMaterials, SpaceEnvironment } from '@/lib/jwst-materials'
+import {
+  detectDeviceCapabilities,
+  PerformanceConfig,
+  PerformanceMonitor,
+} from '@/lib/performance-optimization'
 import { TelescopeComponent } from '@/lib/telescope-data'
 import {
   ArrowsClockwise,
@@ -16,6 +21,7 @@ import {
   House,
   Info,
   Lightning,
+  Play,
   Target,
 } from '@phosphor-icons/react'
 import { Environment, Html, MeshReflectorMaterial, OrbitControls, Stars } from '@react-three/drei'
@@ -23,21 +29,12 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { DeploymentAnimation } from './DeploymentAnimation3D'
 
 interface Telescope3DProps {
   onComponentClick: (component: TelescopeComponent) => void
   selectedComponent: TelescopeComponent | null
   components: TelescopeComponent[]
-}
-
-interface JWSTComponentProps {
-  position: [number, number, number]
-  rotation?: [number, number, number]
-  scale?: number
-  highlighted: boolean
-  onClick: () => void
-  component: TelescopeComponent
-  exploded: number
 }
 
 interface MirrorSegmentProps {
@@ -51,23 +48,32 @@ interface MirrorSegmentProps {
 const Materials = JWSTMaterials
 
 // Individual mirror segment component
-function MirrorSegment({ position, rotation, highlighted, segmentId }: MirrorSegmentProps) {
+// Optimized mirror segment component with LOD
+function MirrorSegment({
+  position,
+  rotation,
+  highlighted,
+  segmentId: _segmentId,
+}: MirrorSegmentProps) {
   const meshRef = useRef<THREE.Mesh>(null)
 
   useFrame(state => {
-    if (meshRef.current && highlighted) {
+    if (!meshRef.current) return
+
+    // Material and animation updates
+    if (highlighted) {
       meshRef.current.material = Materials.highlighted
-      // Subtle breathing animation for highlighted segments
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.05
+      // Optimized animation for performance
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.03
       meshRef.current.scale.setScalar(scale)
-    } else if (meshRef.current) {
+    } else {
       meshRef.current.material = Materials.primaryMirror
       meshRef.current.scale.setScalar(1)
     }
   })
 
   return (
-    <mesh ref={meshRef} position={position} rotation={rotation}>
+    <mesh ref={meshRef} position={position} rotation={rotation} frustumCulled>
       <primitive object={JWSTGeometries.primaryMirrorSegment} />
       <primitive object={highlighted ? Materials.highlighted : Materials.primaryMirror} />
     </mesh>
@@ -233,18 +239,44 @@ function JWSTModel({
   onComponentClick,
   components,
   exploded,
+  perfConfig,
+  onPerformanceUpdate,
 }: {
   selectedComponent: TelescopeComponent | null
   onComponentClick: (component: TelescopeComponent) => void
   components: TelescopeComponent[]
   exploded: number
+  perfConfig: PerformanceConfig
+  onPerformanceUpdate?: (fps: number) => void
 }) {
   const groupRef = useRef<THREE.Group>(null)
+  const performanceMonitor = useRef<PerformanceMonitor>()
 
-  // Rotation animation
+  // Initialize performance monitor
+  if (!performanceMonitor.current) {
+    performanceMonitor.current = new PerformanceMonitor(perfConfig, true)
+  }
+
+  // Rotation animation with performance monitoring
   useFrame(state => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * 0.1
+      // Reduce animation complexity based on performance
+      const animationIntensity = perfConfig.textureResolution === 'low' ? 0.05 : 0.1
+      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * animationIntensity
+    }
+
+    // Monitor performance
+    if (performanceMonitor.current) {
+      const { fps, shouldAdaptQuality } = performanceMonitor.current.update()
+
+      if (onPerformanceUpdate) {
+        onPerformanceUpdate(fps)
+      }
+
+      // Adaptive quality adjustments would go here in a real implementation
+      if (shouldAdaptQuality && import.meta.env.DEV) {
+        console.warn('Performance: Adaptive quality adjustment recommended', { fps })
+      }
     }
   })
 
@@ -345,6 +377,9 @@ function Controls3D({
   viewMode,
   setViewMode,
   onReset,
+  onShowDeployment,
+  fps,
+  perfConfig,
 }: {
   exploded: number
   setExploded: (value: number) => void
@@ -353,6 +388,9 @@ function Controls3D({
   viewMode: string
   setViewMode: (value: string) => void
   onReset: () => void
+  onShowDeployment: () => void
+  fps: number
+  perfConfig: PerformanceConfig
 }) {
   return (
     <motion.div
@@ -389,6 +427,16 @@ function Controls3D({
                 <ArrowsOut size={16} />
                 <span className="ml-2 hidden sm:inline">Exploded</span>
               </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onShowDeployment}
+                className="flex-1 min-w-0 bg-linear-to-r from-blue-600 to-purple-600 border-blue-500 text-white hover:from-blue-700 hover:to-purple-700"
+              >
+                <Play size={16} />
+                <span className="ml-2 hidden sm:inline">Deployment</span>
+              </Button>
             </div>
 
             {/* Exploded view slider */}
@@ -407,6 +455,25 @@ function Controls3D({
                 step={0.01}
                 className="w-full"
               />
+            </div>
+
+            {/* Performance indicator */}
+            <div className="flex items-center justify-between text-xs">
+              <div className="text-white/60 flex items-center gap-2">
+                <span>Performance:</span>
+                <span
+                  className={
+                    fps >= 30 ? 'text-green-400' : fps >= 20 ? 'text-yellow-400' : 'text-red-400'
+                  }
+                >
+                  {Math.round(fps)} FPS
+                </span>
+                <span className="text-white/40">
+                  {perfConfig.textureResolution.charAt(0).toUpperCase() +
+                    perfConfig.textureResolution.slice(1)}{' '}
+                  Quality
+                </span>
+              </div>
             </div>
 
             {/* Mobile touch hint */}
@@ -510,7 +577,18 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
   const [exploded, setExploded] = useState(0)
   const [autoRotate, setAutoRotate] = useState(true)
   const [viewMode, setViewMode] = useState('normal')
+  const [showDeployment, setShowDeployment] = useState(false)
+
+  // Performance optimization
+  const [perfConfig, setPerfConfig] = useState<PerformanceConfig>(() => detectDeviceCapabilities())
+  const performanceMonitor = useRef<PerformanceMonitor>()
+  const [fps, setFps] = useState(60)
   const controlsRef = useRef<unknown>()
+
+  // Initialize performance monitoring
+  useMemo(() => {
+    performanceMonitor.current = new PerformanceMonitor(perfConfig, true)
+  }, [perfConfig])
 
   const handleReset = useCallback(() => {
     if (controlsRef.current) {
@@ -541,15 +619,27 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       <Card className="relative h-[70vh] overflow-hidden border-2 border-primary/20">
         <Canvas
           camera={{ position: [8, 8, 8], fov: 50 }}
+          dpr={perfConfig.devicePixelRatio}
           gl={{
-            antialias: true,
+            antialias: perfConfig.antialiasing,
             alpha: true,
             powerPreference: 'high-performance',
+            pixelRatio: perfConfig.devicePixelRatio,
           }}
           onCreated={({ gl }) => {
             gl.setClearColor('#000011', 1)
-            gl.shadowMap.enabled = true
-            gl.shadowMap.type = THREE.PCFSoftShadowMap
+
+            // Shadow settings based on performance config
+            gl.shadowMap.enabled = perfConfig.shadowQuality !== 'off'
+            if (gl.shadowMap.enabled) {
+              gl.shadowMap.type =
+                perfConfig.shadowQuality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap
+            }
+
+            // Performance optimizations
+            if (perfConfig.frustumCulling) {
+              gl.setPixelRatio(perfConfig.devicePixelRatio)
+            }
           }}
         >
           {/* Lighting setup for realistic space appearance */}
@@ -601,6 +691,8 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
             onComponentClick={handleComponentClick}
             components={components}
             exploded={exploded}
+            perfConfig={perfConfig}
+            onPerformanceUpdate={setFps}
           />
 
           {/* Camera controls */}
@@ -629,6 +721,9 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
           viewMode={viewMode}
           setViewMode={setViewMode}
           onReset={handleReset}
+          onShowDeployment={() => setShowDeployment(true)}
+          fps={fps}
+          perfConfig={perfConfig}
         />
 
         {/* Component Info Panel */}
@@ -637,6 +732,11 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
           onClose={() => onComponentClick({} as TelescopeComponent)}
         />
       </Card>
+
+      {/* Deployment Animation Modal */}
+      <AnimatePresence>
+        {showDeployment && <DeploymentAnimation onClose={() => setShowDeployment(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

@@ -5,8 +5,8 @@ import * as THREE from 'three'
  * Realistic space telescope materials with proper PBR properties
  */
 
-// Texture loader for reusable textures
-const textureLoader = new THREE.TextureLoader()
+// Texture loader for reusable textures (currently unused but available for future enhancements)
+// const textureLoader = new THREE.TextureLoader()
 
 // Base materials with physically accurate properties
 export const JWSTMaterials = {

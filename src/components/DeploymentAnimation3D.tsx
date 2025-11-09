@@ -113,11 +113,11 @@ interface DeploymentState {
 const INITIAL_DEPLOYMENT_STATE: DeploymentState = {
   stage: 'launch',
   progress: 0,
-  solarArrayAngle: -90, // Folded position
-  sunshieldLayers: [0, 0, 0, 0, 0], // All layers stacked
-  sunshieldTension: 0,
-  secondaryMirrorExtension: 0,
-  mirrorWingsRotation: [90, -90], // Folded inward
+  solarArrayAngle: 90, // Folded flat against body
+  sunshieldLayers: [0, 0, 0, 0, 0], // All layers stacked together
+  sunshieldTension: 0, // Fully compressed
+  secondaryMirrorExtension: 0, // Retracted
+  mirrorWingsRotation: [90, -90], // Folded inward against center
   overallProgress: 0,
 }
 
@@ -180,80 +180,146 @@ function DeployingJWST({ deploymentState }: Readonly<{ deploymentState: Deployme
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* Main Observatory Structure */}
+      {/* Main Observatory Structure - Built from back to front */}
       <group position={[0, 0, 0]}>
-        {/* Primary Mirror - Center Section (always visible) */}
+        {/* LAYER 1: Spacecraft Bus (back of telescope) */}
+        <group position={[0, -1.5, -2]}>
+          <mesh castShadow>
+            <boxGeometry args={[2, 1.5, 1.2]} />
+            <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+          </mesh>
+          {/* Add detail to spacecraft bus */}
+          <mesh position={[0, 0.8, 0]}>
+            <cylinderGeometry args={[0.3, 0.3, 0.2, 6]} />
+            <meshStandardMaterial color="#34495e" metalness={0.7} roughness={0.4} />
+          </mesh>
+        </group>
+
+        {/* LAYER 2: Instrument Section (ISIM - behind mirror) */}
+        <group position={[0, -0.8, -0.8]}>
+          <mesh castShadow>
+            <boxGeometry args={[1.5, 1, 0.6]} />
+            <meshStandardMaterial
+              color="#1a1a2e"
+              metalness={0.6}
+              roughness={0.5}
+              emissive="#0f3460"
+              emissiveIntensity={0.2}
+            />
+          </mesh>
+          {/* Instrument details */}
+          {[
+            [-0.4, 0, 0.4],
+            [0.4, 0, 0.4],
+            [0, -0.3, 0.4],
+          ].map((pos, i) => (
+            <mesh key={`instrument-${i}`} position={pos as [number, number, number]}>
+              <boxGeometry args={[0.3, 0.3, 0.2]} />
+              <meshStandardMaterial
+                color="#16213e"
+                metalness={0.5}
+                roughness={0.6}
+                emissive="#1e88e5"
+                emissiveIntensity={0.3}
+              />
+            </mesh>
+          ))}
+        </group>
+
+        {/* LAYER 3: Backplane Structure (connects bus to mirror) */}
+        <group position={[0, -0.5, -0.3]}>
+          <mesh castShadow>
+            <boxGeometry args={[4, 3.5, 0.15]} />
+            <meshStandardMaterial color="#34495e" metalness={0.9} roughness={0.2} />
+          </mesh>
+          {/* Backplane support struts */}
+          {[-1.5, -0.5, 0.5, 1.5].map((x, i) => (
+            <mesh key={`backplane-strut-${i}`} position={[x, 0, -0.1]}>
+              <boxGeometry args={[0.08, 3.5, 0.08]} />
+              <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* LAYER 4: Primary Mirror Assembly */}
         <group position={[0, 0, 0]}>
-          {/* Central mirror segments (fixed) - Inner ring + center */}
-          {Array.from({ length: 7 }, (_, i) => {
-            if (i === 0) {
-              // Center segment
+          {/* Center mirror segment */}
+          <mesh position={[0, 0, 0]} castShadow>
+            <primitive object={JWSTGeometries.primaryMirrorSegment} />
+            <primitive object={JWSTMaterials.primaryMirror} />
+          </mesh>
+
+          {/* Inner ring - 6 segments surrounding center */}
+          {Array.from({ length: 6 }, (_, i) => {
+            const angle = (i * Math.PI) / 3
+            const hexRadius = 1.32
+            return (
+              <mesh
+                key={`center-ring-${i}`}
+                position={[Math.cos(angle) * hexRadius, Math.sin(angle) * hexRadius, 0]}
+                castShadow
+              >
+                <primitive object={JWSTGeometries.primaryMirrorSegment} />
+                <primitive object={JWSTMaterials.primaryMirror} />
+              </mesh>
+            )
+          })}
+
+          {/* Left Mirror Wing - 6 segments (folds out) */}
+          <group ref={leftWingRef} position={[-2.64, 0, 0]}>
+            {/* Hinge mechanism visualization */}
+            <mesh position={[1.32, 0, -0.2]}>
+              <cylinderGeometry args={[0.1, 0.1, 0.3, 8]} />
+              <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+            </mesh>
+            {Array.from({ length: 6 }, (_, i) => {
+              const angle = (i * Math.PI) / 3
+              const hexRadius = 1.32
               return (
-                <mesh key="center" position={[0, 0, 0]} castShadow>
+                <mesh
+                  key={`left-wing-${i}`}
+                  position={[Math.cos(angle) * hexRadius, Math.sin(angle) * hexRadius, 0]}
+                  castShadow
+                >
                   <primitive object={JWSTGeometries.primaryMirrorSegment} />
                   <primitive object={JWSTMaterials.primaryMirror} />
                 </mesh>
               )
-            }
-            // Inner ring - 6 segments
-            const angle = ((i - 1) * Math.PI) / 3
-            const hexRadius = 1.32
-            return (
-              <mesh
-                key={`center-${i}`}
-                position={[Math.cos(angle) * hexRadius, Math.sin(angle) * hexRadius, 0]}
-                castShadow
-              >
-                <primitive object={JWSTGeometries.primaryMirrorSegment} />
-                <primitive object={JWSTMaterials.primaryMirror} />
-              </mesh>
-            )
-          })}
+            })}
+          </group>
+
+          {/* Right Mirror Wing - 6 segments (folds out) */}
+          <group ref={rightWingRef} position={[2.64, 0, 0]}>
+            {/* Hinge mechanism visualization */}
+            <mesh position={[-1.32, 0, -0.2]}>
+              <cylinderGeometry args={[0.1, 0.1, 0.3, 8]} />
+              <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+            </mesh>
+            {Array.from({ length: 6 }, (_, i) => {
+              const angle = (i * Math.PI) / 3
+              const hexRadius = 1.32
+              return (
+                <mesh
+                  key={`right-wing-${i}`}
+                  position={[Math.cos(angle) * hexRadius, Math.sin(angle) * hexRadius, 0]}
+                  castShadow
+                >
+                  <primitive object={JWSTGeometries.primaryMirrorSegment} />
+                  <primitive object={JWSTMaterials.primaryMirror} />
+                </mesh>
+              )
+            })}
+          </group>
         </group>
 
-        {/* Left Mirror Wing - 6 segments */}
-        <group ref={leftWingRef} position={[-2.64, 0, 0]}>
-          {Array.from({ length: 6 }, (_, i) => {
-            const angle = (i * Math.PI) / 3
-            const hexRadius = 1.32
-            return (
-              <mesh
-                key={`left-${i}`}
-                position={[Math.cos(angle) * hexRadius, Math.sin(angle) * hexRadius, 0]}
-                castShadow
-              >
-                <primitive object={JWSTGeometries.primaryMirrorSegment} />
-                <primitive object={JWSTMaterials.primaryMirror} />
-              </mesh>
-            )
-          })}
-        </group>
-
-        {/* Right Mirror Wing - 6 segments */}
-        <group ref={rightWingRef} position={[2.64, 0, 0]}>
-          {Array.from({ length: 6 }, (_, i) => {
-            const angle = (i * Math.PI) / 3
-            const hexRadius = 1.32
-            return (
-              <mesh
-                key={`right-${i}`}
-                position={[Math.cos(angle) * hexRadius, Math.sin(angle) * hexRadius, 0]}
-                castShadow
-              >
-                <primitive object={JWSTGeometries.primaryMirrorSegment} />
-                <primitive object={JWSTMaterials.primaryMirror} />
-              </mesh>
-            )
-          })}
-        </group>
-
-        {/* Secondary Mirror */}
+        {/* LAYER 5: Secondary Mirror & Tripod (extends forward) */}
         <group ref={secondaryMirrorRef} position={[0, 0, 3]}>
+          {/* Secondary mirror */}
           <mesh castShadow>
             <primitive object={JWSTGeometries.secondaryMirror} />
             <primitive object={JWSTMaterials.secondaryMirror} />
           </mesh>
-          {/* Support struts - three-legged tripod */}
+          {/* Support tripod struts */}
           {Array.from({ length: 3 }, (_, i) => {
             const angle = (i * Math.PI * 2) / 3
             const strutRadius = 2.5
@@ -262,39 +328,62 @@ function DeployingJWST({ deploymentState }: Readonly<{ deploymentState: Deployme
             const strutAngle = Math.atan2(-strutY, -strutX)
 
             return (
-              <mesh
-                key={`strut-${i}`}
-                position={[strutX, strutY, -1.5]}
-                rotation={[Math.PI / 2, 0, strutAngle + Math.PI / 2]}
-                castShadow
-              >
-                <primitive object={JWSTGeometries.supportStrut} />
-                <primitive object={JWSTMaterials.supportStrut} />
-              </mesh>
+              <group key={`strut-group-${i}`}>
+                {/* Main strut */}
+                <mesh
+                  position={[strutX, strutY, -1.5]}
+                  rotation={[Math.PI / 2, 0, strutAngle + Math.PI / 2]}
+                  castShadow
+                >
+                  <cylinderGeometry args={[0.03, 0.03, 3.5, 8]} />
+                  <meshStandardMaterial color="#95a5a6" metalness={0.9} roughness={0.1} />
+                </mesh>
+                {/* Strut connection point */}
+                <mesh position={[strutX, strutY, 0.1]}>
+                  <sphereGeometry args={[0.08, 8, 8]} />
+                  <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+                </mesh>
+              </group>
             )
           })}
         </group>
 
-        {/* Solar Array */}
-        <group ref={solarArrayRef} position={[3.5, -2.5, -1.2]} rotation={[Math.PI * 0.1, 0, 0]}>
+        {/* LAYER 6: Solar Array (side mounted) */}
+        <group ref={solarArrayRef} position={[3.5, -1.2, -1]} rotation={[0, 0, Math.PI * 0.5]}>
           <mesh castShadow>
             <primitive object={JWSTGeometries.solarPanel} />
             <primitive object={JWSTMaterials.solarPanel} />
           </mesh>
+          {/* Solar array mounting arm */}
+          <mesh position={[-1.8, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.05, 0.05, 1.5, 8]} />
+            <meshStandardMaterial color="#7f8c8d" metalness={0.8} roughness={0.3} />
+          </mesh>
         </group>
 
-        {/* Sunshield Layers */}
-        <group position={[0, -4, -1.5]} rotation={[Math.PI * 0.05, 0, 0]}>
+        {/* LAYER 7: Sunshield Assembly (largest component, deploys downward) */}
+        <group position={[0, -3, -1.5]}>
+          {/* Sunshield support frame */}
+          <mesh position={[0, 0.5, 0]}>
+            <boxGeometry args={[2, 0.1, 0.1]} />
+            <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
+          </mesh>
+          <mesh position={[0, -0.5, 0]}>
+            <boxGeometry args={[2, 0.1, 0.1]} />
+            <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
+          </mesh>
+
+          {/* Sunshield layers with proper stacking */}
           {deploymentState.sunshieldLayers.map((yOffset, i) => {
             const tension = deploymentState.sunshieldTension
-            const scaleX = 1 + tension * 0.5
-            const scaleY = 1 + tension * 0.3
-            const layerRotation = (i * Math.PI) / 12 + Math.sin(i) * 0.1
+            const scaleX = 1 + tension * 0.8
+            const scaleY = 1 + tension * 0.6
+            const layerRotation = (i * Math.PI) / 20 + Math.sin(i) * 0.05
 
             return (
               <mesh
-                key={`sunshield-${i}`}
-                position={[0, yOffset, -i * 0.2]}
+                key={`sunshield-layer-${i}`}
+                position={[0, yOffset, -i * 0.15]}
                 scale={[scaleX, scaleY, 1]}
                 rotation={[0, 0, layerRotation]}
                 castShadow
@@ -309,20 +398,6 @@ function DeployingJWST({ deploymentState }: Readonly<{ deploymentState: Deployme
               </mesh>
             )
           })}
-        </group>
-
-        {/* Spacecraft Bus */}
-        <mesh position={[0, -2.8, -0.8]} rotation={[0, Math.PI / 12, 0]} castShadow>
-          <primitive object={JWSTGeometries.spacecraftBus} />
-          <primitive object={JWSTMaterials.structure} />
-        </mesh>
-
-        {/* Instruments */}
-        <group position={[0, -2, 0.3]}>
-          <mesh castShadow>
-            <primitive object={JWSTGeometries.instrumentHousing} />
-            <primitive object={JWSTMaterials.instrumentHousing} />
-          </mesh>
         </group>
       </group>
 
@@ -363,47 +438,54 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
     let secondaryMirrorExtension = 0
     let mirrorWingsRotation = [90, -90]
 
-    // Solar array deployment (Day 0.5) - happens early
+    // PHASE 1: Solar array deployment (Day 0.5) - Unfold from side
     if (progress > 0.03) {
       const solarProgress = Math.min(1, (progress - 0.03) / 0.08)
-      // Smooth easing for solar array unfold
       const easedProgress = solarProgress * solarProgress * (3 - 2 * solarProgress)
-      solarArrayAngle = -90 + easedProgress * 90 // Unfold to 0 degrees
+      solarArrayAngle = 90 - easedProgress * 90 // Rotate from 90° (folded) to 0° (deployed)
     }
 
-    // Sunshield pallet drop (Day 3) - initial lowering
+    // PHASE 2: Sunshield pallet release (Day 3) - Begin lowering
     if (progress > 0.21) {
       const palletProgress = Math.min(1, (progress - 0.21) / 0.1)
       const easedProgress = palletProgress * palletProgress * (3 - 2 * palletProgress)
-      sunshieldLayers = sunshieldLayers.map(() => -easedProgress * 0.4)
+      // All layers drop together initially
+      sunshieldLayers = sunshieldLayers.map(() => -easedProgress * 0.6)
     }
 
-    // Sunshield layer separation (Day 5) - layers separate
+    // PHASE 3: Sunshield layer separation (Day 5-7) - Layers separate vertically
     if (progress > 0.36) {
       const separationProgress = Math.min(1, (progress - 0.36) / 0.18)
       const easedProgress = separationProgress * separationProgress * (3 - 2 * separationProgress)
-      sunshieldLayers = sunshieldLayers.map((_, i) => -0.4 - i * easedProgress * 0.25)
+      // Spread layers vertically with increasing spacing
+      sunshieldLayers = sunshieldLayers.map((_, i) => {
+        return -0.6 - i * easedProgress * 0.35
+      })
     }
 
-    // Sunshield tensioning (Day 8) - stretch into kite shape
+    // PHASE 4: Sunshield tensioning (Day 8-9) - Stretch into diamond/kite shape
     if (progress > 0.57) {
       const tensionProgress = Math.min(1, (progress - 0.57) / 0.15)
       const easedProgress = tensionProgress * tensionProgress * (3 - 2 * tensionProgress)
-      sunshieldTension = easedProgress
+      sunshieldTension = easedProgress // Gradually stretch to full size
     }
 
-    // Secondary mirror deployment (Day 10) - tripod extends
+    // PHASE 5: Secondary mirror deployment (Day 10-11) - Extend tripod forward
     if (progress > 0.71) {
       const mirrorProgress = Math.min(1, (progress - 0.71) / 0.14)
       const easedProgress = mirrorProgress * mirrorProgress * (3 - 2 * mirrorProgress)
-      secondaryMirrorExtension = easedProgress
+      secondaryMirrorExtension = easedProgress // Extend from 0 to 1
     }
 
-    // Primary mirror wings (Day 12) - final unfold
+    // PHASE 6: Primary mirror wings (Day 12-14) - Unfold side panels
     if (progress > 0.86) {
       const wingsProgress = Math.min(1, (progress - 0.86) / 0.14)
       const easedProgress = wingsProgress * wingsProgress * (3 - 2 * wingsProgress)
-      mirrorWingsRotation = [90 - easedProgress * 90, -90 + easedProgress * 90]
+      // Rotate wings from folded (90°, -90°) to flat (0°, 0°)
+      mirrorWingsRotation = [
+        90 - easedProgress * 90, // Left wing: 90° → 0°
+        -90 + easedProgress * 90, // Right wing: -90° → 0°
+      ]
     }
 
     setDeploymentState({
@@ -459,16 +541,22 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
     >
       {/* 3D Canvas */}
       <div className="flex-1 relative">
-        <Canvas camera={{ position: [10, 5, 10], fov: 50 }} shadows gl={{ antialias: true }}>
-          {/* Enhanced space environment lighting */}
+        <Canvas
+          camera={{ position: [8, 4, 12], fov: 50 }}
+          shadows
+          gl={{ antialias: true, alpha: false }}
+        >
+          {/* Enhanced multi-angle lighting for better structure visibility */}
           <ambientLight
             color={SpaceEnvironment.ambientLight.color}
-            intensity={SpaceEnvironment.ambientLight.intensity * 1.5}
+            intensity={SpaceEnvironment.ambientLight.intensity * 2.5}
           />
+
+          {/* Primary sun light - stronger and from better angle */}
           <directionalLight
             color={SpaceEnvironment.sunLight.color}
-            intensity={SpaceEnvironment.sunLight.intensity * 1.2}
-            position={SpaceEnvironment.sunLight.position}
+            intensity={SpaceEnvironment.sunLight.intensity * 2}
+            position={[12, 10, 8]}
             castShadow
             shadow-mapSize={[2048, 2048]}
             shadow-camera-far={50}
@@ -477,18 +565,24 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
             shadow-camera-top={20}
             shadow-camera-bottom={-20}
           />
-          <pointLight
-            color={SpaceEnvironment.fillLight.color}
-            intensity={SpaceEnvironment.fillLight.intensity * 1.5}
-            position={SpaceEnvironment.fillLight.position}
+
+          {/* Fill light from left side */}
+          <pointLight color="#4a90e2" intensity={1} position={[-10, 2, 8]} />
+
+          {/* Back light for depth and rim */}
+          <pointLight color="#1e3a8a" intensity={0.8} position={[0, -6, -10]} />
+
+          {/* Front light for better component visibility */}
+          <pointLight color="#ffffff" intensity={0.6} position={[0, 2, 15]} />
+
+          {/* Accent light from below to show sunshield layers */}
+          <spotLight
+            color="#60a5fa"
+            intensity={0.7}
+            position={[0, -10, 0]}
+            angle={0.9}
+            penumbra={1}
           />
-          <pointLight
-            color={SpaceEnvironment.rimLight.color}
-            intensity={SpaceEnvironment.rimLight.intensity}
-            position={SpaceEnvironment.rimLight.position}
-          />
-          {/* Additional front light for better visibility */}
-          <pointLight color="#ffffff" intensity={0.3} position={[0, 0, 10]} />
 
           <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 

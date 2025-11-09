@@ -367,49 +367,90 @@ function JWSTModel({
         exploded={exploded}
       />
 
-      {/* Spacecraft Bus - Main structural hub */}
-      <mesh
-        position={[0, -2.8 - exploded * 1.5, -0.8]}
-        rotation={[0, Math.PI / 12, 0]}
-        castShadow
-        receiveShadow
-      >
-        <primitive object={JWSTGeometries.spacecraftBus} />
-        <primitive
-          object={
-            selectedComponent?.id === 'spacecraft-bus' ? Materials.highlighted : Materials.structure
-          }
-        />
-      </mesh>
+      {/* Spacecraft Bus - Main structural hub with antenna */}
+      <group position={[0, -2.8 - exploded * 1.5, -0.8]}>
+        {/* Main bus structure */}
+        <mesh rotation={[0, Math.PI / 12, 0]} castShadow receiveShadow>
+          <primitive object={JWSTGeometries.spacecraftBus} />
+          <primitive
+            object={
+              selectedComponent?.id === 'spacecraft-bus' ? Materials.highlighted : Materials.structure
+            }
+          />
+        </mesh>
 
-      {/* Solar Arrays - Two panels with proper orientation */}
-      <mesh
-        position={[3.5 + exploded * 2.5, -2.5, -1.2]}
-        rotation={[Math.PI * 0.1, 0, 0]}
-        castShadow
-        receiveShadow
-      >
-        <primitive object={JWSTGeometries.solarPanel} />
-        <primitive
-          object={
-            selectedComponent?.id === 'solar-arrays' ? Materials.highlighted : Materials.solarPanel
-          }
-        />
-      </mesh>
+        {/* High-Gain Antenna Assembly - mounted on top of bus */}
+        <group position={[0, 0.8, 0]}>
+          {/* Antenna mounting post */}
+          <mesh position={[0, 0.15, 0]}>
+            <cylinderGeometry args={[0.08, 0.12, 0.3, 8]} />
+            <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
+          </mesh>
+          
+          {/* Antenna dish (parabolic reflector) */}
+          <mesh position={[0, 0.4, 0]} rotation={[Math.PI / 4, 0, 0]} scale={[1, 1, 0.4]}>
+            <sphereGeometry args={[0.35, 16, 16]} />
+            <meshStandardMaterial 
+              color="#c9a961" 
+              metalness={0.95} 
+              roughness={0.05}
+              side={2}
+            />
+          </mesh>
+          
+          {/* Feed horn at center of dish */}
+          <mesh position={[0, 0.5, 0.1]}>
+            <cylinderGeometry args={[0.04, 0.06, 0.15, 8]} />
+            <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+          </mesh>
+        </group>
 
-      <mesh
-        position={[-3.5 - exploded * 2.5, -2.5, -1.2]}
-        rotation={[Math.PI * 0.1, 0, 0]}
-        castShadow
-        receiveShadow
-      >
-        <primitive object={JWSTGeometries.solarPanel} />
-        <primitive
-          object={
-            selectedComponent?.id === 'solar-arrays' ? Materials.highlighted : Materials.solarPanel
-          }
-        />
-      </mesh>
+        {/* Connection strut from bus to solar array mount */}
+        <mesh position={[0.6, -0.3, 0.6]}>
+          <boxGeometry args={[0.2, 0.08, 0.08]} />
+          <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        {/* Solar Array Assembly - connected to bus */}
+        <group position={[1.0 + exploded * 2.5, -0.3, 0.6]}>
+          {/* Mounting bracket on bus */}
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[0.15, 0.25, 0.25]} />
+            <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+          </mesh>
+
+          {/* Deployment hinge mechanism */}
+          <mesh position={[0.1, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <cylinderGeometry args={[0.1, 0.1, 0.15, 8]} />
+            <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+          </mesh>
+
+          {/* Solar panel with support boom */}
+          <group position={[0.15, 0, 0]}>
+            {/* Support boom arm */}
+            <mesh position={[0.6, 0, 0]}>
+              <boxGeometry args={[1.2, 0.05, 0.05]} />
+              <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
+            </mesh>
+            
+            {/* Boom end connection */}
+            <mesh position={[1.2, 0, 0]}>
+              <boxGeometry args={[0.08, 0.12, 0.12]} />
+              <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+            </mesh>
+
+            {/* Solar panel array */}
+            <mesh position={[1.3, 0, 0]} castShadow receiveShadow>
+              <primitive object={JWSTGeometries.solarPanel} />
+              <primitive
+                object={
+                  selectedComponent?.id === 'solar-arrays' ? Materials.highlighted : Materials.solarPanel
+                }
+              />
+            </mesh>
+          </group>
+        </group>
+      </group>
 
       {/* Interaction spheres for components */}
       {components.map(component => {
@@ -449,11 +490,11 @@ function getComponentPosition(componentId: string, exploded: number): [number, n
 type CameraPreset = 'default' | 'top' | 'side' | 'front' | 'closeup'
 
 const CAMERA_PRESETS: Record<CameraPreset, { position: [number, number, number]; target?: [number, number, number] }> = {
-  default: { position: [8, 8, 8], target: [0, 0, 0] },
-  top: { position: [0, 15, 0], target: [0, 0, 0] },
-  side: { position: [15, 0, 0], target: [0, 0, 0] },
-  front: { position: [0, 0, 15], target: [0, 0, 0] },
-  closeup: { position: [4, 4, 4], target: [0, 0, 0] },
+  default: { position: [10, 5, 12], target: [0, 0, 0] },
+  top: { position: [0, 18, 0], target: [0, 0, 0] },
+  side: { position: [18, 2, 0], target: [0, 0, 0] },
+  front: { position: [0, 2, 18], target: [0, 0, 0] },
+  closeup: { position: [6, 3, 8], target: [0, 0, 0] },
 }
 
 // Enhanced 3D controls component
@@ -866,7 +907,7 @@ export function Telescope3D({
         </div>
       </div>
 
-      <Card className="relative h-[70vh] overflow-hidden border-2 border-primary/20">
+      <Card className="relative h-[70vh] md:h-[75vh] lg:h-[80vh] overflow-hidden border-2 border-primary/20">
         {/* Loading indicator */}
         <Suspense
           fallback={
@@ -879,7 +920,7 @@ export function Telescope3D({
           }
         >
           <Canvas
-            camera={{ position: [8, 8, 8], fov: 50 }}
+            camera={{ position: [10, 5, 12], fov: 45 }}
             dpr={perfConfig.devicePixelRatio}
             gl={{
               antialias: perfConfig.antialiasing,
@@ -977,12 +1018,13 @@ export function Telescope3D({
             enableRotate={true}
             autoRotate={autoRotate}
             autoRotateSpeed={0.5}
-            maxDistance={20}
-            minDistance={3}
-            maxPolarAngle={Math.PI / 1.5}
-            minPolarAngle={Math.PI / 6}
+            maxDistance={25}
+            minDistance={5}
+            maxPolarAngle={Math.PI / 1.8}
+            minPolarAngle={Math.PI / 8}
             dampingFactor={0.05}
             enableDamping={true}
+            target={[0, 0, 0]}
             touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
             mouseButtons={{
               LEFT: THREE.MOUSE.ROTATE,

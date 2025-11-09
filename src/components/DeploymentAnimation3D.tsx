@@ -139,14 +139,18 @@ function DeployingJWST({ deploymentState }: Readonly<{ deploymentState: Deployme
       groupRef.current.position.y = Math.sin(time * 0.1) * 0.1
     }
 
-    // Solar array deployment with smooth rotation
+    // Solar array deployment with smooth rotation (unfolds on Y-axis)
     if (solarArrayRef.current) {
       const targetRotation = THREE.MathUtils.degToRad(deploymentState.solarArrayAngle)
-      solarArrayRef.current.rotation.z = THREE.MathUtils.lerp(
-        solarArrayRef.current.rotation.z,
-        targetRotation,
-        0.05
-      )
+      // Find the solar panel group (third child after bracket and hinge)
+      const solarPanelGroup = solarArrayRef.current.children[2]
+      if (solarPanelGroup) {
+        solarPanelGroup.rotation.y = THREE.MathUtils.lerp(
+          solarPanelGroup.rotation.y,
+          targetRotation,
+          0.05
+        )
+      }
     }
 
     // Secondary mirror extension with smooth interpolation
@@ -184,15 +188,37 @@ function DeployingJWST({ deploymentState }: Readonly<{ deploymentState: Deployme
       <group position={[0, 0, 0]}>
         {/* LAYER 1: Spacecraft Bus (back of telescope) */}
         <group position={[0, -1.5, -2]}>
+          {/* Main spacecraft bus body */}
           <mesh castShadow>
             <boxGeometry args={[2, 1.5, 1.2]} />
             <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
           </mesh>
-          {/* Add detail to spacecraft bus */}
-          <mesh position={[0, 0.8, 0]}>
-            <cylinderGeometry args={[0.3, 0.3, 0.2, 6]} />
-            <meshStandardMaterial color="#34495e" metalness={0.7} roughness={0.4} />
-          </mesh>
+          
+          {/* High-Gain Antenna Assembly - mounted on top */}
+          <group position={[0, 0.75, 0]}>
+            {/* Antenna mounting post */}
+            <mesh position={[0, 0.15, 0]}>
+              <cylinderGeometry args={[0.08, 0.12, 0.3, 8]} />
+              <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
+            </mesh>
+            
+            {/* Antenna dish (sphere for parabolic reflector) */}
+            <mesh position={[0, 0.4, 0]} rotation={[Math.PI / 4, 0, 0]} scale={[1, 1, 0.4]}>
+              <sphereGeometry args={[0.35, 16, 16]} />
+              <meshStandardMaterial 
+                color="#c9a961" 
+                metalness={0.95} 
+                roughness={0.05}
+                side={2}
+              />
+            </mesh>
+            
+            {/* Feed horn at center of dish */}
+            <mesh position={[0, 0.5, 0.1]}>
+              <cylinderGeometry args={[0.04, 0.06, 0.15, 8]} />
+              <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+            </mesh>
+          </group>
         </group>
 
         {/* LAYER 2: Instrument Section (ISIM - behind mirror) */}
@@ -348,17 +374,49 @@ function DeployingJWST({ deploymentState }: Readonly<{ deploymentState: Deployme
           })}
         </group>
 
-        {/* LAYER 6: Solar Array (side mounted) */}
-        <group ref={solarArrayRef} position={[3.5, -1.2, -1]} rotation={[0, 0, Math.PI * 0.5]}>
-          <mesh castShadow>
-            <primitive object={JWSTGeometries.solarPanel} />
-            <primitive object={JWSTMaterials.solarPanel} />
+        {/* LAYER 6: Solar Array (side mounted on spacecraft bus) */}
+        <group position={[0, -1.5, -2]}>
+          {/* Connection strut from bus to solar array mount */}
+          <mesh position={[0.6, 0, 0]}>
+            <boxGeometry args={[0.2, 0.08, 0.08]} />
+            <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
           </mesh>
-          {/* Solar array mounting arm */}
-          <mesh position={[-1.8, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.05, 0.05, 1.5, 8]} />
-            <meshStandardMaterial color="#7f8c8d" metalness={0.8} roughness={0.3} />
-          </mesh>
+          
+          {/* Solar array assembly */}
+          <group position={[1.0, 0, 0]} ref={solarArrayRef}>
+            {/* Mounting bracket on bus */}
+            <mesh position={[0, 0, 0]}>
+              <boxGeometry args={[0.15, 0.25, 0.25]} />
+              <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+            </mesh>
+
+            {/* Deployment hinge mechanism */}
+            <mesh position={[0.1, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+              <cylinderGeometry args={[0.1, 0.1, 0.15, 8]} />
+              <meshStandardMaterial color="#7f8c8d" metalness={0.9} roughness={0.2} />
+            </mesh>
+
+            {/* Solar panel assembly (rotates from Y-axis, starting folded) */}
+            <group position={[0.15, 0, 0]} rotation={[0, 0, 0]}>
+              {/* Support boom arm */}
+              <mesh position={[0.6, 0, 0]}>
+                <boxGeometry args={[1.2, 0.05, 0.05]} />
+                <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
+              </mesh>
+              
+              {/* Boom end connection */}
+              <mesh position={[1.2, 0, 0]}>
+                <boxGeometry args={[0.08, 0.12, 0.12]} />
+                <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
+              </mesh>
+
+              {/* Solar panel array */}
+              <mesh position={[1.3, 0, 0]}>
+                <primitive object={JWSTGeometries.solarPanel} />
+                <primitive object={JWSTMaterials.solarPanel} />
+              </mesh>
+            </group>
+          </group>
         </group>
 
         {/* LAYER 7: Sunshield Assembly (largest component, deploys downward) */}
@@ -432,17 +490,17 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
       DEPLOYMENT_TIMELINE[Math.floor(progress * (DEPLOYMENT_TIMELINE.length - 1))]
     const stage = currentEvent.deploymentStage
 
-    let solarArrayAngle = -90
+    let solarArrayAngle = 90 // Start folded flat against the bus (90°)
     let sunshieldLayers = [0, 0, 0, 0, 0]
     let sunshieldTension = 0
     let secondaryMirrorExtension = 0
     let mirrorWingsRotation = [90, -90]
 
-    // PHASE 1: Solar array deployment (Day 0.5) - Unfold from side
+    // PHASE 1: Solar array deployment (Day 0.5) - Unfold perpendicular to bus
     if (progress > 0.03) {
       const solarProgress = Math.min(1, (progress - 0.03) / 0.08)
       const easedProgress = solarProgress * solarProgress * (3 - 2 * solarProgress)
-      solarArrayAngle = 90 - easedProgress * 90 // Rotate from 90° (folded) to 0° (deployed)
+      solarArrayAngle = 90 - easedProgress * 90 // Rotate from 90° (folded against bus) to 0° (perpendicular)
     }
 
     // PHASE 2: Sunshield pallet release (Day 3) - Begin lowering
@@ -542,7 +600,7 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
       {/* 3D Canvas */}
       <div className="flex-1 relative">
         <Canvas
-          camera={{ position: [8, 4, 12], fov: 50 }}
+          camera={{ position: [10, 5, 14], fov: 45 }}
           shadows
           gl={{ antialias: true, alpha: false }}
         >
@@ -592,9 +650,14 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            minDistance={5}
+            minDistance={6}
             maxDistance={30}
+            maxPolarAngle={Math.PI / 1.5}
+            minPolarAngle={Math.PI / 8}
             autoRotate={false}
+            target={[0, 0, 0]}
+            enableDamping={true}
+            dampingFactor={0.05}
           />
 
           <Environment preset="night" />

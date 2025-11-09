@@ -28,7 +28,10 @@ const TelemetryMonitor = lazy(() =>
 const TelescopeAnatomy = lazy(() =>
   import('@/components/TelescopeAnatomy').then(m => ({ default: m.TelescopeAnatomy }))
 )
-const Timeline = lazy(() => import('@/components/Timeline').then(m => ({ default: m.Timeline })))
+// Temporarily import Timeline directly for debugging
+import { Timeline } from '@/components/Timeline'
+// import { ImageTest } from '@/components/ImageTest'
+// const Timeline = lazy(() => import('@/components/Timeline').then(m => ({ default: m.Timeline })))
 
 // Keep essential UI components for initial render
 import { Skeleton } from '@/components/ui/skeleton'
@@ -107,9 +110,21 @@ function App() {
   const loadImages = async () => {
     setLoading(true)
     try {
+      console.warn('🚀 Starting to fetch JWST images...')
       const data = await fetchJWSTImages()
+      console.warn(`📊 Received ${data.length} images from NASA API`)
+      if (data.length > 0) {
+        console.warn(
+          'First 3 images:',
+          data.slice(0, 3).map(img => ({
+            title: img.title,
+            thumbnailUrl: img.thumbnailUrl,
+            distance: img.distance,
+          }))
+        )
+      }
       setImages(data)
-      toast.success('Images refreshed successfully')
+      toast.success(`Images refreshed successfully (${data.length} found)`)
     } catch (error) {
       console.error('Failed to load JWST images:', error)
       toast.error('Failed to load JWST images. Please try again.')
@@ -163,17 +178,28 @@ function App() {
     let filtered = images
     const favs = favorites || []
 
+    console.warn(`🔍 Filtering ${images.length} total images`)
+    console.warn(`   Active tab: ${activeTab}`)
+    console.warn(`   Object type filter: ${filters.objectType}`)
+    console.warn(`   Instrument filter: ${filters.instrument}`)
+    console.warn(`   Favorites: ${favs.length}`)
+
     if (filters.objectType !== 'all') {
       filtered = filtered.filter(img => img.objectType === filters.objectType)
+      console.warn(`   After object type filter: ${filtered.length}`)
     }
 
     if (filters.instrument !== 'all') {
       filtered = filtered.filter(img => img.instrument === filters.instrument)
+      console.warn(`   After instrument filter: ${filtered.length}`)
     }
 
     if (activeTab === 'favorites') {
       filtered = filtered.filter(img => favs.includes(img.id))
+      console.warn(`   After favorites filter: ${filtered.length}`)
     }
+
+    console.warn(`✅ Final filtered images: ${filtered.length}`)
 
     return filtered
   }, [images, filters, activeTab, favorites])
@@ -192,7 +218,7 @@ function App() {
         className="relative overflow-hidden transition-transform duration-300 ease-out"
         style={pullToRefreshStyle}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none" />{' '}
+        <div className="absolute inset-0 bg-linear-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none" />{' '}
         <div className="relative">
           <header className="border-b backdrop-blur-sm cosmic-header">
             <div className="cosmic-container py-4 sm:py-6">
@@ -361,7 +387,14 @@ function App() {
 
             {mainView === 'explore' && (
               <>
+                {(() => {
+                  console.warn(
+                    `🔄 Render state: loading=${loading}, images=${images.length}, filteredImages=${filteredImages.length}`
+                  )
+                  return null
+                })()}
                 {loading ? (
+                  /* Debug: Currently loading... */
                   <>
                     <div className="hidden sm:flex gap-4 overflow-hidden pb-6">
                       {[1, 2, 3, 4].map(i => (
@@ -411,22 +444,12 @@ function App() {
                       )}
                     </div>
 
-                    <Suspense
-                      fallback={
-                        <div className="space-y-4">
-                          {[1, 2, 3].map(i => (
-                            <Skeleton key={i} className="w-full h-64 rounded-lg" />
-                          ))}
-                        </div>
-                      }
-                    >
-                      <Timeline
-                        images={filteredImages}
-                        favorites={favorites || []}
-                        onImageClick={setSelectedImage}
-                        onFavoriteToggle={handleFavoriteToggle}
-                      />
-                    </Suspense>
+                    <Timeline
+                      images={filteredImages}
+                      favorites={favorites || []}
+                      onImageClick={setSelectedImage}
+                      onFavoriteToggle={handleFavoriteToggle}
+                    />
                   </div>
                 )}
               </>

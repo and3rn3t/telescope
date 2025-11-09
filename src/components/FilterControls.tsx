@@ -40,7 +40,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
     <div className="flex flex-col gap-4">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="cosmic-body-sm text-starlight-gold">Object Type</label>
+          <label className="text-sm font-medium text-yellow-300">Object Type</label>
           <InfoTooltip
             content={{
               title: 'Cosmic Objects',
@@ -56,10 +56,10 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
           {objectTypes.map(type => (
             <div key={type.value} className="relative group">
               <Button
-                variant={filters.objectType === type.value ? 'default' : 'outline'}
+                variant="ghost"
                 size="sm"
                 onClick={() => onFilterChange({ ...filters, objectType: type.value })}
-                className="justify-start gap-2 w-full cosmic-nav-tab"
+                className={`justify-start gap-2 w-full cosmic-filter-button ${filters.objectType === type.value ? 'active' : ''}`}
                 data-slot="button"
               >
                 {type.icon}
@@ -81,7 +81,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="cosmic-body-sm text-starlight-gold">Instrument</label>
+          <label className="text-sm font-medium text-yellow-300">Instrument</label>
           <InfoTooltip
             content={{
               title: 'JWST Science Instruments',
@@ -165,14 +165,14 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 pr-4 sm:pr-6">
       {objectTypes.map(type => (
         <Button
           key={type.value}
-          variant={filters.objectType === type.value ? 'default' : 'outline'}
+          variant="ghost"
           size="sm"
           onClick={() => onFilterChange({ ...filters, objectType: type.value })}
-          className="gap-2 cosmic-nav-tab"
+          className={`gap-2 cosmic-filter-button ${filters.objectType === type.value ? 'active' : ''}`}
           data-slot="button"
         >
           {type.icon}
@@ -186,7 +186,7 @@ export function FilterControls({ filters, onFilterChange }: FilterControlsProps)
         value={filters.instrument}
         onValueChange={value => onFilterChange({ ...filters, instrument: value as InstrumentType })}
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger className="w-40 bg-slate-800/90 border-slate-600/60 text-white backdrop-blur-sm shadow-md hover:bg-slate-700/90 hover:border-slate-500/70 font-medium">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -17,8 +17,7 @@
     "preview": "vite preview",
     "check-all": "npm run type-check && npm run lint && npm run format:check",
     "deploy": "npm run build:production && wrangler pages deploy dist --project-name=jwst-deep-sky-explorer",
-    "deploy:preview": "npm run build && wrangler pages deploy dist --project-name=jwst-deep-sky-explorer --compatibility-date=2024-11-04",
-    "prepare": "husky"
+    "deploy:preview": "npm run build && wrangler pages deploy dist --project-name=jwst-deep-sky-explorer --compatibility-date=2024-11-04"
   },
   "dependencies": {
     "@github/spark": "^0.39.0",

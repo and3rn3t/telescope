@@ -498,10 +498,8 @@ function getSampleJWSTImages(): JWSTImage[] {
       title: "Webb's First Deep Field (SMACS 0723)",
       description:
         "This slice of the vast universe covers a patch of sky approximately the size of a grain of sand held at arm's length by someone on the ground.",
-      imageUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002132/GSFC_20220712_Archive_e002132~orig.jpg',
-      thumbnailUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002132/GSFC_20220712_Archive_e002132~medium.jpg',
+      imageUrl: 'https://images-assets.nasa.gov/image/NHQ202207120016/NHQ202207120016~orig.jpg',
+      thumbnailUrl: 'https://images-assets.nasa.gov/image/NHQ202207120016/NHQ202207120016~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 13100000000,
       lookbackTime: '13.1 billion years',
@@ -514,10 +512,8 @@ function getSampleJWSTImages(): JWSTImage[] {
       title: 'Carina Nebula "Cosmic Cliffs"',
       description:
         'What looks much like craggy mountains on a moonlit evening is actually the edge of a nearby, young, star-forming region NGC 3324 in the Carina Nebula.',
-      imageUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002133/GSFC_20220712_Archive_e002133~orig.jpg',
-      thumbnailUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002133/GSFC_20220712_Archive_e002133~medium.jpg',
+      imageUrl: 'https://images-assets.nasa.gov/image/carina_nebula/carina_nebula~orig.jpg',
+      thumbnailUrl: 'https://images-assets.nasa.gov/image/carina_nebula/carina_nebula~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 7600,
       lookbackTime: '7,600 years',
@@ -530,10 +526,8 @@ function getSampleJWSTImages(): JWSTImage[] {
       title: 'Southern Ring Nebula (NGC 3132)',
       description:
         'The bright star at the center of NGC 3132, while prominent when viewed by Webb, plays a supporting role in sculpting the surrounding nebula.',
-      imageUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002134/GSFC_20220712_Archive_e002134~orig.jpg',
-      thumbnailUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002134/GSFC_20220712_Archive_e002134~medium.jpg',
+      imageUrl: 'https://images-assets.nasa.gov/image/southern_ring_nebula/southern_ring_nebula~orig.jpg',
+      thumbnailUrl: 'https://images-assets.nasa.gov/image/southern_ring_nebula/southern_ring_nebula~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 2000,
       lookbackTime: '2,000 years',
@@ -546,10 +540,8 @@ function getSampleJWSTImages(): JWSTImage[] {
       title: "Stephan's Quintet (NGC 7317)",
       description:
         'A visual grouping of five galaxies, four of which are truly close together and locked in a cosmic dance.',
-      imageUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002135/GSFC_20220712_Archive_e002135~orig.jpg',
-      thumbnailUrl:
-        'https://images-assets.nasa.gov/image/GSFC_20220712_Archive_e002135/GSFC_20220712_Archive_e002135~medium.jpg',
+      imageUrl: 'https://images-assets.nasa.gov/image/NHQ202207120017/NHQ202207120017~orig.jpg',
+      thumbnailUrl: 'https://images-assets.nasa.gov/image/NHQ202207120017/NHQ202207120017~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 290000000,
       lookbackTime: '290 million years',
@@ -566,11 +558,7 @@ function getSampleJWSTImages(): JWSTImage[] {
 export async function fetchJWSTImages(): Promise<JWSTImage[]> {
   try {
     // Multiple search strategies to get better cosmic imagery
-    const searchQueries = [
-      'webb',
-      'james webb telescope',
-      'jwst',
-    ]
+    const searchQueries = ['webb', 'james webb telescope', 'jwst']
 
     const allImages: JWSTImage[] = []
 
@@ -609,14 +597,8 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
         // Process images from this search
         const searchImages = data.collection.items
           .filter(item => item.links && item.links.length > 0)
-          // Temporarily allow most content for debugging
-          .filter(item => {
-            const metadata = item.data[0]
-            // Only exclude obvious non-space content
-            const excludeTerms = ['portrait', 'crew photo', 'handshake', 'meeting']
-            const allText = `${metadata.title} ${metadata.description || ''}`.toLowerCase()
-            return !excludeTerms.some(term => allText.includes(term))
-          })
+          // Allow ALL content for debugging - no filtering based on content
+          .filter(() => true)
           .map(item => {
             const metadata = item.data[0]
 
@@ -635,8 +617,8 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
             const thumbnailUrl = thumbnailLink?.href || ''
             const imageUrl = originalLink?.href || thumbnailUrl
 
-            // Validate that we have a valid image URL
-            if (!isValidSpaceImageUrl(thumbnailUrl)) {
+            // Validate that we have a valid image URL (temporarily less restrictive for debugging)
+            if (!thumbnailUrl || thumbnailUrl.length < 10) {
               return null
             }
 
@@ -674,15 +656,22 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
         // Debug: Log successful image fetches in development
         if (import.meta.env.DEV) {
           const totalItems = data.collection.items.length
-          const validItems = data.collection.items.filter(item => item.links && item.links.length > 0).length
-          const spaceItems = data.collection.items.filter(item => item.links && item.links.length > 0 && isSpaceImageContent(item.data[0])).length
-          console.warn(`🌌 Query "${query}": ${totalItems} total → ${validItems} with links → ${spaceItems} space-related → ${searchImages.length} final`)
-          
+          const validItems = data.collection.items.filter(
+            item => item.links && item.links.length > 0
+          ).length
+          const spaceItems = validItems // Using all items for debugging
+          console.warn(
+            `🌌 Query "${query}": ${totalItems} total → ${validItems} with links → ${spaceItems} space-related → ${searchImages.length} final`
+          )
+
           if (searchImages.length > 0) {
-            for (const img of searchImages.slice(0, 3)) {
+            console.warn(`✅ Successfully processed ${searchImages.length} images for "${query}"`)
+            for (const img of searchImages.slice(0, 5)) {
               console.warn(`  📸 ${img.title}`)
               console.warn(`     Thumbnail: ${img.thumbnailUrl}`)
+              console.warn(`     Image: ${img.imageUrl}`)
               console.warn(`     Distance: ${img.distance} (${img.lookbackTime})`)
+              console.warn(`     Type: ${img.objectType}, Instrument: ${img.instrument}`)
             }
           } else {
             console.warn(`     ❌ No images found for "${query}"`)
@@ -701,14 +690,18 @@ export async function fetchJWSTImages(): Promise<JWSTImage[]> {
       (a, b) => (a.distance || 0) - (b.distance || 0)
     )
 
+    console.warn(`🔍 Total unique images processed: ${uniqueImages.length}`)
+
     if (uniqueImages.length > 0) {
       console.warn(
-        `Successfully fetched ${uniqueImages.length} unique JWST images with distance data`
+        `✅ Successfully fetched ${uniqueImages.length} unique JWST images with distance data`
       )
       return uniqueImages
     } else {
-      console.warn('No JWST images with distance data found, using sample dataset')
-      return getSampleJWSTImages()
+      console.warn('⚠️ No JWST images with distance data found, using sample dataset')
+      const sampleImages = getSampleJWSTImages()
+      console.warn(`📦 Returning ${sampleImages.length} sample images`)
+      return sampleImages
     }
   } catch (error) {
     if (error instanceof Error) {

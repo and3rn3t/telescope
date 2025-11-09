@@ -13,12 +13,21 @@ interface TimelineProps {
 export function Timeline({ images, favorites, onImageClick, onFavoriteToggle }: TimelineProps) {
   const isMobile = useIsMobile()
 
+  // Debug logging
+  console.warn(`🎬 Timeline component rendered with ${images.length} images`)
+  if (images.length > 0) {
+    console.warn('First image in Timeline:', images[0])
+  }
+
   if (images.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground text-lg">
           No images found. Try adjusting your filters.
         </p>
+        <div className="mt-4 text-sm text-muted-foreground">
+          Debug: Timeline received {images.length} images
+        </div>
       </div>
     )
   }
@@ -41,7 +50,7 @@ export function Timeline({ images, favorites, onImageClick, onFavoriteToggle }: 
 
   return (
     <ScrollArea className="w-full">
-      <div className="flex gap-4 pb-6">
+      <div className="flex gap-4 pb-6 items-stretch">
         {images.map(image => (
           <ImageCard
             key={image.id}

@@ -445,6 +445,37 @@
     font-weight: 500;
   }
 
+  /* Separate styling for filter buttons with better contrast */
+  .cosmic-filter-button {
+    @apply relative transition-all duration-300 ease-out;
+    /* Force high contrast colors that override Button variants */
+    color: white !important;
+    background-color: rgba(30, 41, 59, 0.95) !important; /* slate-800/95 */
+    border-color: rgba(71, 85, 105, 0.7) !important; /* slate-600/70 */
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
+  }
+
+  .cosmic-filter-button:hover {
+    color: white !important;
+    background-color: rgba(109, 40, 217, 0.8) !important; /* violet-700/80 */
+    border-color: rgba(139, 92, 246, 0.7) !important; /* violet-500/70 */
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(139, 92, 246, 0.3);
+  }
+
+  .cosmic-filter-button[data-state='active'],
+  .cosmic-filter-button.active {
+    color: white !important;
+    background-color: rgba(124, 58, 237, 0.9) !important; /* violet-600/90 */
+    border-color: rgba(250, 204, 21, 0.8) !important; /* yellow-400/80 */
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 0 25px rgba(250, 204, 21, 0.4);
+  }
+
   .cosmic-nav-tab::after {
     content: '';
     position: absolute;

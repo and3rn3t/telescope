@@ -41,7 +41,7 @@ export function detectDeviceCapabilities(): PerformanceConfig {
 
   let gpuTier: 'low' | 'medium' | 'high' = 'medium'
 
-  if (gl) {
+  if (gl && gl instanceof WebGLRenderingContext) {
     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info')
     if (debugInfo) {
       const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)

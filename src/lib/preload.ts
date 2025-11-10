@@ -1,7 +1,7 @@
 // Preload critical assets and components for better perceived performance
 export const preloadCriticalAssets = () => {
   // Preload essential images that are likely to be needed immediately
-  const criticalImages = [
+  const criticalImages: string[] = [
     // Add paths to critical images here
   ]
 
@@ -44,7 +44,7 @@ export const preloadComponent = (componentName: string) => {
 // Preload on hover - start loading component before user clicks
 export const usePreloadOnHover = () => {
   const preloadOnHover = (componentName: string) => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: ReturnType<typeof setTimeout>
 
     const handleMouseEnter = () => {
       timeoutId = setTimeout(() => {

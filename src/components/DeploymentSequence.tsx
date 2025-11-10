@@ -1,17 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import {
-  Play,
-  Pause,
   ArrowCounterClockwise,
-  SkipForward,
-  SkipBack,
   CheckCircle,
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
 } from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 interface DeploymentStep {

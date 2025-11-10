@@ -499,15 +499,12 @@ function DeployingJWST({
     // Solar array deployment with smooth rotation (unfolds on Y-axis)
     if (solarArrayRef.current) {
       const targetRotation = THREE.MathUtils.degToRad(deploymentState.solarArrayAngle)
-      // Find the solar panel group (third child after bracket and hinge)
-      const solarPanelGroup = solarArrayRef.current.children[2]
-      if (solarPanelGroup) {
-        solarPanelGroup.rotation.y = THREE.MathUtils.lerp(
-          solarPanelGroup.rotation.y,
-          targetRotation,
-          0.05
-        )
-      }
+      // Ref now points directly to the rotating group
+      solarArrayRef.current.rotation.y = THREE.MathUtils.lerp(
+        solarArrayRef.current.rotation.y,
+        targetRotation,
+        0.05
+      )
     }
 
     // Secondary mirror extension with smooth interpolation
@@ -573,14 +570,14 @@ function DeployingJWST({
           </group>
 
           {/* Solar Array - mounted on side of spacecraft bus */}
-          {/* Connection strut from bus to solar array mount */}
-          <mesh position={[0.6, 0, 0]}>
+          {/* Connection strut from bus edge to solar array mount */}
+          <mesh position={[1.1, 0, 0]}>
             <boxGeometry args={[0.2, 0.08, 0.08]} />
             <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
           </mesh>
 
-          {/* Solar array assembly */}
-          <group position={[1.0, 0, 0]} ref={solarArrayRef}>
+          {/* Solar array assembly - positioned outside bus */}
+          <group position={[1.3, 0, 0]}>
             {/* Mounting bracket on bus */}
             <mesh position={[0, 0, 0]}>
               <boxGeometry args={[0.15, 0.25, 0.25]} />
@@ -594,7 +591,7 @@ function DeployingJWST({
             </mesh>
 
             {/* Solar panel assembly (rotates from Y-axis, starting folded) */}
-            <group position={[0.15, 0, 0]} rotation={[0, 0, 0]}>
+            <group position={[0.15, 0, 0]} rotation={[0, 0, 0]} ref={solarArrayRef}>
               {/* Support boom arm */}
               <mesh position={[0.6, 0, 0]}>
                 <boxGeometry args={[1.2, 0.05, 0.05]} />

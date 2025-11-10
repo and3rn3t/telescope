@@ -294,7 +294,7 @@ function buildNASAApiUrl(baseUrl: string, params: Record<string, string>): strin
 /**
  * Validate that the image URL is from legitimate space image collections
  */
-function isValidSpaceImageUrl(url?: string): boolean {
+export function isValidSpaceImageUrl(url?: string): boolean {
   if (!url) return false
 
   // Ensure the URL is from NASA's images API and not a placeholder or non-space image
@@ -350,7 +350,7 @@ function isValidSpaceImageUrl(url?: string): boolean {
 /**
  * Check if image content is space-related and doesn't contain people/non-space elements
  */
-function isSpaceImageContent(metadata: {
+export function isSpaceImageContent(metadata: {
   title: string
   description?: string
   keywords?: string[]

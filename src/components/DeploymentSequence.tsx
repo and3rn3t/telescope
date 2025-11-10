@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -691,11 +691,11 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.struts.forEach(s => {
           s.scale.z = 0.2
         })
-        meshes.sunshield.forEach((s, i) => {
+        meshes.sunshield.forEach(s => {
           s.scale.set(0.3, 0.3, 1)
           s.position.z = -1
         })
-        meshes.solarArray.forEach((p, i) => {
+        meshes.solarArray.forEach(p => {
           p.rotation.y = -Math.PI / 2
           p.position.x = 0.5
         })
@@ -709,13 +709,13 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.struts.forEach(s => {
           s.scale.z = 0.2
         })
-        meshes.sunshield.forEach((s, i) => {
+        meshes.sunshield.forEach(s => {
           s.scale.set(0.3, 0.3, 1)
           s.position.z = -1
         })
-        meshes.solarArray.forEach((p, i) => {
+        meshes.solarArray.forEach((p, _i) => {
           p.rotation.y = 0
-          p.position.x = 3 + i * 0.3
+          p.position.x = 3 + _i * 0.3
         })
         meshes.antenna.rotation.x = -Math.PI / 2
         break
@@ -727,13 +727,13 @@ function DeploymentVisualization({ step }: { step: string }) {
         meshes.struts.forEach(s => {
           s.scale.z = 0.2
         })
-        meshes.sunshield.forEach((s, i) => {
+        meshes.sunshield.forEach(s => {
           s.scale.set(0.3, 0.3, 1)
           s.position.z = -1
         })
-        meshes.solarArray.forEach((p, i) => {
+        meshes.solarArray.forEach((p, _i) => {
           p.rotation.y = 0
-          p.position.x = 3 + i * 0.3
+          p.position.x = 3 + _i * 0.3
         })
         meshes.antenna.rotation.x = 0
         break

@@ -22,6 +22,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import type { OrbitControls as OrbitControlsType } from 'three-stdlib'
 
 interface DeploymentAnimationProps {
   onClose: () => void
@@ -352,7 +353,7 @@ function CameraController({
 }: {
   deploymentState: DeploymentState
   autoFollow: boolean
-  controlsRef: React.RefObject<any>
+  controlsRef: React.RefObject<OrbitControlsType | null>
 }) {
   useFrame(state => {
     if (!autoFollow || !controlsRef.current) return
@@ -922,8 +923,7 @@ export function DeploymentAnimation({ onClose }: DeploymentAnimationProps) {
   const [showVectors, setShowVectors] = useState(true)
   const [showTechnicalPanel, setShowTechnicalPanel] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const orbitControlsRef = useRef<any>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const orbitControlsRef = useRef<OrbitControlsType>(null)
 
   // Screenshot capture function
   const captureScreenshot = useCallback(() => {

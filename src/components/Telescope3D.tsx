@@ -24,7 +24,7 @@ import {
   PlayCircle,
   Target,
 } from '@phosphor-icons/react'
-import { Environment, Html, MeshReflectorMaterial, OrbitControls, Stars } from '@react-three/drei'
+import { Html, MeshReflectorMaterial, OrbitControls, Stars } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -996,8 +996,8 @@ export function Telescope3D({
               color={SpaceEnvironment.rimLight.color}
             />
 
-            {/* Environment and atmosphere */}
-            <Environment preset="night" />
+            {/* Stars for space environment */}
+            <Stars radius={300} depth={60} count={20000} factor={7} saturation={0} fade speed={1} />
 
             {/* Ground plane with reflections */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -8, 0]} receiveShadow>

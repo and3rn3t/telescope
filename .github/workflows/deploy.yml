@@ -38,13 +38,22 @@ jobs:
           NODE_ENV: production
           VITE_NASA_API_BASE: https://images-api.nasa.gov
 
+      - name: Create Cloudflare Pages Project
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create jwst-deep-sky-explorer --production-branch=main
+
       - name: Deploy to Cloudflare Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=jwst-deep-sky-explorer
+          command: pages deploy dist --project-name=jwst-deep-sky-explorer --branch=main
 
       - name: Create deployment comment
         if: github.event_name == 'pull_request'

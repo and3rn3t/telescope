@@ -1,6 +1,7 @@
 // Extend the existing @react-three/fiber types to include the missing JSX properties
 // This augments the existing module rather than replacing it
 
+import { ThreeEvent } from '@react-three/fiber'
 import { ReactNode } from 'react'
 import * as THREE from 'three'
 
@@ -19,17 +20,17 @@ declare module '@react-three/fiber' {
         renderOrder?: number
         userData?: Record<string, unknown>
         children?: ReactNode
-        onClick?: (event: any) => void
-        onPointerOver?: (event: any) => void
-        onPointerOut?: (event: any) => void
-        onPointerMove?: (event: any) => void
-        onPointerDown?: (event: any) => void
-        onPointerUp?: (event: any) => void
-        onDoubleClick?: (event: any) => void
-        onContextMenu?: (event: any) => void
-        onWheel?: (event: any) => void
+        onClick?: (event: ThreeEvent<MouseEvent>) => void
+        onPointerOver?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerOut?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerMove?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerDown?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerUp?: (event: ThreeEvent<PointerEvent>) => void
+        onDoubleClick?: (event: ThreeEvent<MouseEvent>) => void
+        onContextMenu?: (event: ThreeEvent<MouseEvent>) => void
+        onWheel?: (event: ThreeEvent<WheelEvent>) => void
       }
-      
+
       group: {
         ref?: React.Ref<THREE.Group>
         position?: [number, number, number] | THREE.Vector3
@@ -42,20 +43,20 @@ declare module '@react-three/fiber' {
         renderOrder?: number
         userData?: Record<string, unknown>
         children?: ReactNode
-        onClick?: (event: any) => void
-        onPointerOver?: (event: any) => void
-        onPointerOut?: (event: any) => void
-        onPointerMove?: (event: any) => void
-        onPointerDown?: (event: any) => void
-        onPointerUp?: (event: any) => void
-        onDoubleClick?: (event: any) => void
-        onContextMenu?: (event: any) => void
-        onWheel?: (event: any) => void
+        onClick?: (event: ThreeEvent<MouseEvent>) => void
+        onPointerOver?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerOut?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerMove?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerDown?: (event: ThreeEvent<PointerEvent>) => void
+        onPointerUp?: (event: ThreeEvent<PointerEvent>) => void
+        onDoubleClick?: (event: ThreeEvent<MouseEvent>) => void
+        onContextMenu?: (event: ThreeEvent<MouseEvent>) => void
+        onWheel?: (event: ThreeEvent<WheelEvent>) => void
       }
 
       primitive: {
-        ref?: React.Ref<any>
-        object?: any
+        ref?: React.Ref<THREE.Object3D>
+        object?: THREE.Object3D
         children?: ReactNode
       }
 
@@ -68,7 +69,7 @@ declare module '@react-three/fiber' {
           phiStart?: number,
           phiLength?: number,
           thetaStart?: number,
-          thetaLength?: number
+          thetaLength?: number,
         ]
       }
 

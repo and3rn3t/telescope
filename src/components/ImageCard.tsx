@@ -79,7 +79,7 @@ export function ImageCard({ image, isFavorited, onImageClick, onFavoriteToggle }
 
         {/* Always-visible gradient overlay for better text contrast */}
         <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
-        
+
         {/* Additional hover overlay for enhanced effect */}
         <div
           className={cn(
@@ -113,23 +113,29 @@ export function ImageCard({ image, isFavorited, onImageClick, onFavoriteToggle }
           <Heart size={isMobile ? 22 : 20} weight={isFavorited ? 'fill' : 'regular'} />
         </button>
 
-        <div className={cn(
-          'flex-1 flex flex-col justify-between space-y-2 relative z-10',
-          isMobile ? 'p-3' : 'p-4', 
-          'min-h-20',
-          'bg-linear-to-t from-black/95 via-black/80 to-black/40',
-          'backdrop-blur-sm'
-        )}>
-          <h3 className={cn(
-            'font-semibold line-clamp-2 text-white drop-shadow-lg',
-            isMobile ? 'text-sm' : 'text-base'
-          )}>
+        <div
+          className={cn(
+            'flex-1 flex flex-col justify-between space-y-2 relative z-10',
+            isMobile ? 'p-3' : 'p-4',
+            'min-h-20',
+            'bg-linear-to-t from-black/95 via-black/80 to-black/40',
+            'backdrop-blur-sm'
+          )}
+        >
+          <h3
+            className={cn(
+              'font-semibold line-clamp-2 text-white drop-shadow-lg',
+              isMobile ? 'text-sm' : 'text-base'
+            )}
+          >
             {image.title}
           </h3>
 
           <div className="flex items-center justify-between text-xs mt-auto">
             <div className="flex items-center gap-1.5">
-              <span className="font-mono font-bold text-blue-300 drop-shadow-md">{image.lookbackTime}</span>
+              <span className="font-mono font-bold text-blue-300 drop-shadow-md">
+                {image.lookbackTime}
+              </span>
               {!isMobile && (
                 <InfoTooltip
                   content={distanceTooltips.lightYear}

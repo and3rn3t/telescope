@@ -1,13 +1,16 @@
 /**
  * React Three Fiber TypeScript Module Augmentation
- * 
+ *
  * This file extends the @react-three/fiber module to provide proper TypeScript
  * support for JSX intrinsic elements and their properties.
  */
 
 import type { ReactNode, Ref } from 'react'
 import type * as THREE from 'three'
-import type { Object3DNode as BaseObject3DNode, MaterialNode as BaseMaterialNode } from '@react-three/fiber'
+import type {
+  Object3DNode as BaseObject3DNode,
+  MaterialNode as BaseMaterialNode,
+} from '@react-three/fiber'
 
 // Augment the @react-three/fiber module
 declare module '@react-three/fiber' {
@@ -32,9 +35,15 @@ declare module '@react-three/fiber' {
 
       // Materials with proper typing
       meshBasicMaterial: MaterialNode<THREE.MeshBasicMaterial, [THREE.MeshBasicMaterialParameters?]>
-      meshStandardMaterial: MaterialNode<THREE.MeshStandardMaterial, [THREE.MeshStandardMaterialParameters?]>
+      meshStandardMaterial: MaterialNode<
+        THREE.MeshStandardMaterial,
+        [THREE.MeshStandardMaterialParameters?]
+      >
       meshPhongMaterial: MaterialNode<THREE.MeshPhongMaterial, [THREE.MeshPhongMaterialParameters?]>
-      meshLambertMaterial: MaterialNode<THREE.MeshLambertMaterial, [THREE.MeshLambertMaterialParameters?]>
+      meshLambertMaterial: MaterialNode<
+        THREE.MeshLambertMaterial,
+        [THREE.MeshLambertMaterialParameters?]
+      >
 
       // Lights with proper typing
       ambientLight: LightNode<THREE.AmbientLight, typeof THREE.AmbientLight>
@@ -58,7 +67,7 @@ declare module '@react-three/fiber' {
     rotation?: [number, number, number] | THREE.Euler
     scale?: [number, number, number] | THREE.Vector3 | number
     quaternion?: [number, number, number, number] | THREE.Quaternion
-    
+
     // Object3D properties
     visible?: boolean
     castShadow?: boolean
@@ -66,7 +75,7 @@ declare module '@react-three/fiber' {
     frustumCulled?: boolean
     renderOrder?: number
     userData?: Record<string, unknown>
-    
+
     // Event handlers
     onClick?: (event: Event) => void
     onPointerOver?: (event: PointerEvent) => void
@@ -89,7 +98,7 @@ declare module '@react-three/fiber' {
     color?: string | number | THREE.Color
     wireframe?: boolean
     visible?: boolean
-    
+
     // Additional material properties
     alphaTest?: number
     blending?: THREE.Blending
@@ -102,7 +111,7 @@ declare module '@react-three/fiber' {
   type LightNode<T extends THREE.Light, P> = Object3DNode<T, P> & {
     color?: string | number | THREE.Color
     intensity?: number
-    
+
     // Shadow properties
     castShadow?: boolean
     'shadow-mapSize'?: [number, number] | THREE.Vector2

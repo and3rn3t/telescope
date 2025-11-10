@@ -374,7 +374,9 @@ function JWSTModel({
           <primitive object={JWSTGeometries.spacecraftBus} />
           <primitive
             object={
-              selectedComponent?.id === 'spacecraft-bus' ? Materials.highlighted : Materials.structure
+              selectedComponent?.id === 'spacecraft-bus'
+                ? Materials.highlighted
+                : Materials.structure
             }
           />
         </mesh>
@@ -386,18 +388,13 @@ function JWSTModel({
             <cylinderGeometry args={[0.08, 0.12, 0.3, 8]} />
             <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
           </mesh>
-          
+
           {/* Antenna dish (parabolic reflector) */}
           <mesh position={[0, 0.4, 0]} rotation={[Math.PI / 4, 0, 0]} scale={[1, 1, 0.4]}>
             <sphereGeometry args={[0.35, 16, 16]} />
-            <meshStandardMaterial 
-              color="#c9a961" 
-              metalness={0.95} 
-              roughness={0.05}
-              side={2}
-            />
+            <meshStandardMaterial color="#c9a961" metalness={0.95} roughness={0.05} side={2} />
           </mesh>
-          
+
           {/* Feed horn at center of dish */}
           <mesh position={[0, 0.5, 0.1]}>
             <cylinderGeometry args={[0.04, 0.06, 0.15, 8]} />
@@ -410,7 +407,7 @@ function JWSTModel({
           <boxGeometry args={[0.2, 0.08, 0.08]} />
           <meshStandardMaterial color="#2c3e50" metalness={0.8} roughness={0.3} />
         </mesh>
-        
+
         {/* Solar Array Assembly - connected to bus */}
         <group position={[1.0 + exploded * 2.5, -0.3, 0.6]}>
           {/* Mounting bracket on bus */}
@@ -432,7 +429,7 @@ function JWSTModel({
               <boxGeometry args={[1.2, 0.05, 0.05]} />
               <meshStandardMaterial color="#34495e" metalness={0.8} roughness={0.3} />
             </mesh>
-            
+
             {/* Boom end connection */}
             <mesh position={[1.2, 0, 0]}>
               <boxGeometry args={[0.08, 0.12, 0.12]} />
@@ -444,7 +441,9 @@ function JWSTModel({
               <primitive object={JWSTGeometries.solarPanel} />
               <primitive
                 object={
-                  selectedComponent?.id === 'solar-arrays' ? Materials.highlighted : Materials.solarPanel
+                  selectedComponent?.id === 'solar-arrays'
+                    ? Materials.highlighted
+                    : Materials.solarPanel
                 }
               />
             </mesh>
@@ -493,7 +492,10 @@ function getComponentPosition(componentId: string, exploded: number): [number, n
 // Camera preset positions for quick navigation
 type CameraPreset = 'default' | 'top' | 'side' | 'front' | 'closeup'
 
-const CAMERA_PRESETS: Record<CameraPreset, { position: [number, number, number]; target?: [number, number, number] }> = {
+const CAMERA_PRESETS: Record<
+  CameraPreset,
+  { position: [number, number, number]; target?: [number, number, number] }
+> = {
   default: { position: [10, 5, 12], target: [0, 0, 0] },
   top: { position: [0, 18, 0], target: [0, 0, 0] },
   side: { position: [18, 2, 0], target: [0, 0, 0] },
@@ -553,10 +555,10 @@ function Controls3D({
                 <span className="ml-2 hidden sm:inline">Auto Rotate</span>
               </Button>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onReset} 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onReset}
                 className="flex-1 min-w-0"
                 title="Reset camera to default view"
               >
@@ -597,11 +599,9 @@ function Controls3D({
                 title="Show camera presets and advanced controls"
               >
                 <Cube size={16} />
-                <span className="ml-2">
-                  {showAdvanced ? 'Hide' : 'Show'} Views
-                </span>
+                <span className="ml-2">{showAdvanced ? 'Hide' : 'Show'} Views</span>
               </Button>
-              
+
               {onScreenshot && (
                 <Button
                   variant="outline"
@@ -821,10 +821,10 @@ export function Telescope3D({
   // Camera preset handler with smooth transition
   const handleCameraPreset = useCallback((preset: CameraPreset) => {
     if (!controlsRef.current) return
-    
+
     const { position, target } = CAMERA_PRESETS[preset]
     const controls = controlsRef.current
-    
+
     // Smoothly transition camera
     controls.object.position.set(...position)
     if (target) {
@@ -899,15 +899,25 @@ export function Telescope3D({
             Explore JWST's revolutionary design in stunning detail
           </p>
         </div>
-        
+
         {/* Keyboard shortcuts hint */}
         <div className="hidden lg:block text-xs text-muted-foreground space-y-1 bg-secondary/20 p-3 rounded-lg">
           <div className="font-semibold mb-2">Keyboard Shortcuts:</div>
-          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">R</kbd> Reset</div>
-          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">E</kbd> Exploded</div>
-          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">A</kbd> Auto-rotate</div>
-          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">S</kbd> Screenshot</div>
-          <div><kbd className="px-1.5 py-0.5 bg-secondary rounded">1-4</kbd> Views</div>
+          <div>
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded">R</kbd> Reset
+          </div>
+          <div>
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded">E</kbd> Exploded
+          </div>
+          <div>
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded">A</kbd> Auto-rotate
+          </div>
+          <div>
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded">S</kbd> Screenshot
+          </div>
+          <div>
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded">1-4</kbd> Views
+          </div>
         </div>
       </div>
 
@@ -931,137 +941,145 @@ export function Telescope3D({
               alpha: true,
               powerPreference: 'high-performance',
             }}
-          onCreated={({ gl }) => {
-            try {
-              gl.setClearColor('#000011', 1)
+            onCreated={({ gl }) => {
+              try {
+                gl.setClearColor('#000011', 1)
 
-              // Shadow settings based on performance config
-              gl.shadowMap.enabled = perfConfig.shadowQuality !== 'off'
-              if (gl.shadowMap.enabled) {
-                gl.shadowMap.type =
-                  perfConfig.shadowQuality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap
+                // Shadow settings based on performance config
+                gl.shadowMap.enabled = perfConfig.shadowQuality !== 'off'
+                if (gl.shadowMap.enabled) {
+                  gl.shadowMap.type =
+                    perfConfig.shadowQuality === 'high'
+                      ? THREE.PCFSoftShadowMap
+                      : THREE.PCFShadowMap
+                }
+
+                // Performance optimizations
+                if (perfConfig.frustumCulling) {
+                  gl.setPixelRatio(perfConfig.devicePixelRatio)
+                }
+
+                // Add context lost/restored handlers
+                gl.domElement.addEventListener('webglcontextlost', event => {
+                  event.preventDefault()
+                  console.warn('WebGL context lost, attempting to restore...')
+                })
+
+                gl.domElement.addEventListener('webglcontextrestored', () => {
+                  console.warn('WebGL context restored')
+                })
+              } catch (error) {
+                console.error('WebGL setup error:', error)
               }
-
-              // Performance optimizations
-              if (perfConfig.frustumCulling) {
-                gl.setPixelRatio(perfConfig.devicePixelRatio)
-              }
-
-              // Add context lost/restored handlers
-              gl.domElement.addEventListener('webglcontextlost', event => {
-                event.preventDefault()
-                console.warn('WebGL context lost, attempting to restore...')
-              })
-
-              gl.domElement.addEventListener('webglcontextrestored', () => {
-                console.warn('WebGL context restored')
-              })
-            } catch (error) {
-              console.error('WebGL setup error:', error)
-            }
-          }}
-        >
-          {/* Lighting setup for realistic space appearance */}
-          <ambientLight
-            intensity={SpaceEnvironment.ambientLight.intensity}
-            color={SpaceEnvironment.ambientLight.color}
-          />
-          <directionalLight
-            position={SpaceEnvironment.sunLight.position}
-            intensity={SpaceEnvironment.sunLight.intensity}
-            color={SpaceEnvironment.sunLight.color}
-            castShadow
-            shadow-mapSize={SpaceEnvironment.sunLight.shadowMapSize}
-          />
-          <pointLight
-            position={SpaceEnvironment.fillLight.position}
-            intensity={SpaceEnvironment.fillLight.intensity}
-            color={SpaceEnvironment.fillLight.color}
-          />
-          <pointLight
-            position={SpaceEnvironment.rimLight.position}
-            intensity={SpaceEnvironment.rimLight.intensity}
-            color={SpaceEnvironment.rimLight.color}
-          />
-
-          {/* Environment and atmosphere */}
-          <Environment preset="night" />
-
-          {/* Ground plane with reflections */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -8, 0]} receiveShadow>
-            <planeGeometry args={[50, 50]} />
-            <MeshReflectorMaterial
-              blur={[300, 100]}
-              resolution={2048}
-              mixBlur={1}
-              mixStrength={40}
-              roughness={1}
-              depthScale={1.2}
-              minDepthThreshold={0.4}
-              maxDepthThreshold={1.4}
-              color="#050505"
-              metalness={0.5}
-            />
-          </mesh>
-
-          {/* Main JWST Model */}
-          <JWSTModel
-            selectedComponent={selectedComponent}
-            onComponentClick={handleComponentClick}
-            components={components}
-            exploded={exploded}
-            perfConfig={perfConfig}
-            onPerformanceUpdate={setFps}
-          />
-
-          {/* Camera controls */}
-          <OrbitControls
-            ref={controlsRef}
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            autoRotate={autoRotate}
-            autoRotateSpeed={0.5}
-            maxDistance={25}
-            minDistance={5}
-            maxPolarAngle={Math.PI / 1.8}
-            minPolarAngle={Math.PI / 8}
-            dampingFactor={0.05}
-            enableDamping={true}
-            target={[0, 0, 0]}
-            touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
-            mouseButtons={{
-              LEFT: THREE.MOUSE.ROTATE,
-              MIDDLE: THREE.MOUSE.DOLLY,
-              RIGHT: THREE.MOUSE.PAN,
             }}
-          />
+          >
+            {/* Lighting setup for realistic space appearance */}
+            <ambientLight
+              intensity={SpaceEnvironment.ambientLight.intensity}
+              color={SpaceEnvironment.ambientLight.color}
+            />
+            <directionalLight
+              position={SpaceEnvironment.sunLight.position}
+              intensity={SpaceEnvironment.sunLight.intensity}
+              color={SpaceEnvironment.sunLight.color}
+              castShadow
+              shadow-mapSize={SpaceEnvironment.sunLight.shadowMapSize}
+            />
+            <pointLight
+              position={SpaceEnvironment.fillLight.position}
+              intensity={SpaceEnvironment.fillLight.intensity}
+              color={SpaceEnvironment.fillLight.color}
+            />
+            <pointLight
+              position={SpaceEnvironment.rimLight.position}
+              intensity={SpaceEnvironment.rimLight.intensity}
+              color={SpaceEnvironment.rimLight.color}
+            />
 
-          {/* Orientation Helper - Mini Axes */}
-          <Html position={[0, 0, 0]} style={{ pointerEvents: 'none' }}>
-            <div className="fixed bottom-24 right-4 bg-black/50 rounded-lg p-3 backdrop-blur-sm border border-white/10">
-              <div className="text-xs text-white/60 mb-1 text-center">Orientation</div>
-              <div className="relative w-16 h-16">
-                <svg viewBox="-50 -50 100 100" className="w-full h-full">
-                  {/* X-axis - Red */}
-                  <line x1="0" y1="0" x2="40" y2="0" stroke="#ef4444" strokeWidth="2" />
-                  <text x="45" y="5" fill="#ef4444" fontSize="12" fontWeight="bold">X</text>
-                  
-                  {/* Y-axis - Green */}
-                  <line x1="0" y1="0" x2="0" y2="-40" stroke="#22c55e" strokeWidth="2" />
-                  <text x="5" y="-42" fill="#22c55e" fontSize="12" fontWeight="bold">Y</text>
-                  
-                  {/* Z-axis - Blue */}
-                  <line x1="0" y1="0" x2="-28" y2="28" stroke="#3b82f6" strokeWidth="2" />
-                  <text x="-35" y="35" fill="#3b82f6" fontSize="12" fontWeight="bold">Z</text>
-                  
-                  {/* Origin */}
-                  <circle cx="0" cy="0" r="3" fill="white" />
-                </svg>
+            {/* Environment and atmosphere */}
+            <Environment preset="night" />
+
+            {/* Ground plane with reflections */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -8, 0]} receiveShadow>
+              <planeGeometry args={[50, 50]} />
+              <MeshReflectorMaterial
+                blur={[300, 100]}
+                resolution={2048}
+                mixBlur={1}
+                mixStrength={40}
+                roughness={1}
+                depthScale={1.2}
+                minDepthThreshold={0.4}
+                maxDepthThreshold={1.4}
+                color="#050505"
+                metalness={0.5}
+              />
+            </mesh>
+
+            {/* Main JWST Model */}
+            <JWSTModel
+              selectedComponent={selectedComponent}
+              onComponentClick={handleComponentClick}
+              components={components}
+              exploded={exploded}
+              perfConfig={perfConfig}
+              onPerformanceUpdate={setFps}
+            />
+
+            {/* Camera controls */}
+            <OrbitControls
+              ref={controlsRef}
+              enablePan={true}
+              enableZoom={true}
+              enableRotate={true}
+              autoRotate={autoRotate}
+              autoRotateSpeed={0.5}
+              maxDistance={25}
+              minDistance={5}
+              maxPolarAngle={Math.PI / 1.8}
+              minPolarAngle={Math.PI / 8}
+              dampingFactor={0.05}
+              enableDamping={true}
+              target={[0, 0, 0]}
+              touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
+              mouseButtons={{
+                LEFT: THREE.MOUSE.ROTATE,
+                MIDDLE: THREE.MOUSE.DOLLY,
+                RIGHT: THREE.MOUSE.PAN,
+              }}
+            />
+
+            {/* Orientation Helper - Mini Axes */}
+            <Html position={[0, 0, 0]} style={{ pointerEvents: 'none' }}>
+              <div className="fixed bottom-24 right-4 bg-black/50 rounded-lg p-3 backdrop-blur-sm border border-white/10">
+                <div className="text-xs text-white/60 mb-1 text-center">Orientation</div>
+                <div className="relative w-16 h-16">
+                  <svg viewBox="-50 -50 100 100" className="w-full h-full">
+                    {/* X-axis - Red */}
+                    <line x1="0" y1="0" x2="40" y2="0" stroke="#ef4444" strokeWidth="2" />
+                    <text x="45" y="5" fill="#ef4444" fontSize="12" fontWeight="bold">
+                      X
+                    </text>
+
+                    {/* Y-axis - Green */}
+                    <line x1="0" y1="0" x2="0" y2="-40" stroke="#22c55e" strokeWidth="2" />
+                    <text x="5" y="-42" fill="#22c55e" fontSize="12" fontWeight="bold">
+                      Y
+                    </text>
+
+                    {/* Z-axis - Blue */}
+                    <line x1="0" y1="0" x2="-28" y2="28" stroke="#3b82f6" strokeWidth="2" />
+                    <text x="-35" y="35" fill="#3b82f6" fontSize="12" fontWeight="bold">
+                      Z
+                    </text>
+
+                    {/* Origin */}
+                    <circle cx="0" cy="0" r="3" fill="white" />
+                  </svg>
+                </div>
               </div>
-            </div>
-          </Html>
-        </Canvas>
+            </Html>
+          </Canvas>
         </Suspense>
 
         {/* 3D Controls Overlay */}

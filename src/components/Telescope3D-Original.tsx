@@ -311,7 +311,9 @@ export function Telescope3D({ onComponentClick, selectedComponent, components }:
       const raycaster = new THREE.Raycaster()
       raycaster.setFromCamera(new THREE.Vector2(x, y), camera)
 
-      const validMeshes = markers.map(m => m.mesh).filter((mesh): mesh is THREE.Mesh => mesh !== undefined)
+      const validMeshes = markers
+        .map(m => m.mesh)
+        .filter((mesh): mesh is THREE.Mesh => mesh !== undefined)
       const intersects = raycaster.intersectObjects(validMeshes)
 
       if (intersects.length > 0) {

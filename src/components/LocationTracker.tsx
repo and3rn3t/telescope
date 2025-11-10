@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Globe, Rocket, Timer } from '@phosphor-icons/react'
@@ -9,7 +9,7 @@ export function LocationTracker() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number | undefined>(undefined)
 
-  const launchDate = new Date('2021-12-25T12:20:00Z')
+  const launchDate = useMemo(() => new Date('2021-12-25T12:20:00Z'), [])
   const l2Distance = 1500000
   const orbitPeriod = 180
 
@@ -17,7 +17,7 @@ export function LocationTracker() {
     const now = new Date()
     const daysSinceLaunch = (now.getTime() - launchDate.getTime()) / (1000 * 60 * 60 * 24)
     setElapsedTime(daysSinceLaunch)
-  }, [])
+  }, [launchDate])
 
   useEffect(() => {
     const canvas = canvasRef.current

@@ -499,7 +499,8 @@ function getSampleJWSTImages(): JWSTImage[] {
       description:
         "This slice of the vast universe covers a patch of sky approximately the size of a grain of sand held at arm's length by someone on the ground.",
       imageUrl: 'https://images-assets.nasa.gov/image/NHQ202207120016/NHQ202207120016~orig.jpg',
-      thumbnailUrl: 'https://images-assets.nasa.gov/image/NHQ202207120016/NHQ202207120016~medium.jpg',
+      thumbnailUrl:
+        'https://images-assets.nasa.gov/image/NHQ202207120016/NHQ202207120016~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 13100000000,
       lookbackTime: '13.1 billion years',
@@ -526,8 +527,10 @@ function getSampleJWSTImages(): JWSTImage[] {
       title: 'Southern Ring Nebula (NGC 3132)',
       description:
         'The bright star at the center of NGC 3132, while prominent when viewed by Webb, plays a supporting role in sculpting the surrounding nebula.',
-      imageUrl: 'https://images-assets.nasa.gov/image/southern_ring_nebula/southern_ring_nebula~orig.jpg',
-      thumbnailUrl: 'https://images-assets.nasa.gov/image/southern_ring_nebula/southern_ring_nebula~medium.jpg',
+      imageUrl:
+        'https://images-assets.nasa.gov/image/southern_ring_nebula/southern_ring_nebula~orig.jpg',
+      thumbnailUrl:
+        'https://images-assets.nasa.gov/image/southern_ring_nebula/southern_ring_nebula~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 2000,
       lookbackTime: '2,000 years',
@@ -541,7 +544,8 @@ function getSampleJWSTImages(): JWSTImage[] {
       description:
         'A visual grouping of five galaxies, four of which are truly close together and locked in a cosmic dance.',
       imageUrl: 'https://images-assets.nasa.gov/image/NHQ202207120017/NHQ202207120017~orig.jpg',
-      thumbnailUrl: 'https://images-assets.nasa.gov/image/NHQ202207120017/NHQ202207120017~medium.jpg',
+      thumbnailUrl:
+        'https://images-assets.nasa.gov/image/NHQ202207120017/NHQ202207120017~medium.jpg',
       dateCreated: '2022-07-12T00:00:00Z',
       distance: 290000000,
       lookbackTime: '290 million years',
@@ -907,7 +911,7 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
   // Estimate total observations (API gives us a sample, multiply by approximation factor)
   // Real JWST has done ~20,000+ observations, we typically get 30-50 from API
   const estimatedTotalObservations = Math.max(totalObservations * 400, 19465)
-  
+
   // Calculate average observations per day
   const averageObservationsPerDay = missionDays > 0 ? estimatedTotalObservations / missionDays : 0
 
@@ -925,7 +929,7 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
 
   // Calculate instrument percentages and create detailed stats
   const totalInstrumentObservations = Object.values(instrumentCounts).reduce((a, b) => a + b, 0)
-  
+
   const instruments = [
     {
       name: 'NIRCam',
@@ -933,7 +937,9 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
         (instrumentCounts.NIRCam / totalInstrumentObservations) * estimatedTotalObservations
       ),
       dataVolume: `${Math.round((instrumentCounts.NIRCam / totalInstrumentObservations) * estimatedDataVolume)} TB`,
-      hoursActive: Math.round(missionDays * 12 * (instrumentCounts.NIRCam / totalInstrumentObservations)),
+      hoursActive: Math.round(
+        missionDays * 12 * (instrumentCounts.NIRCam / totalInstrumentObservations)
+      ),
       specialty: 'Near-Infrared Camera',
       percentage: Math.round((instrumentCounts.NIRCam / totalInstrumentObservations) * 100),
     },
@@ -943,7 +949,9 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
         (instrumentCounts.NIRSpec / totalInstrumentObservations) * estimatedTotalObservations
       ),
       dataVolume: `${Math.round((instrumentCounts.NIRSpec / totalInstrumentObservations) * estimatedDataVolume)} TB`,
-      hoursActive: Math.round(missionDays * 12 * (instrumentCounts.NIRSpec / totalInstrumentObservations)),
+      hoursActive: Math.round(
+        missionDays * 12 * (instrumentCounts.NIRSpec / totalInstrumentObservations)
+      ),
       specialty: 'Near-Infrared Spectrograph',
       percentage: Math.round((instrumentCounts.NIRSpec / totalInstrumentObservations) * 100),
     },
@@ -953,7 +961,9 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
         (instrumentCounts.MIRI / totalInstrumentObservations) * estimatedTotalObservations
       ),
       dataVolume: `${Math.round((instrumentCounts.MIRI / totalInstrumentObservations) * estimatedDataVolume)} TB`,
-      hoursActive: Math.round(missionDays * 12 * (instrumentCounts.MIRI / totalInstrumentObservations)),
+      hoursActive: Math.round(
+        missionDays * 12 * (instrumentCounts.MIRI / totalInstrumentObservations)
+      ),
       specialty: 'Mid-Infrared Instrument',
       percentage: Math.round((instrumentCounts.MIRI / totalInstrumentObservations) * 100),
     },
@@ -963,7 +973,9 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
         (instrumentCounts.NIRISS / totalInstrumentObservations) * estimatedTotalObservations
       ),
       dataVolume: `${Math.round((instrumentCounts.NIRISS / totalInstrumentObservations) * estimatedDataVolume)} TB`,
-      hoursActive: Math.round(missionDays * 12 * (instrumentCounts.NIRISS / totalInstrumentObservations)),
+      hoursActive: Math.round(
+        missionDays * 12 * (instrumentCounts.NIRISS / totalInstrumentObservations)
+      ),
       specialty: 'Near-Infrared Imager',
       percentage: Math.round((instrumentCounts.NIRISS / totalInstrumentObservations) * 100),
     },
@@ -971,7 +983,7 @@ export function calculateMetricsFromImages(images: JWSTImage[]): DerivedMetrics 
 
   // Calculate science category distribution based on object types
   const totalObjectTypes = Object.values(objectTypeCounts).reduce((a, b) => a + b, 0)
-  
+
   const scienceCategories = [
     {
       category: 'Galaxies & Early Universe',

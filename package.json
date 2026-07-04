@@ -1,5 +1,6 @@
 {
   "name": "spark-template",
+  "description": "A general overview of the JWST for fun.",
   "private": true,
   "version": "0.0.0",
   "type": "module",

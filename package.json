@@ -1,5 +1,8 @@
 {
   "name": "spark-template",
+  "engines": { "node": ">=24.13.0" },
+  "repository": { "type": "git", "url": "https://github.com/and3rn3t/telescope.git" },
+  "license": "MIT",
   "description": "A general overview of the JWST for fun.",
   "private": true,
   "version": "0.0.0",

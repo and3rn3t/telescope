@@ -11,6 +11,6 @@ permissions:
 
 jobs:
   quality:
-    uses: and3rn3t/.github/.github/workflows/reusable-node-verify.yml@main
+    uses: and3rn3t/.github/.github/workflows/reusable-node-verify.yml@v1
     with:
       command: npm run check-all && npm run build

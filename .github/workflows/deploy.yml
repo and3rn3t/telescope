@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   deploy:
-    uses: and3rn3t/.github/.github/workflows/reusable-cloudflare-pages-deploy.yml@v1
+    uses: and3rn3t/.github/.github/workflows/reusable-cloudflare-pages-deploy.yml@bac71674cf57c550774f71a70e32a5bb7bec48ad # v1
     with:
       project-name: jwst-deep-sky-explorer
       build-command: build:production
@@ -31,7 +31,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Create deployment comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const { owner, repo, number } = context.issue;

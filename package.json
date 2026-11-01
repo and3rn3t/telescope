@@ -86,7 +86,7 @@
     "tw-animate-css": "^1.2.4",
     "uuid": "^11.1.0",
     "vaul": "^1.1.2",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
@@ -107,7 +107,7 @@
     "typescript": "~5.9.0",
     "typescript-eslint": "^8.38.0",
     "vite": "^6.3.5",
-    "wrangler": "^4.45.4"
+    "wrangler": "^4.156.0"
   },
   "workspaces": {
     "packages": [
